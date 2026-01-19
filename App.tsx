@@ -7,11 +7,12 @@
 	import PlayerBoard from './components/PlayerBoard';
 	import ConfirmationModal from './components/ConfirmationModal';
 	import ControlPanel from './components/ControlPanel';
-	import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
+import VolumeBar from './components/VolumeBar';
+import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
 
-	const App: React.FC = () => {
-	  const [gameState, setGameState] = useState<GameState>({
-	    players: [{ id: 0, name: '', score: 0, stars: 0 }],
+const App: React.FC = () => {
+  const [gameState, setGameState] = useState<GameState>({
+    players: [{ id: 0, name: '', score: 0, stars: 0 }],
 	    currentPlayerIndex: 0,
 	    currentRound: 0,
 	    isMusicEnabled: true,
@@ -34,6 +35,7 @@
 	  } | null>(null);
 	  const [showScoreboard, setShowScoreboard] = useState(false);
 	  const [showVictory, setShowVictory] = useState(false);
+	  const [volume, setVolume] = useState(0.7);
 
 	  const songRef = useRef<HTMLAudioElement | null>(null);
 	  const bgmRef = useRef<HTMLAudioElement | null>(null);
@@ -77,8 +79,22 @@
 	    }
 	    const audio = new Audio(url);
 	    sfxRef.current = audio;
+	    audio.volume = volume;
 	    audio.play().catch(e => console.log("SFX block", e));
 	  }, [gameState.isMusicEnabled]);
+
+	  const handleVolumeChange = useCallback((newVolume: number) => {
+	    setVolume(newVolume);
+	    if (songRef.current) {
+	      songRef.current.volume = newVolume;
+	    }
+	    if (bgmRef.current) {
+	      bgmRef.current.volume = newVolume;
+	    }
+	    if (sfxRef.current) {
+	      sfxRef.current.volume = newVolume;
+	    }
+	  }, []);
 
 	  const stopBGM = useCallback(() => {
 	    if (bgmRef.current) {
@@ -142,6 +158,7 @@
 	      const audio = new Audio(audioSrc);
 	      bgmRef.current = audio;
 	      audio.loop = loop;
+	      audio.volume = volume;
 	      audio.play().catch(e => console.log("BGM block", e));
 	    }
 	  }, [gameState.isMusicEnabled, stopBGM]);
@@ -535,9 +552,11 @@
 
 	      if (!songRef.current) {
 		songRef.current = new Audio(audioUrlToPlay);
+		songRef.current.volume = volume;
 	      } else if (songRef.current.src !== audioUrlToPlay) {
 		songRef.current.pause();
 		songRef.current = new Audio(audioUrlToPlay);
+		songRef.current.volume = volume;
 	      }
 
 	      songRef.current.onloadedmetadata = () => {
@@ -1962,7 +1981,7 @@ useEffect(() => {
 };
 	  return (
 	    <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
-	      <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 6 && gameState.activeRoundId !== 5} />
+	      <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 6 && gameState.activeRoundId !== 5} />
 	      {currentPage === 'setup' && <SetupView />}
 	      {currentPage === 'start' && <StartView />}
 	      {currentPage === 'round' && <RoundView />}

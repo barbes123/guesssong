@@ -13,6 +13,8 @@ interface SettingsOverlayProps {
   onGoHome: () => void;
   onGoStart: () => void;
   onReset: () => void;
+  volume?: number;
+  onVolumeChange?: (volume: number) => void;
   t: any;
   isLocked?: boolean;
 }
@@ -27,12 +29,39 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   onGoHome,
   onGoStart,
   onReset,
+  volume = 0.7,
+  onVolumeChange = () => {},
   t,
   isLocked = false
 }) => {
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    onVolumeChange(newVolume);
+  };
+
   return (
     <div className="fixed top-6 right-6 flex items-center gap-3 z-50">
       <div className="bg-slate-800/95 backdrop-blur-xl rounded-full shadow-2xl border border-slate-700/50 p-2 flex items-center gap-2">
+        {/* Volume Control */}
+        <div className="flex items-center gap-2 px-2">
+          <VolumeX size={18} className="text-slate-500" />
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={handleVolumeChange}
+            className="w-20 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+            style={{
+              background: `linear-gradient(to right, rgb(99, 102, 241) 0%, rgb(99, 102, 241) ${volume * 100}%, rgb(55, 65, 81) ${volume * 100}%, rgb(55, 65, 81) 100%)`
+            }}
+          />
+          <span className="text-xs font-bold text-slate-400 w-6 text-right">
+            {Math.round(volume * 100)}%
+          </span>
+        </div>
+        <div className="w-px h-8 bg-slate-700 mx-1" />
         <button
           onClick={onGoHome}
           disabled={isLocked}
