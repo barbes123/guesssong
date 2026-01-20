@@ -1245,8 +1245,34 @@ const handleAudioControl = (action: 'start' | 'stop') => {
       const roundData = getRoundData(roundId, selectedSetId) || []; 
       if (!roundData || roundData.length === 0) return null;
       const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-      const pId = currentPlayer.id; const playerProg = progress.r4PlayerProgress?.[pId]; const usedRowsSet = progress.usedRows || new Set();
+      const pId = currentPlayer.id;
+      let playerProg = progress.r4PlayerProgress?.[pId];
+      
+      // If playerProg doesn't exist, initialize it
+      if (!playerProg && progress.r4PlayerProgress) {
+        playerProg = {
+          correctIndices: new Set(),
+          wrongIndex: null,
+          hasFinished: false,
+          timeSpent: 0
+        };
+        setGameState(prev => ({
+          ...prev,
+          roundProgress: {
+            ...prev.roundProgress,
+            [4]: {
+              ...prev.roundProgress[4],
+              r4PlayerProgress: {
+                ...prev.roundProgress[4].r4PlayerProgress,
+                [pId]: playerProg
+              }
+            }
+          }
+        }));
+      }
+      
       if (!playerProg) return null;
+      const usedRowsSet = progress.usedRows || new Set();
       return (
         <div className="min-h-screen bg-slate-950 p-8 pt-24">
           <div className="max-w-[1600px] mx-auto flex gap-12">
