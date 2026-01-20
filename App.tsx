@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { translations } from './translations';
-import { Player, GameState, Page, Language, PlayerR5Progress } from './types';
+import { Player, GameState, Page, Language } from './types';
 import { ROUND_DATA, SCREEN_BGM, SFX, INITIAL_POINTS, shuffle, getRoundData, getAvailableSets } from './data/index_data';
 import SettingsOverlay from './components/SettingsOverlay';
 import PlayerBoard from './components/PlayerBoard';
@@ -303,22 +303,16 @@ const App: React.FC = () => {
   };
 
   // UPDATED initializeRound function
-  const initializeRound = (roundId: number) => {
-    // Map new round IDs to old round IDs for data fetching
-    let oldRoundId = roundId;
-    if (roundId === 2) oldRoundId = 4;      // New Round 2 = Old Round 4
-    if (roundId === 3) oldRoundId = 6;      // New Round 3 = Old Round 6 (final)
-    if (roundId === 4) oldRoundId = 5;      // New Round 4 = Old Round 5 (sprint)
-    
-    // Skip initialization if already initialized (except for rounds 3 & 4 which need special handling)
-    if (gameState.roundProgress[roundId] && roundId !== 3 && roundId !== 4) return;
-    
-    const pointMap: { [categoryId: string]: number[] } = {};
-    const persistentPoints: { [noteId: string]: number } = {};
-    
-    // Get the selected variant for this round, fallback to 'default'
-    const selectedSetId = gameState.roundSets[roundId] || 'default';
-    const roundData = getRoundData(oldRoundId, selectedSetId) || [];
+const initializeRound = (roundId: number) => {
+  // Skip initialization if already initialized (except for rounds 3 & 4 which need special handling)
+  if (gameState.roundProgress[roundId] && roundId !== 3 && roundId !== 4) return;
+  
+  const pointMap: { [categoryId: string]: number[] } = {};
+  const persistentPoints: { [noteId: string]: number } = {};
+  
+  // Get the selected variant for this round, fallback to 'default'
+  const selectedSetId = gameState.roundSets[roundId] || 'default';
+  const roundData = getRoundData(roundId, selectedSetId) || [];
     
     // NEW ROUND 3 (Final - was old round 6)
     if (roundId === 3) {
@@ -353,7 +347,7 @@ const App: React.FC = () => {
 
     // NEW ROUND 4 (Sprint - was old round 5)
     if (roundId === 4) {
-      const initialR4Progress: { [playerId: number]: PlayerR5Progress } = {};
+      const initialR4Progress: { [playerId: number]: { correctIndices: Set<number>; wrongIndex: number | null; hasFinished: boolean; timeSpent: number } } = {};
       gameState.players.forEach(p => {
         initialR4Progress[p.id] = {
           correctIndices: new Set(),
@@ -533,18 +527,16 @@ const App: React.FC = () => {
   };
 
   // UPDATED handleAudioControl function
-  const handleAudioControl = (action: 'start' | 'stop') => {
+const handleAudioControl = (action: 'start' | 'stop') => {
     if (!activeNote) return;
     const roundId = gameState.activeRoundId!;
     const progress = gameState.roundProgress[roundId];
     const selectedSetId = gameState.roundSets[roundId] || 'default';
+
+    let dataRoundId = roundId;
+    if (roundId === 3) dataRoundId = 6; // New Round 3 uses old Round 6 data
     
-    let oldRoundId = roundId;
-    if (roundId === 2) oldRoundId = 4;
-    if (roundId === 3) oldRoundId = 6;
-    if (roundId === 4) oldRoundId = 5;
-    
-    const roundData = getRoundData(oldRoundId, selectedSetId) || [];
+    const roundData = getRoundData(roundId, selectedSetId) || [];
     const isMelodyRound = roundId === 2;
     const isFinalRound = roundId === 3;
     const isSprintRound = roundId === 4;
@@ -965,8 +957,9 @@ const App: React.FC = () => {
     const roundId = gameState.activeRoundId!;
     const progress = gameState.roundProgress[roundId];
     
-    let oldRoundId = roundId;
-    if (roundId === 2) oldRoundId = 4;
+    // let oldRoundId = roundId;
+    // if (roundId === 2) oldRoundId = 4;
+    const oldRoundId = roundId; // No mapping
     
     const selectedSetId = gameState.roundSets[roundId] || 'default';
     const roundData = getRoundData(oldRoundId, selectedSetId) || [];
@@ -1248,9 +1241,9 @@ const App: React.FC = () => {
     const isFinalRound = roundId === 3;
 
     if (isSprintRound) {
-      let oldRoundId = 5; // Old round 5 data
       const selectedSetId = gameState.roundSets[roundId] || 'default';
-      const roundData = getRoundData(oldRoundId, selectedSetId) || []; if (!roundData || roundData.length === 0) return null;
+      const roundData = getRoundData(roundId, selectedSetId) || []; 
+      if (!roundData || roundData.length === 0) return null;
       const currentPlayer = gameState.players[gameState.currentPlayerIndex];
       const pId = currentPlayer.id; const playerProg = progress.r4PlayerProgress?.[pId]; const usedRowsSet = progress.usedRows || new Set();
       if (!playerProg) return null;
@@ -1424,10 +1417,9 @@ const App: React.FC = () => {
       );
     }
 
-    if (isFinalRound) {
-      let oldRoundId = 6; // Old round 6 data
+   if (isFinalRound) {
       const selectedSetId = gameState.roundSets[roundId] || 'default';
-      const roundData = getRoundData(oldRoundId, selectedSetId) || [];
+      const roundData = getRoundData(roundId, selectedSetId) || [];
       const turnIdx = progress.currentTurnIndex || 0; const song = roundData[0]?.songs[turnIdx]; const isSongUsed = progress.usedNotes?.has(`r3_final-${turnIdx}`); const currentPlayer = gameState.players[gameState.currentPlayerIndex];
       return (
         <div className="min-h-screen bg-slate-950 p-8 pt-24">
@@ -1747,11 +1739,14 @@ const App: React.FC = () => {
         <button onClick={() => { initializeRound(1); navigateTo('round', 1); }} className="mb-12 py-8 px-20 bg-indigo-600 text-white rounded-[2.5rem] font-black text-3xl shadow-xl flex items-center gap-6 mx-auto"><PlayCircle size={48} /> {t.startOrder}</button>
         <div className="grid grid-cols-2 md:grid-cols-2 gap-8"> {/* Changed to 2 columns for 4 rounds */}
           {[1, 2, 3, 4].map((num) => { // Only 4 rounds now
-            const availableSets = getAvailableSets(num === 2 ? 4 : num === 3 ? 6 : num === 4 ? 5 : num); // Map to old round IDs
+            //const availableSets = getAvailableSets(num === 2 ? 4 : num === 3 ? 6 : num === 4 ? 5 : num); // Map to old round IDs
+            const availableSets = getAvailableSets(num);
             const selectedSetId = gameState.roundSets[num] || 'default';
             const selectedSet = availableSets.find(s => s.id === selectedSetId);
-            const hasMultipleSets = [1, 2].includes(num) && availableSets.length > 1; // Only rounds 1 & 2 have multiple sets
-            
+            //const hasMultipleSets = [1, 2].includes(num) && availableSets.length > 1; // Only rounds 1 & 2 have multiple sets
+            // const hasMultipleSets = [1, 2, 3, 4].includes(num);
+            const hasMultipleSets = [1, 2].includes(num) && availableSets.length > 1;
+
             return (
               <div key={num} className="flex flex-col gap-3">
                 <button 
@@ -1773,12 +1768,12 @@ const App: React.FC = () => {
                     className="w-full px-6 py-3 bg-indigo-600/30 border-2 border-indigo-500 text-indigo-200 rounded-[1.5rem] hover:bg-indigo-600/50 hover:border-indigo-400 transition-all font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow-lg"
                     title="Select dataset for this round"
                   >
-                    <span>📁 {selectedSet?.name[gameState.language] || 'Default'}</span>
+                    <span> {selectedSet?.name[gameState.language] || 'Default'}</span>
                     <ChevronRight size={16} />
                   </button>
                 ) : (
                   <div className="w-full px-6 py-3 bg-slate-800/50 border-2 border-slate-700 text-slate-400 rounded-[1.5rem] font-bold text-sm uppercase tracking-wide text-center">
-                    📁 {selectedSet?.name[gameState.language] || 'Default'}
+                    {selectedSet?.name[gameState.language] || 'Default'}
                   </div>
                 )}
               </div>
@@ -1991,12 +1986,7 @@ const App: React.FC = () => {
       {roundSetSelectionModal !== null && (
         <RoundSetSelector
           roundId={roundSetSelectionModal}
-          availableSets={getAvailableSets(
-            roundSetSelectionModal === 2 ? 4 : 
-            roundSetSelectionModal === 3 ? 6 : 
-            roundSetSelectionModal === 4 ? 5 : 
-            roundSetSelectionModal
-          )}
+          availableSets={getAvailableSets(roundSetSelectionModal)}
           selectedSetId={gameState.roundSets[roundSetSelectionModal] || 'default'}
           onSelect={(setId) => {
             if (setId) {

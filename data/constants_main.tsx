@@ -737,5 +737,5 @@ export const shuffle = <T,>(array: T[]): T[] => {
 };
 
 // At the end of your constants_main.ts file, add:
-export { getRoundData, getRoundSet, getAvailableSets, roundsConfig } from './rounds/index_rounds';
+export { getRoundData, getRoundSet, getAvailableSets, roundsConfig } from './index_rounds';
 
