@@ -24,11 +24,11 @@ export const roundsConfig: Record<number, RoundConfig> = {
     defaultSet: 'default',
     availableSets: {}  // Or import round3Sets if you have it
   },
-  4: {  // ADD ROUND 4 (sprint)
-    roundNumber: 4,
-    defaultSet: 'default',
-    availableSets: {}  // Or import round4Sets if you have it
-  }
+//  4: {  // ADD ROUND 4 (sprint)
+//    roundNumber: 4,
+//    defaultSet: 'default',
+//    availableSets: {}  // Or import round4Sets if you have it
+//  }
 };
 
 // Helper functions
