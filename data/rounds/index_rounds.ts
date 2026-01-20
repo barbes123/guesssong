@@ -10,16 +10,5 @@ export { round1Sets } from "../round1_index";
 // Export config and helpers
 export { roundsConfig, getRoundData, getRoundSet, getAvailableSets } from '../config/roundsConfig';
 
-// Legacy ROUND_DATA for backward compatibility
-import { roundsConfig } from '../config/roundsConfig';
-
-export const ROUND_DATA: Record<number, any> = {};
-
-// Initialize ROUND_DATA from config (uses default sets)
-Object.entries(roundsConfig).forEach(([roundId, config]) => {
-  const setId = config.defaultSet;	
-  const set = config.availableSets[setId];
-  if (set) {
-    ROUND_DATA[parseInt(roundId)] = set.data;
-  }
-});
+// Legacy ROUND_DATA for backward compatibility - imported from constants_main
+export { ROUND_DATA } from '../constants_main';

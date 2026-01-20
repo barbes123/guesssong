@@ -1,5 +1,6 @@
 import { RoundConfig } from '../../types';
-import { round1Sets } from '../round1_index';	
+import { round1Sets } from '../round1_index';
+import { ROUND_DATA } from '../constants_main';	
 // We'll import other rounds later
 // import { round2Sets } from '../round2_index';
 // import { round3Sets } from '../round3_index';
@@ -25,12 +26,16 @@ export const roundsConfig: Record<number, RoundConfig> = {
 // Helper functions
 export const getRoundData = (roundId: number, setId?: string) => {
   const config = roundsConfig[roundId];
-  if (!config) return null;
   
-  const setKey = setId || config.defaultSet;
-  const set = config.availableSets[setKey];
+  // If round has modular config, use that
+  if (config) {
+    const setKey = setId || config.defaultSet;
+    const set = config.availableSets[setKey];
+    return set?.data || null;
+  }
   
-  return set?.data || null;
+  // Otherwise fall back to original ROUND_DATA for rounds 2-6
+  return ROUND_DATA[roundId] || null;
 };
 
 export const getRoundSet = (roundId: number, setId?: string) => {
