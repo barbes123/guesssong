@@ -1771,7 +1771,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
             const selectedSet = availableSets.find(s => s.id === selectedSetId);
             //const hasMultipleSets = [1, 2].includes(num) && availableSets.length > 1; // Only rounds 1 & 2 have multiple sets
             // const hasMultipleSets = [1, 2, 3, 4].includes(num);
-            const hasMultipleSets = [1, 2].includes(num) && availableSets.length > 1;
+            const hasMultipleSets = [1, 2, 4].includes(num) && availableSets.length > 1;
 
             return (
               <div key={num} className="flex flex-col gap-3">
