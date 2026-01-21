@@ -79,4 +79,4 @@ export interface GameState {
   roundSets: Record<number, string>; // roundId -> setId
 }
 
-export type Page = 'setup' | 'start' | 'round' | 'r6_select';
+export type Page = 'setup' | 'start' | 'round' | 'r3_select';

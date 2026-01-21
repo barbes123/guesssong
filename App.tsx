@@ -889,7 +889,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
     if (roundId === 3) {
       const nextIdx = (progress.currentTurnIndex || 0) + 1;
       
-      if (nextIdx >= 10) { 
+      if (nextIdx >= 5) { 
         setShowVictory(true);
         return; 
       }
@@ -1452,7 +1452,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
           <div className="max-w-[1600px] mx-auto flex gap-12">
             <div className="flex-1 flex flex-col gap-12">
               <div className="bg-slate-900/80 backdrop-blur-xl rounded-[5rem] p-16 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 left-0 w-full h-4 bg-indigo-600/10"><div className="bg-indigo-600 h-full transition-all duration-1000" style={{ width: `${((turnIdx+1)/10)*100}%` }} /></div>
+                <div className="absolute top-0 left-0 w-full h-4 bg-indigo-600/10"><div className="bg-indigo-600 h-full transition-all duration-1000" style={{ width: `${((turnIdx+1)/5)*100}%` }} /></div>
                 <div className="flex items-center justify-between mb-10">
                   <div className="flex items-center gap-6">
                     <div className="bg-indigo-600 text-white w-20 h-20 rounded-2xl flex items-center justify-center text-5xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">3</div>
@@ -1547,7 +1547,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
             <div className="w-[450px] flex flex-col gap-10 relative">
               <div className="bg-slate-800 rounded-[3rem] p-12 border-2 border-slate-700 shadow-2xl flex flex-col items-center gap-4">
                 <span className="text-lg font-black text-indigo-400 uppercase tracking-[0.2em] mb-2">
-                  {t.turn || "TURN"} {turnIdx + 1} / 10
+                  {t.turn || "TURN"} {turnIdx + 1} / 5
                 </span>
 
                 <div className="grid grid-cols-2 gap-8 w-full">
@@ -1771,7 +1771,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
             const selectedSet = availableSets.find(s => s.id === selectedSetId);
             //const hasMultipleSets = [1, 2].includes(num) && availableSets.length > 1; // Only rounds 1 & 2 have multiple sets
             // const hasMultipleSets = [1, 2, 3, 4].includes(num);
-            const hasMultipleSets = [1, 2, 4].includes(num) && availableSets.length > 1;
+            const hasMultipleSets = [1, 2, 3, 4].includes(num) && availableSets.length > 1;
 
             return (
               <div key={num} className="flex flex-col gap-3">
@@ -1784,7 +1784,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                     {num === 3 ? t.categories.superGame : `${t.round} ${num}`}
                   </div>
                   <div className="text-base font-black text-slate-500 uppercase mt-3">
-                    {num === 4 ? 'SPRINT' : num === 3 ? 'FINAL' : num === 2 ? 'MELODY GUESS' : 'SONG CHALLENGE'}
+                    {num === 4 ? 'SPRINT' : num === 3 ? 'DUEL' : num === 2 ? 'MELODY GUESS' : 'SONG CHALLENGE'}
                   </div>
                 </button>
                 
