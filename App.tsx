@@ -833,12 +833,40 @@ const handleAudioControl = (action: 'start' | 'stop') => {
             playSFX(SFX.correct);
           }
 
-          const newPlayers = prev.players.map(p => 
-            p.id === targetPlayerIdToReward ? { ...p, stars: (p.stars || 0) + 1 } : p
-          );
-          
-          return { ...prev, players: newPlayers, currentPlayerIndex: nextPlayerIdx };
+          // Cap duel stars at 3
+          const newPlayers = prev.players.map(p => {
+            if (p.id !== targetPlayerIdToReward) return p;
+            const nextStars = Math.min(3, (p.stars || 0) + 1);
+            return { ...p, stars: nextStars };
+          });
+
+          const winner = newPlayers.find(p => p.id === targetPlayerIdToReward);
+          const hasWinner = (winner?.stars || 0) >= 3;
+
+          // If someone hit 3 stars, end the round and lock duel to the winner only
+          const newRoundProgress = hasWinner
+            ? {
+                ...prev.roundProgress,
+                [3]: { ...prev.roundProgress[3], activePlayerIds: [targetPlayerIdToReward] }
+              }
+            : prev.roundProgress;
+
+          // Keep the active turn player consistent with existing behavior, but don't swap UI sides (handled in render)
+          return {
+            ...prev,
+            players: newPlayers,
+            currentPlayerIndex: nextPlayerIdx,
+            roundProgress: newRoundProgress
+          };
         });
+        // If winner reached 3 stars, show results immediately
+        if ((status === 'correct' ? currentPlayer : opponent)?.id !== undefined) {
+          const winnerId = status === 'correct' ? currentPlayerId : opponentId;
+          const winnerNow = gameState.players.find(p => p.id === winnerId);
+          if (winnerNow && (winnerNow.stars || 0) + 1 >= 3) {
+            setShowVictory(true);
+          }
+        }
         setIsR3Finalized(true);
         setSelectedDuration(null);
         setModal(null);
@@ -1446,7 +1474,16 @@ const handleAudioControl = (action: 'start' | 'stop') => {
    if (isFinalRound) {
       const selectedSetId = gameState.roundSets[roundId] || 'default';
       const roundData = getRoundData(roundId, selectedSetId) || [];
-      const turnIdx = progress.currentTurnIndex || 0; const song = roundData[0]?.songs[turnIdx]; const isSongUsed = progress.usedNotes?.has(`r3_final-${turnIdx}`); const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+      const turnIdx = progress.currentTurnIndex || 0;
+      const song = roundData[0]?.songs[turnIdx];
+      const isSongUsed = progress.usedNotes?.has(`r3_final-${turnIdx}`);
+
+      // Keep player panels fixed (left/right) regardless of whose turn it is.
+      const duelIds = progress.activePlayerIds || [];
+      const leftId = duelIds[0];
+      const rightId = duelIds[1];
+      const leftPlayer = gameState.players.find(p => p.id === leftId) || gameState.players[0];
+      const rightPlayer = rightId !== undefined ? (gameState.players.find(p => p.id === rightId) || null) : null;
       return (
         <div className="min-h-screen bg-slate-950 p-8 pt-24">
           <div className="max-w-[1600px] mx-auto flex gap-12">
@@ -1554,18 +1591,18 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                   <div className="flex flex-col items-center">
                     <div className="text-2xl font-black text-indigo-300 mb-3 text-center break-words whitespace-normal w-full px-2 min-h-[4rem] flex items-center justify-center">
                       <div className="leading-tight">
-                        {currentPlayer.name || `Player ${gameState.currentPlayerIndex + 1}`}
+                        {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
                       </div>
                     </div>
                     <div className="bg-indigo-900/40 px-6 py-4 rounded-3xl border-2 border-indigo-500/30 shadow-inner flex flex-col items-center">
                       <div className="flex flex-wrap justify-center gap-2">
                         {(() => {
-                          const stars = currentPlayer.stars || 0;
+                          const stars = leftPlayer.stars || 0;
                           const elements = [];
-                          for (let i = 0; i < Math.min(stars, 10); i++) {
+                          for (let i = 0; i < Math.min(stars, 3); i++) {
                             elements.push(<Star key={i} size={28} className="text-yellow-400 fill-yellow-400" />);
                           }
-                          for (let i = stars; i < 10; i++) {
+                          for (let i = Math.min(stars, 3); i < 3; i++) {
                             elements.push(<Star key={`empty-${i}`} size={28} className="text-indigo-900/40 fill-indigo-900/40" />);
                           }
                           return elements;
@@ -1577,29 +1614,19 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                   <div className="flex flex-col items-center">
                     <div className="text-2xl font-black text-rose-300 mb-3 text-center break-words whitespace-normal w-full px-2 min-h-[4rem] flex items-center justify-center">
                       <div className="leading-tight">
-                        {(() => {
-                          const activePlayers = progress.activePlayerIds || [];
-                          const currentPlayerId = currentPlayer.id;
-                          const opponentId = activePlayers.find(id => id !== currentPlayerId);
-                          const opponent = gameState.players.find(p => p.id === opponentId);
-                          return opponent?.name || `Player ${opponentId !== undefined ? opponentId + 1 : '?'}`;
-                        })()}
+                        {rightPlayer ? (rightPlayer.name || `Player ${rightPlayer.id + 1}`) : '--'}
                       </div>
                     </div>
                     <div className="bg-rose-900/40 px-6 py-4 rounded-3xl border-2 border-rose-500/30 shadow-inner flex flex-col items-center">
                       <div className="flex flex-wrap justify-center gap-2">
                         {(() => {
-                          const activePlayers = progress.activePlayerIds || [];
-                          const currentPlayerId = currentPlayer.id;
-                          const opponentId = activePlayers.find(id => id !== currentPlayerId);
-                          const opponent = gameState.players.find(p => p.id === opponentId);
-                          const opponentStars = opponent?.stars || 0;
+                          const opponentStars = rightPlayer?.stars || 0;
                           
-                          const yellowStars = Array.from({ length: Math.min(opponentStars, 10) }).map((_, i) => (
+                          const yellowStars = Array.from({ length: Math.min(opponentStars, 3) }).map((_, i) => (
                             <Star key={i} size={28} className="text-yellow-400 fill-yellow-400" />
                           ));
                           
-                          const grayStars = Array.from({ length: Math.max(0, 10 - opponentStars) }).map((_, i) => (
+                          const grayStars = Array.from({ length: Math.max(0, 3 - opponentStars) }).map((_, i) => (
                             <Star key={`empty-${i}`} size={28} className="text-rose-900/40 fill-rose-900/40" />
                           ));
                           
@@ -1776,12 +1803,19 @@ const handleAudioControl = (action: 'start' | 'stop') => {
             return (
               <div key={num} className="flex flex-col gap-3">
                 <button 
-                  onClick={() => navigateTo('round', num)} 
+                  onClick={() => {
+                    if (num === 4 && gameState.players.length > 1) {
+                      stopSong();
+                      setCurrentPage('r4_select');
+                      return;
+                    }
+                    navigateTo('round', num);
+                  }} 
                   className="group w-full bg-slate-900 border-2 border-slate-800 p-10 rounded-[3rem] hover:border-indigo-500 transition-all hover:-translate-y-3 shadow-2xl"
                 >
                   <MusicIcon size={60} className="text-slate-600 mx-auto mb-6" />
                   <div className="text-5xl font-black text-white mb-2">
-                    {num === 3 ? t.categories.superGame : `${t.round} ${num}`}
+                    {`${t.round} ${num}`}
                   </div>
                   <div className="text-base font-black text-slate-500 uppercase mt-3">
                     {num === 4 ? 'SPRINT' : num === 3 ? 'DUEL' : num === 2 ? 'MELODY GUESS' : 'SONG CHALLENGE'}
@@ -1821,6 +1855,56 @@ const handleAudioControl = (action: 'start' | 'stop') => {
         <div className="mb-12"><h2 className="text-7xl font-black text-white mb-4 tracking-tighter uppercase">{t.selectTeams}</h2><p className="text-xl font-bold text-slate-400 uppercase tracking-widest">{t.selectTwo}</p></div>
         <div className="space-y-8 mb-16">{gameState.players.map(p => (<button key={p.id} onClick={() => setR3Selection(prev => prev.includes(p.id) ? prev.filter(i => i !== p.id) : prev.length < 2 ? [...prev, p.id] : prev)} className={`w-full p-10 rounded-[3rem] border-4 transition-all flex items-center justify-between ${r3Selection.includes(p.id) ? 'bg-indigo-600/20 border-indigo-500 scale-[1.03]' : 'bg-slate-800 border-slate-700 shadow-xl'}`}><div className="text-left"><div className="text-4xl font-black text-white">{p.name || `Player ${p.id+1}`}</div><div className="text-lg font-bold text-slate-500 uppercase">{p.score} {t.points}</div></div>{r3Selection.includes(p.id) && <CheckCircle size={48} className="text-indigo-500" />}</button>))}</div>
         <div className="grid grid-cols-2 gap-6"><button onClick={() => navigateTo('start')} className="py-10 rounded-[2.5rem] bg-slate-800 text-white font-black text-3xl uppercase">{t.cancel}</button><button onClick={() => { if(r3Selection.length !== 2) return; setGameState(prev => ({ ...prev, currentPlayerIndex: prev.players.findIndex(p => p.id === r3Selection[0]), roundProgress: { ...prev.roundProgress, [3]: { usedNotes: new Set(), activatedCategories: new Set(), pointMap: {}, activationCounts: {}, results: {}, activePlayerIds: r3Selection, currentTurnIndex: 0 } }, activeRoundId: 3 })); setCurrentPage('round'); setActiveNote({ categoryId: 'r3_final', noteIndex: 0 }); setSelectedDuration(null); setIsR3Finalized(false); }} className={`py-10 rounded-[2.5rem] font-black text-3xl uppercase ${r3Selection.length === 2 ? 'bg-indigo-600 text-white shadow-2xl' : 'bg-slate-900 text-slate-700 cursor-not-allowed'}`}>{t.startGame}</button></div>
+      </div>
+    </div>
+  );
+
+  const R4SelectView = () => (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8">
+      <div className="bg-slate-900/90 backdrop-blur-xl p-20 rounded-[5rem] border-2 border-slate-800 max-w-3xl w-full text-center shadow-2xl">
+        <div className="mb-12">
+          <h2 className="text-7xl font-black text-white mb-4 tracking-tighter uppercase">
+            {t.playerName}
+          </h2>
+          <p className="text-xl font-bold text-slate-400 uppercase tracking-widest">
+            {t.confirmPlayerActive}
+          </p>
+        </div>
+        <div className="space-y-8 mb-16">
+          {gameState.players.map((p, idx) => (
+            <button
+              key={p.id}
+              onClick={() => {
+                // nominate player and start Round 4 immediately
+                stopSong();
+                initializeRound(4);
+                setActiveNote(null);
+                setCurrentRoundPoints(undefined);
+                setTimeLeft(undefined);
+                setR4IsActiveSession(false);
+                setSelectedRow(null);
+                setR4CurrentSongIdx(0);
+                setShowTimerSettings(false);
+                setPlayedButNotEvaluated([]);
+                setGameState(prev => ({ ...prev, currentPlayerIndex: idx, activeRoundId: 4 }));
+                setCurrentPage('round');
+              }}
+              className="w-full p-10 rounded-[3rem] border-4 transition-all flex items-center justify-between bg-slate-800 border-slate-700 shadow-xl hover:border-indigo-500 hover:bg-slate-700"
+            >
+              <div className="text-left">
+                <div className="text-4xl font-black text-white">{p.name || `Player ${p.id + 1}`}</div>
+                <div className="text-lg font-bold text-slate-500 uppercase">{p.score} {t.points}</div>
+              </div>
+              <CheckCircle size={48} className="text-indigo-500 opacity-40" />
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => navigateTo('start')}
+          className="w-full py-10 rounded-[2.5rem] bg-slate-800 text-white font-black text-3xl uppercase"
+        >
+          {t.cancel}
+        </button>
       </div>
     </div>
   );
@@ -1997,6 +2081,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
       {currentPage === 'start' && <StartView />}
       {currentPage === 'round' && <RoundView />}
       {currentPage === 'r3_select' && <R3SelectView />} {/* Changed from r6_select */}
+      {currentPage === 'r4_select' && <R4SelectView />}
       {modal && modal.position === 'center' && <ConfirmationModal isOpen={modal.isOpen} title={modal.title} message={modal.message} onConfirm={modal.onConfirm} onCancel={() => setModal(null)} confirmLabel={modal.confirmLabel} cancelLabel={modal.cancelLabel} position={modal.position} />}
       {showTimerSettings && <TimerSettings />}
       {showScoreboard && (
