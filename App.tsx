@@ -1315,7 +1315,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                 {r4IsActiveSession && (
                   <div className="mb-10 flex items-center justify-center gap-6"><div className="bg-slate-800/50 px-10 py-6 rounded-3xl border-2 border-slate-700"><div className="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">{t.timeLeft || "Time Left"}</div><div className={`text-6xl font-black tabular-nums ${timeLeft && timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>{formatTime(timeLeft)}</div></div><button onClick={() => setShowTimerSettings(true)} className="px-8 py-6 bg-slate-800 text-white rounded-3xl font-bold border-2 border-slate-700">{t.settings || "Settings"}</button></div>
                 )}
-                <div className="mb-16">{[0, 1, 2].map(row => {
+                <div className="mb-16">{[0].map(row => {
                     const startIdx = row * 7; const isPlayerRow = selectedRow === row; const isRowUsed = usedRowsSet.has(row);
                     return (<div key={row} className={`mb-8 p-8 rounded-[3rem] border-4 ${isPlayerRow && r4IsActiveSession ? 'bg-slate-800/50 border-slate-600' : isRowUsed ? 'opacity-50' : 'bg-slate-900/30'}`}><div className="text-xl font-black text-slate-400 mb-6 uppercase">Row {row + 1}</div><div className="grid grid-cols-7 gap-4">{Array.from({length: 7}, (_, i) => startIdx + i).map(songIdx => {
                       const isCorrect = playerProg?.correctIndices.has(songIdx); const isWrong = playerProg?.wrongIndex === songIdx; const isActive = r4CurrentSongIdx === songIdx; const isSelectable = !playerProg?.hasFinished && !isRowUsed && (!r4IsActiveSession || (isPlayerRow && r4IsActiveSession && !isCorrect));
@@ -1346,7 +1346,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                 </div>
               </div>
               
-              <div className="bg-slate-800 rounded-[3rem] p-8 border-2 border-slate-700 shadow-2xl">
+            <div className="bg-slate-800 rounded-[3rem] p-8 border-2 border-slate-700 shadow-2xl">
                 <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest text-center mb-6"> {t.round5Progress || "ROUND 4 PROGRESS"}</h3>
                 
                 <div className="bg-slate-900/60 rounded-2xl p-6 mb-4 border border-slate-700">

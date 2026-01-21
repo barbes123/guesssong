@@ -3,7 +3,7 @@ import { round1Sets } from '../round1_index';
 import { round2Sets } from '../round2_index';
 //import { round3Sets } from './round3_index';
 import { ROUND_DATA } from '../constants_main';	
-// import { round4Sets } from '../round4_index';
+import { round4Sets } from '../round4_index';
 // import { round5Sets } from '../round5_index';
 // import { round6Sets } from '../round6_index';
 
@@ -24,11 +24,11 @@ export const roundsConfig: Record<number, RoundConfig> = {
     defaultSet: 'default',
     availableSets: {}  // Or import round3Sets if you have it
   },
-//  4: {  // ADD ROUND 4 (sprint)
-//    roundNumber: 4,
-//    defaultSet: 'default',
-//    availableSets: {}  // Or import round4Sets if you have it
-//  }
+  4: {  // ADD ROUND 4 (sprint)
+    roundNumber: 4,
+    defaultSet: 'default',
+    availableSets: round4Sets
+  }
 };
 
 // Helper functions
