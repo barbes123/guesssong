@@ -43,7 +43,7 @@ export const translations = {
     confirmNoPoints: "Do you want to skip assigning points for this turn?",
     confirmAssignStar: "Assign a star to this player?",
     selectTeams: "Select Participating Players",
-    selectTwo: "Please select exactly 2 players for Round 6",
+    selectTwo: "Please select exactly 2 players for Round 6.",
     sec: "sec",
     full: "Full",
     noAssign: "Do not assign points",
@@ -84,7 +84,7 @@ export const translations = {
       retro: "Retro Gems",
       games: "Game OSTs",
       jazz: "Smooth Jazz",
-      superGame: "Super Game"
+      superGame: "Duel"
     }
   },
   ru: {
@@ -121,7 +121,7 @@ export const translations = {
     confirmNoPoints: "Пропустить начисление очков в этом ходу?",
     confirmAssignStar: "Присвоить звезду этому игроку?",
     selectTeams: "Выберите участников",
-    selectTwo: "Пожалуйста, выберите ровно 2 игрока для Раунда 6",
+    selectTwo: "Пожалуйста, выберите ровно 2 игрока для Раунда 6.",
     sec: "сек",
     full: "Полная",
     noAssign: "Не начислять очки",
@@ -171,7 +171,7 @@ export const translations = {
       retro: "Ретро-хиты",
       games: "ОСТ Игр",
       jazz: "Джаз",
-      superGame: "Супер-игра"
+      superGame: "Дуэль"
     }
   }
 };
