@@ -41,3 +41,5 @@ npm install
 node get-cloudinary-ids.js
 
 to get list of IDs from cloudfare
+
+if gemini infine thinking in VS do rm -rf ~/.config/Code/User/globalStorage/google.cloud-code and restart the VS
