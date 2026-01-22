@@ -14,25 +14,33 @@ interface PlayerBoardProps {
 
 const PlayerBoard: React.FC<PlayerBoardProps> = ({ players, currentPlayerIndex, onUpdatePlayer, onSetCurrentPlayer, t, activePlayerIds }) => {
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editName, setEditName] = useState('');
-  const [editScore, setEditScore] = useState(0);
-  const [editStars, setEditStars] = useState(0);
+  const [editData, setEditData] = useState<{ name: string; score: string; stars: string; } | null>(null);
 
   const startEdit = (e: React.MouseEvent, p: Player) => {
     e.stopPropagation();
     setEditingId(p.id);
-    setEditName(p.name);
-    setEditScore(p.score);
-    setEditStars(p.stars || 0);
+    setEditData({
+      name: p.name,
+      score: String(p.score),
+      stars: String(p.stars || 0),
+    });
   };
 
   const saveEdit = (e: React.SyntheticEvent) => {
     e.stopPropagation();
-    if (editingId !== null) {
-      onUpdatePlayer(editingId, editName, Math.max(0, editScore), Math.max(0, editStars));
-      setEditingId(null);
+    if (editingId !== null && editData !== null) {
+      onUpdatePlayer(
+        editingId,
+        editData.name,
+        parseInt(editData.score, 10) || 0,
+        parseInt(editData.stars, 10) || 0
+      );
     }
+    setEditingId(null);
+    setEditData(null);
   };
+  
+  const isEditing = (p: Player) => editingId === p.id;
 
   return (
     <div className="flex flex-row gap-4 w-full">
@@ -67,14 +75,13 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({ players, currentPlayerIndex, 
                 <div className={`p-2 rounded-full flex-shrink-0 ${isActiveTurn ? 'bg-indigo-900/50 text-indigo-400' : 'bg-slate-700 text-slate-500'}`}>
                   <User size={16} />
                 </div>
-                {editingId === p.id ? (
+                {isEditing(p) && editData ? (
                   <input
                     type="text"
-                    value={editName}
+                    value={editData.name}
                     autoFocus
                     onClick={(e) => e.stopPropagation()}
-                    onBlur={saveEdit}
-                    onChange={(e) => setEditName(e.target.value)}
+                    onChange={(e) => setEditData(d => d ? { ...d, name: e.target.value } : null)}
                     className="bg-slate-700 border border-slate-600 rounded px-2 py-1 w-full text-sm font-bold text-slate-100 outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 ) : (
@@ -83,23 +90,28 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({ players, currentPlayerIndex, 
               </div>
               
               <button
-                onClick={(e) => editingId === p.id ? saveEdit(e) : startEdit(e, p)}
+                onClick={(e) => isEditing(p) ? saveEdit(e) : startEdit(e, p)}
                 className="text-slate-500 hover:text-indigo-400 transition-colors flex-shrink-0 p-1"
               >
-                {editingId === p.id ? <Check size={16} /> : <Edit3 size={16} />}
+                {isEditing(p) ? <Check size={16} /> : <Edit3 size={16} />}
               </button>
             </div>
 
             <div className="flex items-center justify-between bg-slate-900/50 rounded-2xl p-2 px-3 gap-2">
               <div className="flex flex-col items-center">
                 <span className="text-[8px] text-slate-500 uppercase font-black tracking-widest">{t.points}</span>
-                {editingId === p.id ? (
+                {isEditing(p) && editData ? (
                   <input
                     type="number"
-                    value={editScore}
+                    value={editData.score}
                     onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => setEditScore(parseInt(e.target.value) || 0)}
-                    className="bg-slate-800 border border-slate-600 rounded px-2 w-16 text-center text-lg font-black text-indigo-400 outline-none"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value)) {
+                        setEditData(d => d ? { ...d, score: value } : null);
+                      }
+                    }}
+                    className="bg-slate-800 border border-slate-600 rounded px-2 w-24 text-center text-lg font-black text-indigo-400 outline-none"
                   />
                 ) : (
                   <span className="text-xl font-black text-indigo-400 tabular-nums">{p.score}</span>
@@ -112,13 +124,18 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({ players, currentPlayerIndex, 
                 <span className="text-[8px] text-slate-500 uppercase font-black tracking-widest flex items-center gap-1">
                   <Star size={8} className="text-yellow-500 fill-yellow-500" /> {t.stars}
                 </span>
-                {editingId === p.id ? (
+                {isEditing(p) && editData ? (
                   <input
                     type="number"
-                    value={editStars}
+                    value={editData.stars}
                     onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => setEditStars(parseInt(e.target.value) || 0)}
-                    className="bg-slate-800 border border-slate-600 rounded px-2 w-12 text-center text-lg font-black text-yellow-500 outline-none"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*$/.test(value)) {
+                        setEditData(d => d ? { ...d, stars: value } : null);
+                      }
+                    }}
+                    className="bg-slate-800 border border-slate-600 rounded px-2 w-20 text-center text-lg font-black text-yellow-500 outline-none"
                   />
                 ) : (
                   <span className="text-xl font-black text-yellow-500 tabular-nums">{p.stars || 0}</span>
@@ -133,4 +150,3 @@ const PlayerBoard: React.FC<PlayerBoardProps> = ({ players, currentPlayerIndex, 
 };
 
 export default PlayerBoard;
-
