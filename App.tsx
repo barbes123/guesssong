@@ -8,9 +8,21 @@ import ConfirmationModal from './components/ConfirmationModal';
 import ControlPanel from './components/ControlPanel';
 import VolumeBar from './components/VolumeBar';
 import RoundSetSelector from './components/RoundSetSelector';
+import SetupView from './src/screens/SetupView';
+import StartView from './src/screens/StartView';
+import RoundStandard from './src/screens/RoundStandard';
+import RoundDuel from './src/screens/RoundDuel'; // (Adjust path if necessary)
+import RoundSprint from './src/screens/RoundSprint'; // (Adjust path if needed)
+import MusicTimeline from './components/MusicTimeline'; // The file you just created
+
+import PlayerScreen from './src/displays/PlayerScreen'; // Adjust path if needed
+
 import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
 
+
+
 const App: React.FC = () => {
+  const isPlayerScreen = window.location.pathname === '/display';
   const [gameState, setGameState] = useState<GameState>({
     players: [{ id: 0, name: '', score: 0, stars: 0 }],
     currentPlayerIndex: 0,
@@ -65,10 +77,14 @@ const App: React.FC = () => {
   const [timerDuration, setTimerDuration] = useState<number>(60);
   const [showTimerSettings, setShowTimerSettings] = useState(false);
   const [playedButNotEvaluated, setPlayedButNotEvaluated] = useState<number[]>([]);
-  
+  const [playerWindow, setPlayerWindow] = useState<Window | null>(null);
+
   const roundPointsTimerRef = useRef<number | null>(null);
   const autoStopTimerRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
+  if (isPlayerScreen) {
+    return <PlayerScreen />;
+  } 
 
   const sortedPlayersScoreboard = [...gameState.players].sort((a, b) => {
     const starsA = a.stars || 0;
@@ -179,6 +195,108 @@ const App: React.FC = () => {
     };
   }, [currentPage, gameState.activeRoundId, triggerBGM]);
 
+
+  // In App.js, add this useEffect after other useEffects
+useEffect(() => {
+  // Share game state with player screen
+  const shareState = () => {
+    const stateToShare = {
+      currentPage,
+      activeRoundId: gameState.activeRoundId,
+      players: gameState.players,
+      currentPlayerIndex: gameState.currentPlayerIndex,
+      roundProgress: gameState.roundProgress,
+      roundSets: gameState.roundSets,
+      // Add round-specific states
+      timeLeft: timeLeft,
+      audioProgress: audioProgress,
+      isPlaying: isPlaying,
+      activeNote: activeNote,
+      currentRoundPoints: currentRoundPoints,
+      // Round 3 specific
+      r3Selection: r3Selection,
+      isR3Finalized: isR3Finalized,
+      selectedDuration: selectedDuration,
+      // Round 4 specific
+      r4CurrentSongIdx: r4CurrentSongIdx,
+      r4IsActiveSession: r4IsActiveSession,
+      selectedRow: selectedRow,
+      timerDuration: timerDuration,
+      playedButNotEvaluated: playedButNotEvaluated,
+      // Victory
+      victoryContext: victoryContext,
+      showVictory: showVictory,
+      // Language
+      language: gameState.language
+    };
+    
+    try {
+      localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShare));
+    } catch (error) {
+      console.log('Error sharing state:', error);
+    }
+  };
+  
+  // Update state every 300ms
+  const interval = setInterval(shareState, 300);
+  
+  return () => clearInterval(interval);
+  }, [
+    currentPage,
+    gameState,
+    timeLeft,
+    audioProgress,
+    isPlaying,
+    activeNote,
+    currentRoundPoints,
+    r3Selection,
+    isR3Finalized,
+    selectedDuration,
+    r4CurrentSongIdx,
+    r4IsActiveSession,
+    selectedRow,
+    timerDuration,
+    playedButNotEvaluated,
+    victoryContext,
+    showVictory
+  ]);
+
+
+  //also for playerscreen
+
+  // Add this function to open/close player window
+const handleOpenPlayerWindow = () => {
+  // Close existing window if open
+  if (playerWindow && !playerWindow.closed) {
+    playerWindow.close();
+    setPlayerWindow(null);
+    return;
+  }
+  
+  // Open new player window
+  const newWindow = window.open(
+    '/display',
+    'musicQuizPlayerScreen',
+    'width=1200,height=800,left=100,top=100,toolbar=no,menubar=no,scrollbars=yes,resizable=yes'
+  );
+  
+  if (newWindow) {
+    setPlayerWindow(newWindow);
+    newWindow.focus();
+    
+    // Monitor if window gets closed by user
+    const checkClosed = setInterval(() => {
+      if (newWindow.closed) {
+        clearInterval(checkClosed);
+        setPlayerWindow(null);
+      }
+    }, 1000);
+  } else {
+    // If popup blocked, fallback to new tab
+    window.open('/display', '_blank');
+  }
+};
+
   const toggleLanguage = () => {
     setGameState(prev => ({ ...prev, language: prev.language === 'en' ? 'ru' : 'en' }));
   };
@@ -212,6 +330,24 @@ const App: React.FC = () => {
     setGameState(prev => ({
       ...prev,
       players: prev.players.map(p => p.id === id ? { ...p, name, score, stars: stars ?? p.stars } : p)
+    }));    
+  };
+
+   const handleAddPlayer = () => {
+    setGameState(prev => {
+      const newId = prev.players.length > 0 
+        ? Math.max(...prev.players.map(p => p.id)) + 1 
+        : 1;
+      
+      const newPlayer = { id: newId, name: '', score: 0, stars: 0 };
+      return { ...prev, players: [...prev.players, newPlayer] };
+    });
+  };
+
+  const handleRemovePlayer = (id: number) => {
+    setGameState(prev => ({
+      ...prev,
+      players: prev.players.filter(p => p.id !== id)
     }));
   };
 
@@ -712,192 +848,180 @@ const handleAudioControl = (action: 'start' | 'stop') => {
     const isFinalRound = roundId === 3;
     const isSprintRound = roundId === 4;
 
+
+
     if (isSprintRound) {
-      const pId = gameState.players[gameState.currentPlayerIndex].id;
-      const playerProg = progress.r4PlayerProgress?.[pId];
-      if (!playerProg) return;
-
-      const finalizeR4Player = (finalStatus: 'wrong' | 'all_correct' | 'time_out') => {
-        stopSong(true);
-        const finalCorrectCount = playerProg.correctIndices.size + (status === 'correct' ? 1 : 0);
-        const pointsAwarded = finalCorrectCount * 10 + (finalCorrectCount === 7 ? 300 : 0);
-        
-        setPlayedButNotEvaluated([]);
-        
-        setGameState(prev => {
-          const newPlayers = prev.players.map(p => p.id === pId ? { ...p, score: p.score + pointsAwarded } : p);
-          const newR4Progs = { ...progress.r4PlayerProgress };
-          const usedRowsSet = new Set(progress.usedRows || []);
-          if (selectedRow !== null) usedRowsSet.add(selectedRow);
-          
-          newR4Progs[pId] = {
-            ...playerProg,
-            hasFinished: true,
-            wrongIndex: finalStatus === 'wrong' ? r4CurrentSongIdx : null,
-            timeSpent: playerProg.timeSpent + (timerDuration - (timeLeft || 0))
-          };
-          if (status === 'correct') newR4Progs[pId].correctIndices.add(r4CurrentSongIdx);
-
-          return {
-            ...prev,
-            roundProgress: {
-              ...prev.roundProgress,
-              [4]: { ...progress, r4PlayerProgress: newR4Progs, usedRows: usedRowsSet }
-            },
-            players: newPlayers
-          };
-        });
-        setR4IsActiveSession(false);
-        setActiveNote({ categoryId: 'r4_sprint', noteIndex: r4CurrentSongIdx, isReveal: true });
-        playSFX(finalStatus === 'wrong' ? SFX.wrong : SFX.correct);
-      };
-
-      if (isTimeOut) { finalizeR4Player('time_out'); return; }
-      if (status === 'wrong') {
-          showModal(t.wrong, t.confirmAction, () => { 
-            setModal(null); 
-            finalizeR4Player('wrong'); 
-            setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
-          }, undefined, undefined, 'inline');
-          return;
-        }
-      if (status === 'correct') {
-        showModal(
-          t.correct || "Correct",
-          t.confirmAction || "Mark this song as correct?",
-          () => {
-            setModal(null);
-            const newSet = new Set(playerProg.correctIndices);
-            newSet.add(r4CurrentSongIdx);
-            setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
-            
-            if (selectedRow !== null) {
-              const startIdx = selectedRow * 7;
-              if (newSet.size === 7) { 
-                finalizeR4Player('all_correct'); 
-                return; 
-              }
-              let nextIdx = r4CurrentSongIdx;
-              for (let i = 1; i <= 7; i++) {
-                const potential = startIdx + ((r4CurrentSongIdx - startIdx + i) % 7);
-                if (!newSet.has(potential)) {
-                  nextIdx = potential;
-                  break;
-                }
-              }
-              setGameState(prev => {
-                const progs = { ...progress.r4PlayerProgress };
-                progs[pId] = { 
-                  ...playerProg, 
-                  correctIndices: newSet, 
-                  timeSpent: playerProg.timeSpent + (timerDuration - (timeLeft || 0)) 
-                };
-                return { 
-                  ...prev, 
-                  roundProgress: { 
-                    ...prev.roundProgress, 
-                    [4]: { ...progress, r4PlayerProgress: progs } 
-                  } 
-                };
-              });
-              setR4CurrentSongIdx(nextIdx);
-              setActiveNote({ categoryId: 'r4_sprint', noteIndex: nextIdx });
-              playSFX(SFX.correct);
-              stopSong(true);
-            }
-          },
-          undefined,
-          undefined,
-          'inline'
-        );
-        return;
-      }
-      return;
+       return (
+         <RoundSprint 
+           gameState={gameState}
+           isPlaying={isPlaying}
+           timeLeft={timeLeft}
+           audioProgress={audioProgress}
+           modal={modal}
+           t={t}
+           // Sprint specific props
+           r4IsActiveSession={r4IsActiveSession}
+           selectedRow={selectedRow}
+           r4CurrentSongIdx={r4CurrentSongIdx}
+           playedButNotEvaluated={playedButNotEvaluated}
+           showTimerSettings={showTimerSettings}
+           timerDuration={timerDuration}
+           activeNote={activeNote}
+           // Actions
+           onNavigate={navigateTo}
+           onInitializeRound={initializeRound}
+           onUpdatePlayer={handleUpdatePlayer}
+           onShowModal={showModal}
+           onSetModal={setModal}
+           onSetCurrentPlayer={(idx) => setGameState(prev => ({ ...prev, currentPlayerIndex: idx }))}
+           onAudioControl={handleAudioControl}
+           onFinalizeTurn={handleFinalizeTurn}
+           onSeek={handleSeek}
+           formatTime={formatTime}
+           onNoteClick={handleNoteClick}
+           onSetR4IsActiveSession={setR4IsActiveSession}
+           onSetSelectedRow={setSelectedRow}
+           onSetTimeLeft={setTimeLeft}
+           onSetShowTimerSettings={setShowTimerSettings}
+           onSetPlayedButNotEvaluated={setPlayedButNotEvaluated}
+           onSetTimerDuration={setTimerDuration}
+           onResetTimer={resetTimer}
+           onStopSong={stopSong}
+         />
+       );
     }
 
-    if (isFinalRound) {
-      const activePlayers = progress.activePlayerIds || [];
-      const currentPlayerId = gameState.players[gameState.currentPlayerIndex].id;
-      const opponentId = activePlayers.find(id => id !== currentPlayerId);
-      const opponent = gameState.players.find(p => p.id === opponentId);
-      const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-      
-      const targetPlayer = status === 'correct' ? currentPlayer : opponent;
-      const targetName = targetPlayer?.name || (targetPlayer?.id !== undefined ? `Player ${targetPlayer.id + 1}` : 'Player');
+    // if (isSprintRound) {
+    //   const pId = gameState.players[gameState.currentPlayerIndex].id;
+    //   const playerProg = progress.r4PlayerProgress?.[pId];
+    //   if (!playerProg) return;
 
-      const title = status === 'correct' ? t.correct : t.wrong;
-      const msg = `${t.confirmAssignStar} ${targetName}?`;
-
-      showModal(title, msg, () => {
-        setGameState(prev => {
-          let targetPlayerIdToReward = currentPlayerId;
-          let nextPlayerIdx = prev.currentPlayerIndex;
+    //   const finalizeR4Player = (finalStatus: 'wrong' | 'all_correct' | 'time_out') => {
+    //     stopSong(true);
+    //     const finalCorrectCount = playerProg.correctIndices.size + (status === 'correct' ? 1 : 0);
+    //     const pointsAwarded = finalCorrectCount * 10 + (finalCorrectCount === 7 ? 300 : 0);
+        
+    //     setPlayedButNotEvaluated([]);
+        
+    //     setGameState(prev => {
+    //       const newPlayers = prev.players.map(p => p.id === pId ? { ...p, score: p.score + pointsAwarded } : p);
+    //       const newR4Progs = { ...progress.r4PlayerProgress };
+    //       const usedRowsSet = new Set(progress.usedRows || []);
+    //       if (selectedRow !== null) usedRowsSet.add(selectedRow);
           
-          if (status === 'wrong') {
-            if (opponentId !== undefined) {
-              targetPlayerIdToReward = opponentId;
-              const foundOpponentIdx = prev.players.findIndex(p => p.id === opponentId);
-              if (foundOpponentIdx !== -1) nextPlayerIdx = foundOpponentIdx;
-            }
-            playSFX(SFX.wrong);
-          } else if (status === 'correct') {
-            playSFX(SFX.correct);
-          }
+    //       newR4Progs[pId] = {
+    //         ...playerProg,
+    //         hasFinished: true,
+    //         wrongIndex: finalStatus === 'wrong' ? r4CurrentSongIdx : null,
+    //         timeSpent: playerProg.timeSpent + (timerDuration - (timeLeft || 0))
+    //       };
+    //       if (status === 'correct') newR4Progs[pId].correctIndices.add(r4CurrentSongIdx);
 
-          // Cap duel stars at 3
-          const newPlayers = prev.players.map(p => {
-            if (p.id !== targetPlayerIdToReward) return p;
-            const nextStars = Math.min(3, (p.stars || 0) + 1);
-            return { ...p, stars: nextStars };
-          });
+    //       return {
+    //         ...prev,
+    //         roundProgress: {
+    //           ...prev.roundProgress,
+    //           [4]: { ...progress, r4PlayerProgress: newR4Progs, usedRows: usedRowsSet }
+    //         },
+    //         players: newPlayers
+    //       };
+    //     });
+    //     setR4IsActiveSession(false);
+    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex: r4CurrentSongIdx, isReveal: true });
+    //     playSFX(finalStatus === 'wrong' ? SFX.wrong : SFX.correct);
+    //   };
 
-          const winner = newPlayers.find(p => p.id === targetPlayerIdToReward);
-          const hasWinner = (winner?.stars || 0) >= 3;
-
-          // If someone hit 3 stars, end the round and lock duel to the winner only
-          const newRoundProgress = hasWinner
-            ? {
-                ...prev.roundProgress,
-                [3]: { ...prev.roundProgress[3], activePlayerIds: [targetPlayerIdToReward] }
-              }
-            : prev.roundProgress;
-
-          // Keep the active turn player consistent with existing behavior, but don't swap UI sides (handled in render)
-          return {
-            ...prev,
-            players: newPlayers,
-            currentPlayerIndex: nextPlayerIdx,
-            roundProgress: newRoundProgress
-          };
-        });
-        // If winner reached 3 stars, show results immediately
-        // if ((status === 'correct' ? currentPlayer : opponent)?.id !== undefined) {
-        //   const winnerId = status === 'correct' ? currentPlayerId : opponentId;
-        //   const winnerNow = gameState.players.find(p => p.id === winnerId);
-        //   if (winnerNow && (winnerNow.stars || 0) + 1 >= 3) {
-        //     setShowVictory(true);
-        //   }
-        // }
-
-        if ((status === 'correct' ? currentPlayer : opponent)?.id !== undefined) {
-          const winnerId = status === 'correct' ? currentPlayerId : opponentId;
-          const winnerNow = gameState.players.find(p => p.id === winnerId);
-          if (winnerNow && (winnerNow.stars || 0) + 1 >= 3) {
-            setVictoryContext({
-              roundId: 3,
-              winnerId: winnerId
-            });
-            setShowVictory(true);
-          }
-        }
-
-
-        setIsR3Finalized(true);
-        setSelectedDuration(null);
-        setModal(null);
-        stopSong(selectedDuration !== null);
-      }, undefined, undefined, 'inline');
-      return;
+    //   if (isTimeOut) { finalizeR4Player('time_out'); return; }
+    //   if (status === 'wrong') {
+    //       showModal(t.wrong, t.confirmAction, () => { 
+    //         setModal(null); 
+    //         finalizeR4Player('wrong'); 
+    //         setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
+    //       }, undefined, undefined, 'inline');
+    //       return;
+    //     }
+    //   if (status === 'correct') {
+    //     showModal(
+    //       t.correct || "Correct",
+    //       t.confirmAction || "Mark this song as correct?",
+    //       () => {
+    //         setModal(null);
+    //         const newSet = new Set(playerProg.correctIndices);
+    //         newSet.add(r4CurrentSongIdx);
+    //         setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
+            
+    //         if (selectedRow !== null) {
+    //           const startIdx = selectedRow * 7;
+    //           if (newSet.size === 7) { 
+    //             finalizeR4Player('all_correct'); 
+    //             return; 
+    //           }
+    //           let nextIdx = r4CurrentSongIdx;
+    //           for (let i = 1; i <= 7; i++) {
+    //             const potential = startIdx + ((r4CurrentSongIdx - startIdx + i) % 7);
+    //             if (!newSet.has(potential)) {
+    //               nextIdx = potential;
+    //               break;
+    //             }
+    //           }
+    //           setGameState(prev => {
+    //             const progs = { ...progress.r4PlayerProgress };
+    //             progs[pId] = { 
+    //               ...playerProg, 
+    //               correctIndices: newSet, 
+    //               timeSpent: playerProg.timeSpent + (timerDuration - (timeLeft || 0)) 
+    //             };
+    //             return { 
+    //               ...prev, 
+    //               roundProgress: { 
+    //                 ...prev.roundProgress, 
+    //                 [4]: { ...progress, r4PlayerProgress: progs } 
+    //               } 
+    //             };
+    //           });
+    //           setR4CurrentSongIdx(nextIdx);
+    //           setActiveNote({ categoryId: 'r4_sprint', noteIndex: nextIdx });
+    //           playSFX(SFX.correct);
+    //           stopSong(true);
+    //         }
+    //       },
+    //       undefined,
+    //       undefined,
+    //       'inline'
+    //     );
+    //     return;
+    //   }
+    //   return;
+    // }
+    if (isFinalRound) {
+      return (
+        <RoundDuel 
+          gameState={gameState}
+          isPlaying={isPlaying}
+          timeLeft={timeLeft}
+          audioProgress={audioProgress}
+          modal={modal}
+          t={t}
+          selectedDuration={selectedDuration}
+          isR3Finalized={isR3Finalized}
+          onNavigate={navigateTo}
+          onInitializeRound={initializeRound}
+          onUpdatePlayer={handleUpdatePlayer}
+          onShowModal={showModal}
+          onSetModal={setModal}
+          onSetCurrentPlayer={(idx) => {
+             setGameState(prev => ({ ...prev, currentPlayerIndex: idx }));
+          }}
+          onAudioControl={handleAudioControl}
+          onFinalizeTurn={handleFinalizeTurn}
+          onSeek={handleSeek}
+          formatTime={formatTime}
+          onSetSelectedDuration={setSelectedDuration}
+          onPlaySFX={playSFX}
+          onNextTurnNav={handleNextTurnNav}
+          onStopSong={stopSong}
+        />
+      );
     }
 
     showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
@@ -1010,305 +1134,15 @@ const handleAudioControl = (action: 'start' | 'stop') => {
     }
   };
 
-  const MusicTimeline = () => {
-    if (!isPlaying && audioProgress.current === 0) return null;
-    return (
-      <div className="w-full bg-slate-800 rounded-3xl p-6 border-2 border-indigo-400 shadow-[0_0_30px_rgba(99,102,241,0.2)] animate-in slide-in-from-top duration-300">
-        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2 block text-center">  {activeNote?.isReveal ? t.fullVersionSeek : t.playbackProgress}</span>
-        <input type="range" min="0" max={audioProgress.total || 0} value={audioProgress.current} onChange={handleSeek} className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500 mb-2" />
-        <div className="flex justify-between text-[10px] font-black text-slate-500 uppercase"><span>{formatTime(audioProgress.current)}</span><span>{formatTime(audioProgress.total)}</span></div>
-      </div>
-    );
-  };
-
-  const TimerSettings = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="bg-slate-900 rounded-3xl p-8 max-w-md w-full border-2 border-slate-700">
-        <h3 className="text-2xl font-black text-white mb-6">{t.timerSettings || "Timer Settings"}</h3>
-        <div className="space-y-4 mb-6"><div><label className="block text-sm font-bold text-slate-400 mb-2">{t.timerDuration || "Timer Duration (seconds)"}</label><input type="number" min="10" max="300" value={timerDuration} onChange={(e) => setTimerDuration(parseInt(e.target.value) || 60)} className="w-full bg-slate-800 border-2 border-slate-700 rounded-2xl px-4 py-3 text-white text-xl font-bold outline-none focus:border-indigo-500" /></div></div>
-        <div className="flex gap-4"><button onClick={() => setShowTimerSettings(false)} className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-2xl hover:bg-slate-700">{t.cancel}</button><button onClick={() => { setShowTimerSettings(false); resetTimer(); }} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500">{t.save || "Save"}</button></div>
-      </div>
-    </div>
-  );
-
-    // UPDATED Round1to2View component
-  const Round1to2View = () => {
-    const roundId = gameState.activeRoundId!;
-    const progress = gameState.roundProgress[roundId];
-    
-    // let oldRoundId = roundId;
-    // if (roundId === 2) oldRoundId = 4;
-    const oldRoundId = roundId; // No mapping
-    
-    const selectedSetId = gameState.roundSets[roundId] || 'default';
-    const roundData = getRoundData(oldRoundId, selectedSetId) || [];
-    const isMelodyRound = roundId === 2;
-    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-    
-    return (
-      <div className="min-h-screen bg-slate-950 p-8 pt-24">
-        <div className="max-w-[1600px] mx-auto flex gap-12">
-          <div className="flex-1 flex flex-col gap-12">
-            <div className="bg-slate-900/80 backdrop-blur-xl rounded-[5rem] p-16 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
-              <div className="flex items-center justify-between mb-10">
-                <div className="flex items-center gap-6">
-                  <div className="bg-indigo-600 text-white w-20 h-20 rounded-2xl flex items-center justify-center text-5xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">
-                    {roundId}
-                  </div>
-                  <div>
-                    <h2 className="text-6xl font-black text-white tracking-tighter uppercase">
-                      {t.round} {roundId}
-                    </h2>
-                    <div className="text-xl font-black text-slate-400 uppercase tracking-[0.3em] mt-2">
-                      {isMelodyRound ? t.melodyGuess : t.songChallenge}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => { 
-                      const pr = Math.max(1, roundId - 1); 
-                      initializeRound(pr); 
-                      navigateTo('round', pr); 
-                    }} 
-                    className="p-6 bg-slate-800 text-slate-300 rounded-2xl hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all shadow-lg"
-                  >
-                    <ChevronLeft size={40} />
-                  </button>
-                  <button 
-                    onClick={() => { 
-                      if(roundId < 4) {
-                        const nxt = roundId + 1; 
-                        initializeRound(nxt); 
-                        navigateTo('round', nxt); 
-                      }
-                    }}
-                    className="p-6 bg-slate-800 text-slate-300 rounded-2xl hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all shadow-lg"
-                  >
-                    <ChevronRight size={40} />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-8">
-                {roundData.map(cat => {
-                  const activatedCount = progress.activationCounts[cat.id] || 0;
-                  const isCategoryFinished = progress.activatedCategories.has(cat.id);
-                  const isPointsActiveInTurn = activeNote?.categoryId === cat.id && activeNote?.noteIndex === 0 && !activeNote.isReveal;
-
-                  return (
-                    <div 
-                      key={cat.id} 
-                      className={`flex items-center gap-8 p-8 rounded-[3rem] border-4 transition-all ${
-                        activeNote?.categoryId === cat.id ? 'bg-indigo-900/20 border-indigo-500/50' : 'bg-slate-800/20 border-slate-700'
-                      } ${isCategoryFinished ? 'opacity-40' : ''}`}
-                    >
-                      <div className={`w-64 h-36 flex items-center justify-center rounded-3xl border-3 font-black text-2xl text-center px-8 leading-tight ${
-                        isCategoryFinished ? 'bg-slate-800 text-slate-600 border-slate-700' : 'bg-slate-800 text-slate-200 border-slate-700'
-                      }`}>
-                        {gameState.language === 'en' ? cat.name.en : cat.name.ru}
-                      </div>
-                      
-                      <div className={`flex-1 grid ${isMelodyRound ? 'grid-cols-5' : 'grid-cols-4'} gap-6`}>
-                        {isMelodyRound ? (
-                          <>
-                            <button 
-                              onClick={() => handleNoteClick(cat.id, 0)}
-                              className={`h-36 rounded-3xl transition-all flex flex-col items-center justify-center border-4 relative overflow-hidden ${
-                                isPointsActiveInTurn ? 'bg-indigo-600 text-white scale-110 shadow-[0_0_40px_rgba(99,102,241,0.6)] border-indigo-400 z-10' : 
-                                'bg-slate-800 border-slate-700 text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700'
-                              }`}
-                              disabled={isCategoryFinished}
-                            >
-                              {isPointsActiveInTurn && isPlaying && <div className="absolute inset-0 bg-white/20 animate-pulse" />}
-                              {(activatedCount === 0 && !isPointsActiveInTurn) ? (
-                                <MusicIcon size={48} className="opacity-40" />
-                              ) : (
-                                <span className="text-6xl font-black tracking-tighter">
-                                  {isPointsActiveInTurn ? currentRoundPoints : (progress.persistentPoints?.[`${cat.id}-0`] || 0)}
-                                </span>
-                              )}
-                              <div className="absolute top-3 right-3 text-xs font-black uppercase opacity-50 bg-slate-900/50 px-2 rounded-md">
-                                {4 - activatedCount} L
-                              </div>
-                            </button>
-                            
-                            {[1, 2, 3, 4].map((idx) => {
-                              const songIdx = idx - 1;
-                              const isUnlocked = songIdx < activatedCount;
-                              const isSelectedReveal = activeNote?.categoryId === cat.id && activeNote?.noteIndex === idx && activeNote.isReveal;
-                              const noteId = `${cat.id}-${idx}`;
-                              const isUsed = progress.usedNotes.has(noteId);
-                              const result = progress.results?.[noteId];
-                              
-                              let btnCls = `h-36 rounded-3xl border-4 flex items-center justify-center transition-all `;
-                              
-                              if (!isUnlocked) {
-                                btnCls += `bg-slate-900/50 border-dashed border-slate-700 text-slate-800 cursor-not-allowed `;
-                              } else if (isSelectedReveal) {
-                                btnCls += `bg-indigo-800 border-white text-white animate-pulse shadow-[0_0_50px_rgba(99,102,241,0.7)] ring-4 ring-indigo-500/50 z-10 `;
-                              } else if (isUsed) {
-                                if (result === 'correct') {
-                                  btnCls += `bg-emerald-900/60 text-emerald-400 border-emerald-500/50 hover:bg-emerald-800/80 hover:border-emerald-400 `;
-                                } else if (result === 'wrong') {
-                                  btnCls += `bg-rose-900/60 text-rose-400 border-rose-500/50 hover:bg-rose-800/80 hover:border-rose-400 `;
-                                } else {
-                                  btnCls += `bg-slate-800 border-slate-600 text-slate-500 hover:bg-slate-700 hover:text-indigo-400 hover:border-slate-500 `;
-                                }
-                              } else {
-                                btnCls += `bg-slate-800 border-slate-700 text-slate-500 hover:bg-slate-700 hover:text-indigo-400 `;
-                              }
-                              
-                              return (
-                                <button
-                                  key={idx}
-                                  onClick={() => isUnlocked && handleNoteClick(cat.id, idx)}
-                                  className={btnCls}
-                                  disabled={!isUnlocked}
-                                >
-                                  {isSelectedReveal && isPlaying ? (
-                                    <PlayCircle size={48} className="animate-spin" />
-                                  ) : (
-                                    <MusicIcon size={isUnlocked ? 48 : 40} />
-                                  )}
-                                  
-                                  {isUsed && !isSelectedReveal && (
-                                    <div className="absolute bottom-3 right-3">
-                                      <PlayCircle size={24} className="text-slate-400" />
-                                    </div>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </>
-                        ) : (
-                          cat.songs.map((_, idx) => {
-                            const noteId = `${cat.id}-${idx}`;
-                            const isUsed = progress.usedNotes.has(noteId);
-                            const isSelected = activeNote?.categoryId === cat.id && activeNote?.noteIndex === idx && !activeNote.isReveal;
-                            const isRevealActive = activeNote?.categoryId === cat.id && activeNote?.noteIndex === idx && activeNote.isReveal;
-                            const turnResult = progress.results[noteId];
-                            const isCurrentlyPlayingThis = (isSelected || isRevealActive) && isPlaying;
-                            let pts = null;
-                            if (isSelected || (isUsed && !isRevealActive)) {
-                              pts = isSelected ? currentRoundPoints : progress.pointMap?.[cat.id]?.[idx];
-                            }
-                            
-                            let btnCls = `h-36 rounded-3xl transition-all flex flex-col items-center justify-center group relative overflow-hidden border-4 `;
-                            
-                            if (isSelected) {
-                              btnCls += `bg-indigo-600 text-white shadow-[0_0_40px_rgba(99,102,241,0.6)] scale-110 border-indigo-400 z-10 `;
-                            } else if (isRevealActive) {
-                              btnCls += `bg-indigo-800 text-white border-white animate-pulse shadow-[0_0_50px_rgba(99,102,241,0.7)] ring-4 ring-indigo-500/50 z-10 `;
-                            } else if (isUsed) {
-                              if (turnResult === 'correct') {
-                                btnCls += `bg-emerald-900/60 text-emerald-400 border-emerald-500/50 hover:bg-emerald-800/80 hover:border-emerald-400 `;
-                              } else if (turnResult === 'wrong') {
-                                btnCls += `bg-rose-900/60 text-rose-400 border-rose-500/50 hover:bg-rose-800/80 hover:border-rose-400 `;
-                              } else {
-                                btnCls += `bg-slate-800 border-slate-600 text-slate-500 hover:bg-slate-700 hover:text-indigo-400 hover:border-slate-500 `;
-                              }
-                            } else {
-                              btnCls += `bg-slate-800 border-slate-700 text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700 hover:-translate-y-1 `;
-                            }
-                            
-                            return (
-                              <button 
-                                key={idx} 
-                                onClick={() => handleNoteClick(cat.id, idx)}
-                                className={btnCls}
-                                disabled={isCategoryFinished && !isUsed}
-                              >
-                                {isCurrentlyPlayingThis && <div className="absolute inset-0 bg-white/20 animate-pulse" />}
-                                {!pts ? (
-                                  <MusicIcon size={48} className={`${isSelected ? 'animate-bounce' : 'group-hover:rotate-12 transition-transform opacity-60'}`} />
-                                ) : (
-                                  <span className="text-6xl font-black tracking-tighter">{pts}</span>
-                                )}
-                                
-                                {isRevealActive && (
-                                  <div className="absolute bottom-3 right-3">
-                                    <PlayCircle size={28} className="text-white opacity-80" />
-                                  </div>
-                                )}
-                              </button>
-                            );
-                          })
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="bg-slate-900/50 p-12 rounded-[5rem] border-2 border-slate-800">
-              <PlayerBoard 
-                players={gameState.players} 
-                currentPlayerIndex={gameState.currentPlayerIndex} 
-                onUpdatePlayer={handleUpdatePlayer} 
-                onSetCurrentPlayer={(idx) => showModal(t.playerName, t.confirmPlayerActive, () => { 
-                  setGameState(prev => ({ ...prev, currentPlayerIndex: idx })); 
-                  setModal(null); 
-                })} 
-                t={t} 
-              />
-            </div>
-          </div>
-
-          <div className="w-[450px] flex flex-col gap-10 relative">
-            <div className="bg-slate-800 rounded-[3rem] p-12 border-2 border-slate-700 shadow-2xl flex flex-col items-center gap-4 overflow-hidden">
-              <span className="text-sm font-black text-slate-500 uppercase tracking-[0.4em] mb-2">{t.currentTurn}</span>
-              <div className="text-4xl font-black text-white truncate text-center w-full mb-2 tracking-tight">
-                {currentPlayer.name || `Player ${gameState.currentPlayerIndex + 1}`}
-              </div>
-              <div className="bg-indigo-900/40 px-10 py-4 rounded-3xl border-2 border-indigo-500/30 shadow-inner">
-                <span className="text-4xl font-black text-indigo-400 tabular-nums">
-                  {currentPlayer.score} <span className="text-xs uppercase opacity-60 ml-2 tracking-widest">{t.points}</span>
-                </span>
-              </div>
-            </div>
-            
-            <ControlPanel 
-              isPlaying={isPlaying} 
-              onStart={() => handleAudioControl('start')} 
-              onStop={() => handleAudioControl('stop')} 
-              onCorrect={() => handleFinalizeTurn('correct')} 
-              onWrong={() => handleFinalizeTurn('wrong')} 
-              currentPoints={currentRoundPoints}
-              timeLeft={timeLeft} 
-              t={t} 
-              disabledActions={!activeNote || activeNote.isReveal || progress.usedNotes.has(`${activeNote.categoryId}-${activeNote.noteIndex}`)} 
-              isStartDisabled={!activeNote}
-            />
-            
-            <MusicTimeline />
-            
-            {modal?.isOpen && modal.position === 'inline' && (
-              <div className="w-full bg-slate-800 rounded-3xl p-8 border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.3)] animate-in fade-in slide-in-from-top duration-300">
-                <h3 className="text-sm font-black text-white mb-3 leading-tight uppercase tracking-widest text-center">{modal.title}</h3>
-                <p className="text-slate-300 text-xs mb-6 font-medium text-center leading-relaxed">{modal.message}</p>
-                <div className="flex flex-col gap-3">
-                  <button 
-                    onClick={modal.onConfirm} 
-                    className="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black hover:bg-indigo-700 transition-all uppercase tracking-widest text-sm shadow-lg shadow-indigo-900/40"
-                  >
-                    {modal.confirmLabel}
-                  </button>
-                  <button 
-                    onClick={() => setModal(null)} 
-                    className="w-full py-4 rounded-2xl bg-slate-700 text-slate-300 font-bold hover:bg-slate-600 transition-colors uppercase tracking-widest text-sm"
-                  >
-                    {modal.cancelLabel}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
+  // const TimerSettings = () => (
+  //   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+  //     <div className="bg-slate-900 rounded-3xl p-8 max-w-md w-full border-2 border-slate-700">
+  //       <h3 className="text-2xl font-black text-white mb-6">{t.timerSettings || "Timer Settings"}</h3>
+  //       <div className="space-y-4 mb-6"><div><label className="block text-sm font-bold text-slate-400 mb-2">{t.timerDuration || "Timer Duration (seconds)"}</label><input type="number" min="10" max="300" value={timerDuration} onChange={(e) => setTimerDuration(parseInt(e.target.value) || 60)} className="w-full bg-slate-800 border-2 border-slate-700 rounded-2xl px-4 py-3 text-white text-xl font-bold outline-none focus:border-indigo-500" /></div></div>
+  //       <div className="flex gap-4"><button onClick={() => setShowTimerSettings(false)} className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-2xl hover:bg-slate-700">{t.cancel}</button><button onClick={() => { setShowTimerSettings(false); resetTimer(); }} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500">{t.save || "Save"}</button></div>
+  //     </div>
+  //   </div>
+  // );
 
   // UPDATED RoundView component
   const RoundView = () => {
@@ -1740,188 +1574,33 @@ const handleAudioControl = (action: 'start' | 'stop') => {
         </div>
       );
     }
-    return <Round1to2View />;
-  };
-
-    // UPDATED SetupView component
-  const SetupView = () => {
-    const [localPlayers, setLocalPlayers] = useState(gameState.players);
-    
-    useEffect(() => {
-      setLocalPlayers(gameState.players);
-    }, [gameState.players.length]);
-
-    const handleLocalUpdate = (id: number, name: string, score: number) => {
-      setLocalPlayers(prev => 
-        prev.map(p => p.id === id ? { ...p, name, score } : p)
-      );
-    };
-
-    const handleSaveAndBlur = (id: number) => {
-      const localPlayer = localPlayers.find(p => p.id === id);
-      const globalPlayer = gameState.players.find(p => p.id === id);
-      
-      if (localPlayer && globalPlayer && 
-          (localPlayer.name !== globalPlayer.name || localPlayer.score !== globalPlayer.score)) {
-        handleUpdatePlayer(id, localPlayer.name, localPlayer.score);
-      }
-    };
-
-    const handleRemovePlayer = (id: number) => {
-      const playerToRemove = localPlayers.find(p => p.id === id);
-      if (playerToRemove) {
-        setGameState(prev => ({
-          ...prev,
-          players: prev.players.filter(p => p.id !== id)
-        }));
-      }
-    };
-
-    const handleAddPlayer = () => {
-      const newId = localPlayers.length > 0 
-        ? Math.max(...localPlayers.map(p => p.id)) + 1 
-        : 1;
-      
-      const newPlayer = { 
-        id: newId, 
-        name: '', 
-        score: 0, 
-        stars: 0 
-      };
-      
-      setLocalPlayers(prev => [...prev, newPlayer]);
-      setGameState(prev => ({
-        ...prev,
-        players: [...prev.players, newPlayer]
-      }));
-    };
-
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8">
-        <div className="bg-slate-900/90 backdrop-blur-xl p-16 rounded-[4rem] border border-slate-800 max-w-4xl w-full text-center shadow-2xl">
-          <Users size={80} className="text-indigo-500 mx-auto mb-10 animate-pulse" />
-          <h1 className="text-6xl font-black text-white mb-12 uppercase tracking-tighter">{t.playerSetup}</h1>
-          
-          <div className="space-y-8 mb-14">
-            {localPlayers.map((p, idx) => (
-              <div key={p.id} className="flex gap-6 items-center">
-                <input 
-                  type="text" 
-                  placeholder={`${t.playerName} ${idx + 1}`} 
-                  value={p.name}
-                  onChange={(e) => handleLocalUpdate(p.id, e.target.value, p.score)}
-                  onBlur={() => handleSaveAndBlur(p.id)}
-                  className="flex-1 bg-slate-800 border-2 border-slate-700 rounded-[2rem] px-10 py-6 text-white text-2xl font-black outline-none focus:border-indigo-500"
-                  autoComplete="off"
-                />
-                
-                <div className="flex flex-col items-center">
-                  <span className="text-xs font-black text-slate-500 mb-2 uppercase">{t.points}</span>
-                  <input 
-                    type="number" 
-                    value={p.score}
-                    onChange={(e) => handleLocalUpdate(p.id, p.name, parseInt(e.target.value) || 0)}
-                    onBlur={() => handleSaveAndBlur(p.id)}
-                    className="w-32 bg-slate-800 border-2 border-slate-700 rounded-[2rem] px-2 py-6 text-indigo-400 font-black text-3xl text-center outline-none focus:border-indigo-500"
-                  />
-                </div>
-                
-                {localPlayers.length > 1 && (
-                  <button 
-                    onClick={() => handleRemovePlayer(p.id)} 
-                    className="p-7 bg-rose-900/20 text-rose-500 rounded-[2rem] hover:bg-rose-900/30 transition-colors"
-                  >
-                    <XCircle size={36} />
-                  </button>
-                )}
-              </div>
-            ))}
-            
-            {localPlayers.length < 3 && (
-              <button 
-                onClick={handleAddPlayer} 
-                className="w-full py-8 border-2 border-dashed border-slate-700 rounded-[2rem] text-slate-500 font-black text-2xl hover:border-indigo-500 hover:text-indigo-400 transition-colors"
-              >
-                + {t.editPlayer}
-              </button>
-            )}
-          </div>
-          
-          <button 
-            onClick={handleStartGameFromSetup} 
-            className="w-full py-10 rounded-[2.5rem] bg-indigo-600 text-white font-black text-3xl shadow-xl uppercase tracking-[0.2em] hover:bg-indigo-700 transition-colors"
-          >
-            {t.startGame}
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // UPDATED StartView component
-  const StartView = () => (
-    <div className="min-h-screen bg-slate-950 p-6 pt-20">
-      <div className="max-w-[1400px] mx-auto text-center">
-        <h1 className="text-7xl font-black text-white mb-6 tracking-tighter uppercase">{t.title}</h1>
-        <p className="text-xl text-slate-400 mb-10 font-bold uppercase tracking-[0.4em]">{t.chooseRound}</p>
-        <button onClick={() => { initializeRound(1); navigateTo('round', 1); }} className="mb-12 py-8 px-20 bg-indigo-600 text-white rounded-[2.5rem] font-black text-3xl shadow-xl flex items-center gap-6 mx-auto"><PlayCircle size={48} /> {t.startOrder}</button>
-        <div className="grid grid-cols-2 md:grid-cols-2 gap-8"> {/* Changed to 2 columns for 4 rounds */}
-          {[1, 2, 3, 4].map((num) => { // Only 4 rounds now
-            //const availableSets = getAvailableSets(num === 2 ? 4 : num === 3 ? 6 : num === 4 ? 5 : num); // Map to old round IDs
-            const availableSets = getAvailableSets(num);
-            const selectedSetId = gameState.roundSets[num] || 'default';
-            const selectedSet = availableSets.find(s => s.id === selectedSetId);
-            //const hasMultipleSets = [1, 2].includes(num) && availableSets.length > 1; // Only rounds 1 & 2 have multiple sets
-            // const hasMultipleSets = [1, 2, 3, 4].includes(num);
-            const hasMultipleSets = [1, 2, 3, 4].includes(num) && availableSets.length > 1;
-
-            return (
-              <div key={num} className="flex flex-col gap-3">
-                <button 
-                  onClick={() => {
-                    if (num === 4 && gameState.players.length > 1) {
-                      stopSong();
-                      setCurrentPage('r4_select');
-                      return;
-                    }
-                    navigateTo('round', num);
-                  }} 
-                  className="group w-full bg-slate-900 border-2 border-slate-800 p-10 rounded-[3rem] hover:border-indigo-500 transition-all hover:-translate-y-3 shadow-2xl"
-                >
-                  <MusicIcon size={60} className="text-slate-600 mx-auto mb-6" />
-                  <div className="text-5xl font-black text-white mb-2">
-                    {`${t.round} ${num}`}
-                  </div>
-                  <div className="text-base font-black text-slate-500 uppercase mt-3">
-                    {num === 4 ? 'SPRINT' : num === 3 ? 'DUEL' : num === 2 ? 'MELODY GUESS' : 'SONG CHALLENGE'}
-                  </div>
-                </button>
-                
-                {hasMultipleSets ? (
-                  <button
-                    onClick={() => setRoundSetSelectionModal(num)}
-                    className="w-full px-6 py-3 bg-indigo-600/30 border-2 border-indigo-500 text-indigo-200 rounded-[1.5rem] hover:bg-indigo-600/50 hover:border-indigo-400 transition-all font-bold text-sm uppercase tracking-wide flex items-center justify-center gap-2 shadow-lg"
-                    title="Select dataset for this round"
-                  >
-                    <span> {selectedSet?.name[gameState.language] || 'Default'}</span>
-                    <ChevronRight size={16} />
-                  </button>
-                ) : (
-                  <div className="w-full px-6 py-3 bg-slate-800/50 border-2 border-slate-700 text-slate-400 rounded-[1.5rem] font-bold text-sm uppercase tracking-wide text-center">
-                    {selectedSet?.name[gameState.language] || 'Default'}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-          <div className="flex flex-col gap-3">
-            <button onClick={() => setShowScoreboard(true)} className="bg-slate-900 border-2 border-slate-800 p-10 rounded-[3rem] hover:border-yellow-500 transition-all shadow-2xl"><Trophy size={60} className="text-yellow-600 mx-auto mb-6" /><div className="text-5xl font-black text-white">{t.scorePanel}</div></button>
-          </div>
-        </div>
-        <button onClick={() => setShowVictory(true)} className="mt-20 px-16 py-6 border-4 border-rose-600/20 rounded-[2rem] text-rose-500 font-black text-xl hover:bg-rose-600 hover:text-white transition-all uppercase tracking-[0.3em]">{t.endGame}</button>
-      </div>
-    </div>
-  );
+    <RoundStandard 
+      gameState={gameState}
+      activeNote={activeNote}
+      currentRoundPoints={currentRoundPoints}
+      isPlaying={isPlaying}
+      timeLeft={timeLeft}
+      audioProgress={audioProgress}
+      modal={modal}
+      t={t}
+      onNavigate={navigateTo}
+      onInitializeRound={initializeRound}
+      onNoteClick={handleNoteClick}
+      onUpdatePlayer={handleUpdatePlayer}
+      onShowModal={showModal}
+      onSetModal={setModal}
+      onSetCurrentPlayer={(idx) => showModal(t.playerName, t.confirmPlayerActive, () => { 
+        setGameState(prev => ({ ...prev, currentPlayerIndex: idx })); 
+        setModal(null); 
+      })}
+      onAudioControl={handleAudioControl}
+      onFinalizeTurn={handleFinalizeTurn}
+      onSeek={handleSeek}
+      formatTime={formatTime}
+    />
+   );
+  };  
 
   // UPDATED R3SelectView component (was R6SelectView)
   const R3SelectView = () => (
@@ -1988,12 +1667,6 @@ const Round3VictoryView = () => {
   const winner = gameState.players.find(p => p.id === victoryContext.winnerId);
   
   if (!winner) return null;
-
-  // Sort all players by stars then score
-  const sortedPlayers = [...gameState.players].sort((a, b) => {
-    if (b.stars !== a.stars) return b.stars - a.stars;
-    return b.score - a.score;
-  });
 
   const handleClose = () => {
     if (sfxRef.current) {
@@ -2072,7 +1745,6 @@ const Round3VictoryView = () => {
           {winner.name} {t.winsDuel || "WINS THE DUEL!"}
         </p>
         
-        {/* WINNER CARD */}
         <div className="bg-slate-900 p-12 rounded-[4rem] border-4 border-yellow-500/40 mb-6 shadow-[0_40px_80px_rgba(234,179,8,0.3)]">
           <div className="text-sm font-black text-yellow-500 uppercase tracking-[0.4em] mb-4">
             {t.duelChampion || "DUEL CHAMPION"}
@@ -2101,46 +1773,6 @@ const Round3VictoryView = () => {
           </div>
         </div>
         
-        {/* ALL PLAYERS RESULTS */}
-        <div className="bg-slate-900/80 p-8 rounded-[3rem] border-2 border-slate-700/50 mb-8 shadow-xl">
-          <div className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-6">
-            {t.allPlayers || "ALL PLAYERS RESULTS"}
-          </div>
-          <div className="space-y-4">
-            {sortedPlayers.map((player, idx) => (
-              <div 
-                key={player.id} 
-                className={`flex items-center justify-between p-6 rounded-[2rem] border-2 ${
-                  player.id === winner.id 
-                    ? 'bg-yellow-900/20 border-yellow-500/30' 
-                    : 'bg-slate-800/40 border-slate-700/30'
-                }`}
-              >
-                <div className="flex items-center gap-6">
-                  <div className="text-slate-500 font-black text-2xl w-8">
-                    {idx + 1}.
-                  </div>
-                  <div>
-                    <div className={`text-2xl font-black ${
-                      player.id === winner.id ? 'text-yellow-400' : 'text-white'
-                    }`}>
-                      {player.name || `Player ${player.id + 1}`}
-                    </div>
-                    <div className="text-sm font-black text-slate-500 uppercase mt-1 flex items-center gap-2">
-                      <Star size={14} fill="currentColor" />
-                      {player.stars || 0} {t.stars || "stars"}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-3xl font-black text-indigo-400 tabular-nums">
-                  {player.score} <span className="text-xs opacity-60">pts</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* BUTTONS */}
         <div className="flex gap-6 justify-center">
           <button 
             onClick={handleClose} 
@@ -2159,9 +1791,6 @@ const Round3VictoryView = () => {
     </div>
   );
 };
-
-
-
 
   // VictoryView component (unchanged except for variable names)
   const VictoryView = () => {
@@ -2331,13 +1960,44 @@ const Round3VictoryView = () => {
   return (
     <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
       <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} />
-      {currentPage === 'setup' && <SetupView />}
-      {currentPage === 'start' && <StartView />}
+      {/* {currentPage === 'setup' && <SetupView />} */}
+       {/* In your App.js render logic, find where SetupView is rendered */}
+      // In your App.js render section:
+      {currentPage === 'setup' && (
+        <SetupView
+          players={gameState.players}
+          t={t}
+          onUpdatePlayer={handleUpdatePlayer}
+          onAddPlayer={handleAddPlayer}
+          onRemovePlayer={handleRemovePlayer}
+          onStartGame={handleStartGameFromSetup}
+          isPlayerWindowOpen={playerWindow && !playerWindow.closed}
+          onTogglePlayerWindow={handleOpenPlayerWindow}
+        />
+      )}
+      {/* {currentPage === 'start' && <StartView />} */}
+
+      {currentPage === 'start' && (
+        <StartView 
+          t={t}
+          language={gameState.language}
+          roundSets={gameState.roundSets}
+          playersCount={gameState.players.length}
+          onNavigate={navigateTo}
+          onInitializeRound={initializeRound}
+          onShowScoreboard={() => setShowScoreboard(true)}
+          onShowVictory={() => setShowVictory(true)}
+          onSetRoundSetSelection={setRoundSetSelectionModal}
+          onStopSong={stopSong}
+          setPage={setCurrentPage}
+        />
+      )}
+      
       {currentPage === 'round' && <RoundView />}
       {currentPage === 'r3_select' && <R3SelectView />} {/* Changed from r6_select */}
       {currentPage === 'r4_select' && <R4SelectView />}
       {modal && modal.position === 'center' && <ConfirmationModal isOpen={modal.isOpen} title={modal.title} message={modal.message} onConfirm={modal.onConfirm} onCancel={() => setModal(null)} confirmLabel={modal.confirmLabel} cancelLabel={modal.cancelLabel} position={modal.position} />}
-      {showTimerSettings && <TimerSettings />}
+      {/* {showTimerSettings && <TimerSettings />} */}
       {showScoreboard && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-3xl p-10 animate-in fade-in duration-500">
           <div className="bg-slate-900 rounded-[4rem] p-16 max-w-2xl w-full border-2 border-slate-800 shadow-2xl">
