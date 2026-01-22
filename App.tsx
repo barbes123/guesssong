@@ -39,6 +39,12 @@ const App: React.FC = () => {
   const [showVictory, setShowVictory] = useState(false);
   const [volume, setVolume] = useState(0.7);
 
+
+  const [victoryContext, setVictoryContext] = useState<{roundId: number | null, winnerId: number | null}>({
+    roundId: null,
+    winnerId: null
+  });
+
   const songRef = useRef<HTMLAudioElement | null>(null);
   const bgmRef = useRef<HTMLAudioElement | null>(null);
   const sfxRef = useRef<HTMLAudioElement | null>(null);
@@ -247,6 +253,7 @@ const App: React.FC = () => {
     setSelectedRow(null);
     setTimerDuration(60);
     setShowTimerSettings(false);
+    setVictoryContext({ roundId: null, winnerId: null });
     stopSong();
     stopBGM();
   };
@@ -263,6 +270,10 @@ const App: React.FC = () => {
       setModal(null);
       setActiveNote(null);
       setCurrentRoundPoints(undefined);
+
+      if (page === 'setup' || page === 'start') {
+        setVictoryContext({ roundId: null, winnerId: null });
+     }
       
       if (roundId === 3) { // Round 3 is final (was round 6)
         setActiveNote({ categoryId: 'r3_final', noteIndex: 0 });
@@ -860,13 +871,27 @@ const handleAudioControl = (action: 'start' | 'stop') => {
           };
         });
         // If winner reached 3 stars, show results immediately
+        // if ((status === 'correct' ? currentPlayer : opponent)?.id !== undefined) {
+        //   const winnerId = status === 'correct' ? currentPlayerId : opponentId;
+        //   const winnerNow = gameState.players.find(p => p.id === winnerId);
+        //   if (winnerNow && (winnerNow.stars || 0) + 1 >= 3) {
+        //     setShowVictory(true);
+        //   }
+        // }
+
         if ((status === 'correct' ? currentPlayer : opponent)?.id !== undefined) {
           const winnerId = status === 'correct' ? currentPlayerId : opponentId;
           const winnerNow = gameState.players.find(p => p.id === winnerId);
           if (winnerNow && (winnerNow.stars || 0) + 1 >= 3) {
+            setVictoryContext({
+              roundId: 3,
+              winnerId: winnerId
+            });
             setShowVictory(true);
           }
         }
+
+
         setIsR3Finalized(true);
         setSelectedDuration(null);
         setModal(null);
@@ -918,8 +943,34 @@ const handleAudioControl = (action: 'start' | 'stop') => {
       const nextIdx = (progress.currentTurnIndex || 0) + 1;
       
       if (nextIdx >= 5) { 
-        setShowVictory(true);
-        return; 
+         // This is the end of Round 3 - find the winner
+          const duelIds = progress.activePlayerIds || [];
+          const leftId = duelIds[0];
+          const rightId = duelIds[1];
+          
+          const leftPlayer = gameState.players.find(p => p.id === leftId);
+          const rightPlayer = gameState.players.find(p => p.id === rightId);
+          
+          // Determine winner by stars, then score
+          let winnerId = leftId;
+          if (rightPlayer) {
+            if ((rightPlayer.stars || 0) > (leftPlayer?.stars || 0)) {
+              winnerId = rightId;
+            } else if ((rightPlayer.stars || 0) === (leftPlayer?.stars || 0)) {
+              if (rightPlayer.score > (leftPlayer?.score || 0)) {
+                winnerId = rightId;
+              }
+            }
+          }
+          
+          setVictoryContext({
+            roundId: 3,
+            winnerId: winnerId
+          });
+          setShowVictory(true);
+          return; 
+        // setShowVictory(true);
+        // return; 
       }
       
       setGameState(prev => ({ 
@@ -1319,7 +1370,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                       onClick={() => { 
                         if (isPlaying) return;
                         stopSong();
-                        initializeRound(3); // Go to Round 3 (final)
+                        initializeRound(4); // Go to Round 3 (final)
                         navigateTo('round', 3);
                       }} 
                       className={`p-6 rounded-2xl transition-all ${
@@ -1497,18 +1548,9 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                   </div>
                   <div className="flex gap-4">
                     <button 
-                      onClick={() => { 
+                    onClick={() => { 
                         if (isPlaying) return;
-                        showModal(
-                          t.mainMenu, 
-                          "Go back to Round 2?", 
-                          () => {
-                            stopSong();
-                            initializeRound(2);
-                            navigateTo('round', 2);
-                            setModal(null);
-                          }
-                        );
+                        navigateTo('round', 2);
                       }} 
                       className={`p-6 rounded-2xl transition-all ${
                         isPlaying 
@@ -1588,14 +1630,31 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                 </span>
 
                 <div className="grid grid-cols-2 gap-8 w-full">
-                  <div className="flex flex-col items-center">
+                  
+                <div className="flex flex-col items-center">
                     <div className="text-2xl font-black text-indigo-300 mb-3 text-center break-words whitespace-normal w-full px-2 min-h-[4rem] flex items-center justify-center">
                       <div className="leading-tight">
                         {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
                       </div>
                     </div>
+                    
                     <div className="bg-indigo-900/40 px-6 py-4 rounded-3xl border-2 border-indigo-500/30 shadow-inner flex flex-col items-center">
-                      <div className="flex flex-wrap justify-center gap-2">
+
+
+                      <div className="flex justify-center gap-2">
+                        {[1, 2, 3].map((starNum) => {
+                          const isFilled = (leftPlayer.stars || 0) >= starNum;
+                          return (
+                            <Star 
+                              key={starNum} 
+                              size={28} 
+                              className={`${isFilled ? 'text-yellow-400 fill-yellow-400' : 'text-indigo-900/40 fill-indigo-900/40'}`}
+                            />
+                          );
+                        })}
+                      </div>
+                    
+                      {/* <div className="flex flex-wrap justify-center gap-2">
                         {(() => {
                           const stars = leftPlayer.stars || 0;
                           const elements = [];
@@ -1607,8 +1666,9 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                           }
                           return elements;
                         })()}
-                      </div>
-                    </div>
+                      </div> */}
+
+                    </div> 
                   </div>
                   
                   <div className="flex flex-col items-center">
@@ -1618,7 +1678,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                       </div>
                     </div>
                     <div className="bg-rose-900/40 px-6 py-4 rounded-3xl border-2 border-rose-500/30 shadow-inner flex flex-col items-center">
-                      <div className="flex flex-wrap justify-center gap-2">
+                      {/* <div className="flex flex-wrap justify-center gap-2">
                         {(() => {
                           const opponentStars = rightPlayer?.stars || 0;
                           
@@ -1631,7 +1691,22 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                           ));
                           
                           return [...yellowStars, ...grayStars];
-                        })()}
+                        })()} */}
+                        <div className="flex justify-center gap-2">
+                       {[1, 2, 3].map((starNum) => {
+                          const opponentStars = rightPlayer?.stars || 0;
+                          const isFilled = opponentStars >= starNum;
+                          return (
+                            <Star 
+                              key={starNum} 
+                              size={28} 
+                              className={`${isFilled ? 'text-yellow-400 fill-yellow-400' : 'text-rose-900/40 fill-rose-900/40'}`}
+                            />
+                          );
+                        })}
+
+
+
                     </div>
                   </div>
                 </div>
@@ -1909,6 +1984,185 @@ const handleAudioControl = (action: 'start' | 'stop') => {
     </div>
   );
 
+const Round3VictoryView = () => {
+  const winner = gameState.players.find(p => p.id === victoryContext.winnerId);
+  
+  if (!winner) return null;
+
+  // Sort all players by stars then score
+  const sortedPlayers = [...gameState.players].sort((a, b) => {
+    if (b.stars !== a.stars) return b.stars - a.stars;
+    return b.score - a.score;
+  });
+
+  const handleClose = () => {
+    if (sfxRef.current) {
+      sfxRef.current.pause();
+      sfxRef.current = null;
+    }
+    setShowVictory(false);
+    setVictoryContext({ roundId: null, winnerId: null });
+    triggerBGM('round', 3);
+  };
+
+  const handleSuperGame = () => {
+    if (sfxRef.current) {
+      sfxRef.current.pause();
+      sfxRef.current = null;
+    }
+    
+    const winnerIndex = gameState.players.findIndex(p => p.id === winner.id);
+    
+    setShowVictory(false);
+    setVictoryContext({ roundId: null, winnerId: null });
+    
+    // Reset Round 4 states
+    setR4IsActiveSession(false);
+    setSelectedRow(null);
+    setR4CurrentSongIdx(0);
+    setTimeLeft(undefined);
+    setShowTimerSettings(false);
+    setPlayedButNotEvaluated([]);
+    setActiveNote(null);
+    setCurrentRoundPoints(undefined);
+    
+    // Set only winner to play Round 4
+    const initialR4Progress = {
+      [winner.id]: {
+        correctIndices: new Set(),
+        wrongIndex: null,
+        hasFinished: false,
+        timeSpent: 0
+      }
+    };
+    
+    setGameState(prev => ({
+      ...prev,
+      currentPlayerIndex: winnerIndex,
+      activeRoundId: 4,
+      roundProgress: {
+        ...prev.roundProgress,
+        [4]: {
+          usedNotes: new Set(),
+          activatedCategories: new Set(),
+          pointMap: {},
+          activationCounts: {},
+          results: {},
+          r4PlayerProgress: initialR4Progress,
+          usedRows: new Set()
+        }
+      }
+    }));
+    
+    setCurrentPage('round');
+  };
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950 p-8 text-center animate-in zoom-in duration-1000">
+      <div className="max-w-[900px] w-full">
+        <Trophy 
+          size={120} 
+          className="text-yellow-500 mx-auto mb-10 animate-bounce"
+        />
+        
+        <h1 className="text-[6rem] font-black text-white mb-4 uppercase tracking-tighter leading-none">
+          {t.duelVictory || "DUEL VICTORY!"}
+        </h1>
+        <p className="text-2xl text-slate-400 mb-12 font-bold uppercase tracking-[0.3em] opacity-60">
+          {winner.name} {t.winsDuel || "WINS THE DUEL!"}
+        </p>
+        
+        {/* WINNER CARD */}
+        <div className="bg-slate-900 p-12 rounded-[4rem] border-4 border-yellow-500/40 mb-6 shadow-[0_40px_80px_rgba(234,179,8,0.3)]">
+          <div className="text-sm font-black text-yellow-500 uppercase tracking-[0.4em] mb-4">
+            {t.duelChampion || "DUEL CHAMPION"}
+          </div>
+          <div className="text-[5rem] font-black text-white mb-8 tracking-tighter leading-none">
+            {winner.name || `Player ${winner.id + 1}`}
+          </div>
+          <div className="flex justify-center gap-16">
+            <div className="text-center">
+              <div className="text-yellow-500/80 text-xs font-black uppercase tracking-[0.2em] mb-3">
+                {t.stars || "STARS"}
+              </div>
+              <div className="text-6xl font-black text-yellow-500 tabular-nums tracking-tighter">
+                {winner.stars || 0}/3
+              </div>
+            </div>
+            <div className="w-1 h-24 bg-slate-800 rounded-full" />
+            <div className="text-center">
+              <div className="text-yellow-500/80 text-xs font-black uppercase tracking-[0.2em] mb-3">
+                {t.totalPoints || "TOTAL POINTS"}
+              </div>
+              <div className="text-6xl font-black text-yellow-500 tabular-nums tracking-tighter">
+                {winner.score}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* ALL PLAYERS RESULTS */}
+        <div className="bg-slate-900/80 p-8 rounded-[3rem] border-2 border-slate-700/50 mb-8 shadow-xl">
+          <div className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-6">
+            {t.allPlayers || "ALL PLAYERS RESULTS"}
+          </div>
+          <div className="space-y-4">
+            {sortedPlayers.map((player, idx) => (
+              <div 
+                key={player.id} 
+                className={`flex items-center justify-between p-6 rounded-[2rem] border-2 ${
+                  player.id === winner.id 
+                    ? 'bg-yellow-900/20 border-yellow-500/30' 
+                    : 'bg-slate-800/40 border-slate-700/30'
+                }`}
+              >
+                <div className="flex items-center gap-6">
+                  <div className="text-slate-500 font-black text-2xl w-8">
+                    {idx + 1}.
+                  </div>
+                  <div>
+                    <div className={`text-2xl font-black ${
+                      player.id === winner.id ? 'text-yellow-400' : 'text-white'
+                    }`}>
+                      {player.name || `Player ${player.id + 1}`}
+                    </div>
+                    <div className="text-sm font-black text-slate-500 uppercase mt-1 flex items-center gap-2">
+                      <Star size={14} fill="currentColor" />
+                      {player.stars || 0} {t.stars || "stars"}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-3xl font-black text-indigo-400 tabular-nums">
+                  {player.score} <span className="text-xs opacity-60">pts</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* BUTTONS */}
+        <div className="flex gap-6 justify-center">
+          <button 
+            onClick={handleClose} 
+            className="px-10 py-6 bg-slate-800 text-white rounded-[2rem] font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-slate-900/40 uppercase tracking-[0.2em] flex items-center gap-4"
+          >
+            <XCircle size={28} /> {t.close || "CLOSE"}
+          </button>
+          <button 
+            onClick={handleSuperGame} 
+            className="px-10 py-6 bg-emerald-600 text-white rounded-[2rem] font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-emerald-900/40 uppercase tracking-[0.2em] flex items-center gap-4"
+          >
+            <Zap size={28} /> {t.superGame || "SUPER GAME"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+
+
   // VictoryView component (unchanged except for variable names)
   const VictoryView = () => {
     const sortedPlayers = [...gameState.players].sort((a, b) => {
@@ -2093,7 +2347,14 @@ const handleAudioControl = (action: 'start' | 'stop') => {
           </div>
         </div>
       )}
-      {showVictory && <VictoryView />}
+      {/* {showVictory && <VictoryView />} */}
+
+      {showVictory && (
+        victoryContext.roundId === 3 ? 
+          <Round3VictoryView /> : 
+          <VictoryView />
+      )}
+
       {roundSetSelectionModal !== null && (
         <RoundSetSelector
           roundId={roundSetSelectionModal}
