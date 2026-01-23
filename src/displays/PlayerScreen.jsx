@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { translations } from '../../translations';
-import './PlayerScreen.css'; // Import CSS
+import './PlayerScreen.css';
+// Import the new component
+import PlayerRoundDisplay from './PlayerRoundDisplay';
 
 const PlayerScreen = () => {
   const [gameState, setGameState] = useState(null);
@@ -18,7 +20,7 @@ const PlayerScreen = () => {
   
   if (!gameState) {
     return (
-      <div className="player-loading-screen">
+      <div className="player-screen player-loading-screen">
         <h1 className="player-loading-title">🎵 {translations.en.title} 🎵</h1>
         <p className="player-loading-text">Waiting for game...</p>
       </div>
@@ -30,7 +32,7 @@ const PlayerScreen = () => {
     players = [], 
     activeRoundId, 
     roundProgress = {}, 
-    language = 'en' 
+    language = 'en'
   } = gameState;
   
   const t = translations[language];
@@ -175,7 +177,12 @@ const PlayerScreen = () => {
     );
   }
   
-  // Default for other pages
+  // Round Display (Rounds 1 & 2)
+  if (currentPage === 'round' && (activeRoundId === 1 || activeRoundId === 2)) {
+    return <PlayerRoundDisplay gameState={gameState} t={t} />;
+  }
+  
+  // Default for other pages/rounds
   return (
     <div className="player-screen player-default-screen">
       <h1 className="player-default-title">{t.title}</h1>

@@ -1962,7 +1962,7 @@ const Round3VictoryView = () => {
       <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} />
       {/* {currentPage === 'setup' && <SetupView />} */}
        {/* In your App.js render logic, find where SetupView is rendered */}
-      // In your App.js render section:
+      {/* // In your App.js render section: */}
       {currentPage === 'setup' && (
         <SetupView
           players={gameState.players}
