@@ -198,51 +198,56 @@ const App: React.FC = () => {
 useEffect(() => {
   // Share game state with player screen
   const shareState = () => {
+    const activeId = gameState.activeRoundId;
+    
+    // We create a "Serialized" version of progress to fix the Set -> Array issue
+    const serializedRoundProgress = { ...gameState.roundProgress };
+    
+    if (activeId && serializedRoundProgress[activeId]) {
+      const currentProg = serializedRoundProgress[activeId];
+      
+      serializedRoundProgress[activeId] = {
+        ...currentProg,
+        // Convert Sets to Arrays so they survive the JSON stringify process
+        usedNotes: currentProg.usedNotes instanceof Set 
+          ? Array.from(currentProg.usedNotes) 
+          : (Array.isArray(currentProg.usedNotes) ? currentProg.usedNotes : []),
+        
+        activatedCategories: currentProg.activatedCategories instanceof Set 
+          ? Array.from(currentProg.activatedCategories) 
+          : (Array.isArray(currentProg.activatedCategories) ? currentProg.activatedCategories : []),
+          
+        usedRows: currentProg.usedRows instanceof Set 
+          ? Array.from(currentProg.usedRows) 
+          : (Array.isArray(currentProg.usedRows) ? currentProg.usedRows : []),
+      };
+    }
+
     const stateToShare = {
-      currentPage,
-      activeRoundId: gameState.activeRoundId,
+      // Force victory page if showVictory is triggered
+      currentPage: showVictory ? 'victory' : currentPage,
+      activeRoundId: activeId,
       players: gameState.players,
       currentPlayerIndex: gameState.currentPlayerIndex,
-      roundProgress: gameState.roundProgress,
+      roundProgress: serializedRoundProgress, // Pass the fixed data
       roundSets: gameState.roundSets,
-      // Add round-specific states
       timeLeft: timeLeft,
       audioProgress: audioProgress,
       isPlaying: isPlaying,
       activeNote: activeNote,
       currentRoundPoints: currentRoundPoints,
-      // Round 3 specific
       r3Selection: r3Selection,
       isR3Finalized: isR3Finalized,
       selectedDuration: selectedDuration,
-      // Round 4 specific
       r4CurrentSongIdx: r4CurrentSongIdx,
       r4IsActiveSession: r4IsActiveSession,
       selectedRow: selectedRow,
       timerDuration: timerDuration,
       playedButNotEvaluated: playedButNotEvaluated,
-      // Victory
       victoryContext: victoryContext,
       showVictory: showVictory,
-      // Language
       language: gameState.language
     };
-    
-    // DEBUG: Log round progress when it changes
-    if (gameState.activeRoundId && gameState.roundProgress[gameState.activeRoundId]) {
-      const currentRound = gameState.activeRoundId;
-      const roundProgress = gameState.roundProgress[currentRound];
-      
-      // Check if this is round 1 or 2 (where notes have results)
-      // if (currentRound === 1 || currentRound === 2) {
-      //   // Log only when results exist
-      //   if (roundProgress.results && Object.keys(roundProgress.results).length > 0) {
-      //     console.log('📤 [App → Player] Sharing state for round', currentRound);
-      //     console.log('📤 Results:', roundProgress.results);
-      //     console.log('📤 Used notes:', Array.from(roundProgress.usedNotes || []));
-      //   }
-      // }
-    }
     
     try {
       localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShare));
@@ -251,7 +256,6 @@ useEffect(() => {
     }
   };
   
-  // Update every 300ms (fast enough for real-time updates)
   const interval = setInterval(shareState, 300);
   return () => clearInterval(interval);
 }, [
@@ -273,6 +277,86 @@ useEffect(() => {
   victoryContext,
   showVictory
 ]);
+
+
+// useEffect(() => {
+//   // Share game state with player screen
+//   const shareState = () => {
+//     const stateToShare = {
+//       currentPage: showVictory ? 'victory' : currentPage,
+//       activeRoundId: gameState.activeRoundId,
+//       players: gameState.players,
+//       currentPlayerIndex: gameState.currentPlayerIndex,
+//       roundProgress: gameState.roundProgress,
+//       roundSets: gameState.roundSets,
+//       // Add round-specific states
+//       timeLeft: timeLeft,
+//       audioProgress: audioProgress,
+//       isPlaying: isPlaying,
+//       activeNote: activeNote,
+//       currentRoundPoints: currentRoundPoints,
+//       // Round 3 specific
+//       r3Selection: r3Selection,
+//       isR3Finalized: isR3Finalized,
+//       selectedDuration: selectedDuration,
+//       // Round 4 specific
+//       r4CurrentSongIdx: r4CurrentSongIdx,
+//       r4IsActiveSession: r4IsActiveSession,
+//       selectedRow: selectedRow,
+//       timerDuration: timerDuration,
+//       playedButNotEvaluated: playedButNotEvaluated,
+//       // Victory
+//       victoryContext: victoryContext,
+//       showVictory: showVictory,
+//       // Language
+//       language: gameState.language
+//     };
+    
+//     // DEBUG: Log round progress when it changes
+//     if (gameState.activeRoundId && gameState.roundProgress[gameState.activeRoundId]) {
+//       const currentRound = gameState.activeRoundId;
+//       const roundProgress = gameState.roundProgress[currentRound];
+      
+//       // Check if this is round 1 or 2 (where notes have results)
+//       // if (currentRound === 1 || currentRound === 2) {
+//       //   // Log only when results exist
+//       //   if (roundProgress.results && Object.keys(roundProgress.results).length > 0) {
+//       //     console.log('📤 [App → Player] Sharing state for round', currentRound);
+//       //     console.log('📤 Results:', roundProgress.results);
+//       //     console.log('📤 Used notes:', Array.from(roundProgress.usedNotes || []));
+//       //   }
+//       // }
+//     }
+    
+//     try {
+//       localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShare));
+//     } catch (error) {
+//       console.log('Error sharing state:', error);
+//     }
+//   };
+  
+//   // Update every 300ms (fast enough for real-time updates)
+//   const interval = setInterval(shareState, 300);
+//   return () => clearInterval(interval);
+// }, [
+//   currentPage,
+//   gameState,
+//   timeLeft,
+//   audioProgress,
+//   isPlaying,
+//   activeNote,
+//   currentRoundPoints,
+//   r3Selection,
+//   isR3Finalized,
+//   selectedDuration,
+//   r4CurrentSongIdx,
+//   r4IsActiveSession,
+//   selectedRow,
+//   timerDuration,
+//   playedButNotEvaluated,
+//   victoryContext,
+//   showVictory
+// ]);
 //   // In App.js, add this useEffect after other useEffects
 // useEffect(() => {
 //   // Share game state with player screen

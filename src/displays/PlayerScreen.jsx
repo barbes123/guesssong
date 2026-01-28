@@ -3,6 +3,7 @@ import { translations } from '../../translations';
 import './PlayerScreen.css';
 // Import the new component
 import PlayerRoundDisplay from './PlayerRoundDisplay';
+import VictoryDisplay from './VictoryDisplay';
 
 const PlayerScreen = () => {
   const [gameState, setGameState] = useState(null);
@@ -180,6 +181,10 @@ const PlayerScreen = () => {
   // Round Display (Rounds 1 & 2)
   if (currentPage === 'round' && (activeRoundId === 1 || activeRoundId === 2)) {
     return <PlayerRoundDisplay gameState={gameState} t={t} />;
+  }
+
+  if (gameState.currentPage === 'victory') {
+    return <VictoryDisplay players={gameState.players} t={t} />;
   }
   
   // Default for other pages/rounds
