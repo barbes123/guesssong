@@ -195,8 +195,6 @@ const App: React.FC = () => {
     };
   }, [currentPage, gameState.activeRoundId, triggerBGM]);
 
-
-  // In App.js, add this useEffect after other useEffects
 useEffect(() => {
   // Share game state with player screen
   const shareState = () => {
@@ -230,6 +228,22 @@ useEffect(() => {
       language: gameState.language
     };
     
+    // DEBUG: Log round progress when it changes
+    if (gameState.activeRoundId && gameState.roundProgress[gameState.activeRoundId]) {
+      const currentRound = gameState.activeRoundId;
+      const roundProgress = gameState.roundProgress[currentRound];
+      
+      // Check if this is round 1 or 2 (where notes have results)
+      // if (currentRound === 1 || currentRound === 2) {
+      //   // Log only when results exist
+      //   if (roundProgress.results && Object.keys(roundProgress.results).length > 0) {
+      //     console.log('📤 [App → Player] Sharing state for round', currentRound);
+      //     console.log('📤 Results:', roundProgress.results);
+      //     console.log('📤 Used notes:', Array.from(roundProgress.usedNotes || []));
+      //   }
+      // }
+    }
+    
     try {
       localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShare));
     } catch (error) {
@@ -237,29 +251,92 @@ useEffect(() => {
     }
   };
   
-  // Update state every 300ms
+  // Update every 300ms (fast enough for real-time updates)
   const interval = setInterval(shareState, 300);
-  
   return () => clearInterval(interval);
-  }, [
-    currentPage,
-    gameState,
-    timeLeft,
-    audioProgress,
-    isPlaying,
-    activeNote,
-    currentRoundPoints,
-    r3Selection,
-    isR3Finalized,
-    selectedDuration,
-    r4CurrentSongIdx,
-    r4IsActiveSession,
-    selectedRow,
-    timerDuration,
-    playedButNotEvaluated,
-    victoryContext,
-    showVictory
-  ]);
+}, [
+  currentPage,
+  gameState,
+  timeLeft,
+  audioProgress,
+  isPlaying,
+  activeNote,
+  currentRoundPoints,
+  r3Selection,
+  isR3Finalized,
+  selectedDuration,
+  r4CurrentSongIdx,
+  r4IsActiveSession,
+  selectedRow,
+  timerDuration,
+  playedButNotEvaluated,
+  victoryContext,
+  showVictory
+]);
+//   // In App.js, add this useEffect after other useEffects
+// useEffect(() => {
+//   // Share game state with player screen
+//   const shareState = () => {
+//     const stateToShare = {
+//       currentPage,
+//       activeRoundId: gameState.activeRoundId,
+//       players: gameState.players,
+//       currentPlayerIndex: gameState.currentPlayerIndex,
+//       roundProgress: gameState.roundProgress,
+//       roundSets: gameState.roundSets,
+//       // Add round-specific states
+//       timeLeft: timeLeft,
+//       audioProgress: audioProgress,
+//       isPlaying: isPlaying,
+//       activeNote: activeNote,
+//       currentRoundPoints: currentRoundPoints,
+//       // Round 3 specific
+//       r3Selection: r3Selection,
+//       isR3Finalized: isR3Finalized,
+//       selectedDuration: selectedDuration,
+//       // Round 4 specific
+//       r4CurrentSongIdx: r4CurrentSongIdx,
+//       r4IsActiveSession: r4IsActiveSession,
+//       selectedRow: selectedRow,
+//       timerDuration: timerDuration,
+//       playedButNotEvaluated: playedButNotEvaluated,
+//       // Victory
+//       victoryContext: victoryContext,
+//       showVictory: showVictory,
+//       // Language
+//       language: gameState.language
+//     };
+    
+//     try {
+//       localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShare));
+//     } catch (error) {
+//       console.log('Error sharing state:', error);
+//     }
+//   };
+  
+//   // Update state every 300ms
+//   const interval = setInterval(shareState, 300);
+  
+//   return () => clearInterval(interval);
+//   }, [
+//     currentPage,
+//     gameState,
+//     timeLeft,
+//     audioProgress,
+//     isPlaying,
+//     activeNote,
+//     currentRoundPoints,
+//     r3Selection,
+//     isR3Finalized,
+//     selectedDuration,
+//     r4CurrentSongIdx,
+//     r4IsActiveSession,
+//     selectedRow,
+//     timerDuration,
+//     playedButNotEvaluated,
+//     victoryContext,
+//     showVictory
+//   ]);
 
 
   //also for playerscreen
@@ -842,221 +919,211 @@ const handleAudioControl = (action: 'start' | 'stop') => {
 
   // UPDATED handleFinalizeTurn function
   const handleFinalizeTurn = (status: 'correct' | 'wrong' | 'skip', isTimeOut = false) => {
-    if (!activeNote || activeNote.isReveal) return;
-    const roundId = gameState.activeRoundId!;
-    const progress = gameState.roundProgress[roundId];
-    const isFinalRound = roundId === 3;
-    const isSprintRound = roundId === 4;
+  if (!activeNote || activeNote.isReveal) return;
+  const roundId = gameState.activeRoundId!;
+  const progress = gameState.roundProgress[roundId];
+  if (!progress) return;
 
+  const isFinalRound = roundId === 3;
+  const isSprintRound = roundId === 4;
 
+  // =========================================================
+  // ROUND 4: SPRINT LOGIC (Update state, don't return JSX)
+  // =========================================================
+  if (isSprintRound) {
+    const pId = gameState.players[gameState.currentPlayerIndex].id;
+    const playerProg = progress.r4PlayerProgress?.[pId];
+    if (!playerProg) return;
 
-    if (isSprintRound) {
-       return (
-         <RoundSprint 
-           gameState={gameState}
-           isPlaying={isPlaying}
-           timeLeft={timeLeft}
-           audioProgress={audioProgress}
-           modal={modal}
-           t={t}
-           // Sprint specific props
-           r4IsActiveSession={r4IsActiveSession}
-           selectedRow={selectedRow}
-           r4CurrentSongIdx={r4CurrentSongIdx}
-           playedButNotEvaluated={playedButNotEvaluated}
-           showTimerSettings={showTimerSettings}
-           timerDuration={timerDuration}
-           activeNote={activeNote}
-           // Actions
-           onNavigate={navigateTo}
-           onInitializeRound={initializeRound}
-           onUpdatePlayer={handleUpdatePlayer}
-           onShowModal={showModal}
-           onSetModal={setModal}
-           onSetCurrentPlayer={(idx) => setGameState(prev => ({ ...prev, currentPlayerIndex: idx }))}
-           onAudioControl={handleAudioControl}
-           onFinalizeTurn={handleFinalizeTurn}
-           onSeek={handleSeek}
-           formatTime={formatTime}
-           onNoteClick={handleNoteClick}
-           onSetR4IsActiveSession={setR4IsActiveSession}
-           onSetSelectedRow={setSelectedRow}
-           onSetTimeLeft={setTimeLeft}
-           onSetShowTimerSettings={setShowTimerSettings}
-           onSetPlayedButNotEvaluated={setPlayedButNotEvaluated}
-           onSetTimerDuration={setTimerDuration}
-           onResetTimer={resetTimer}
-           onStopSong={stopSong}
-         />
-       );
-    }
-
-    // if (isSprintRound) {
-    //   const pId = gameState.players[gameState.currentPlayerIndex].id;
-    //   const playerProg = progress.r4PlayerProgress?.[pId];
-    //   if (!playerProg) return;
-
-    //   const finalizeR4Player = (finalStatus: 'wrong' | 'all_correct' | 'time_out') => {
-    //     stopSong(true);
-    //     const finalCorrectCount = playerProg.correctIndices.size + (status === 'correct' ? 1 : 0);
-    //     const pointsAwarded = finalCorrectCount * 10 + (finalCorrectCount === 7 ? 300 : 0);
-        
-    //     setPlayedButNotEvaluated([]);
-        
-    //     setGameState(prev => {
-    //       const newPlayers = prev.players.map(p => p.id === pId ? { ...p, score: p.score + pointsAwarded } : p);
-    //       const newR4Progs = { ...progress.r4PlayerProgress };
-    //       const usedRowsSet = new Set(progress.usedRows || []);
-    //       if (selectedRow !== null) usedRowsSet.add(selectedRow);
-          
-    //       newR4Progs[pId] = {
-    //         ...playerProg,
-    //         hasFinished: true,
-    //         wrongIndex: finalStatus === 'wrong' ? r4CurrentSongIdx : null,
-    //         timeSpent: playerProg.timeSpent + (timerDuration - (timeLeft || 0))
-    //       };
-    //       if (status === 'correct') newR4Progs[pId].correctIndices.add(r4CurrentSongIdx);
-
-    //       return {
-    //         ...prev,
-    //         roundProgress: {
-    //           ...prev.roundProgress,
-    //           [4]: { ...progress, r4PlayerProgress: newR4Progs, usedRows: usedRowsSet }
-    //         },
-    //         players: newPlayers
-    //       };
-    //     });
-    //     setR4IsActiveSession(false);
-    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex: r4CurrentSongIdx, isReveal: true });
-    //     playSFX(finalStatus === 'wrong' ? SFX.wrong : SFX.correct);
-    //   };
-
-    //   if (isTimeOut) { finalizeR4Player('time_out'); return; }
-    //   if (status === 'wrong') {
-    //       showModal(t.wrong, t.confirmAction, () => { 
-    //         setModal(null); 
-    //         finalizeR4Player('wrong'); 
-    //         setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
-    //       }, undefined, undefined, 'inline');
-    //       return;
-    //     }
-    //   if (status === 'correct') {
-    //     showModal(
-    //       t.correct || "Correct",
-    //       t.confirmAction || "Mark this song as correct?",
-    //       () => {
-    //         setModal(null);
-    //         const newSet = new Set(playerProg.correctIndices);
-    //         newSet.add(r4CurrentSongIdx);
-    //         setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
-            
-    //         if (selectedRow !== null) {
-    //           const startIdx = selectedRow * 7;
-    //           if (newSet.size === 7) { 
-    //             finalizeR4Player('all_correct'); 
-    //             return; 
-    //           }
-    //           let nextIdx = r4CurrentSongIdx;
-    //           for (let i = 1; i <= 7; i++) {
-    //             const potential = startIdx + ((r4CurrentSongIdx - startIdx + i) % 7);
-    //             if (!newSet.has(potential)) {
-    //               nextIdx = potential;
-    //               break;
-    //             }
-    //           }
-    //           setGameState(prev => {
-    //             const progs = { ...progress.r4PlayerProgress };
-    //             progs[pId] = { 
-    //               ...playerProg, 
-    //               correctIndices: newSet, 
-    //               timeSpent: playerProg.timeSpent + (timerDuration - (timeLeft || 0)) 
-    //             };
-    //             return { 
-    //               ...prev, 
-    //               roundProgress: { 
-    //                 ...prev.roundProgress, 
-    //                 [4]: { ...progress, r4PlayerProgress: progs } 
-    //               } 
-    //             };
-    //           });
-    //           setR4CurrentSongIdx(nextIdx);
-    //           setActiveNote({ categoryId: 'r4_sprint', noteIndex: nextIdx });
-    //           playSFX(SFX.correct);
-    //           stopSong(true);
-    //         }
-    //       },
-    //       undefined,
-    //       undefined,
-    //       'inline'
-    //     );
-    //     return;
-    //   }
-    //   return;
-    // }
-    if (isFinalRound) {
-      return (
-        <RoundDuel 
-          gameState={gameState}
-          isPlaying={isPlaying}
-          timeLeft={timeLeft}
-          audioProgress={audioProgress}
-          modal={modal}
-          t={t}
-          selectedDuration={selectedDuration}
-          isR3Finalized={isR3Finalized}
-          onNavigate={navigateTo}
-          onInitializeRound={initializeRound}
-          onUpdatePlayer={handleUpdatePlayer}
-          onShowModal={showModal}
-          onSetModal={setModal}
-          onSetCurrentPlayer={(idx) => {
-             setGameState(prev => ({ ...prev, currentPlayerIndex: idx }));
-          }}
-          onAudioControl={handleAudioControl}
-          onFinalizeTurn={handleFinalizeTurn}
-          onSeek={handleSeek}
-          formatTime={formatTime}
-          onSetSelectedDuration={setSelectedDuration}
-          onPlaySFX={playSFX}
-          onNextTurnNav={handleNextTurnNav}
-          onStopSong={stopSong}
-        />
-      );
-    }
-
-    showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
-      const addedPoints = status === 'correct' ? (currentRoundPoints || 0) : 0;
-      if (status === 'correct') playSFX(SFX.correct);
-      else playSFX(SFX.wrong);
+    const finalizeR4Player = (finalStatus: 'wrong' | 'all_correct' | 'time_out') => {
+      stopSong(true);
+      const finalCorrectCount = playerProg.correctIndices.size + (status === 'correct' ? 1 : 0);
+      const pointsAwarded = finalCorrectCount * 10 + (finalCorrectCount === 7 ? 300 : 0);
+      
+      setPlayedButNotEvaluated([]);
+      
       setGameState(prev => {
-        const newPlayers = prev.players.map((p, idx) => idx === prev.currentPlayerIndex ? { ...p, score: p.score + addedPoints } : p);
-        const newUsedNotes = new Set(progress.usedNotes);
-        const newActivationCounts = { ...progress.activationCounts };
-        const newPersistentPoints = { ...progress.persistentPoints };
-        const newResults = { ...progress.results };
-        const catId = activeNote.categoryId;
+        const newPlayers = prev.players.map(p => p.id === pId ? { ...p, score: p.score + pointsAwarded } : p);
+        const newR4Progs = { ...progress.r4PlayerProgress };
+        const usedRowsSet = new Set(progress.usedRows || []);
+        if (selectedRow !== null) usedRowsSet.add(selectedRow);
         
-        if (roundId === 2) {
-          const count = (newActivationCounts[catId] || 0) + 1;
-          newActivationCounts[catId] = count;
-          newPersistentPoints[`${catId}-0`] = currentRoundPoints || 20; 
-          if (count >= 4) { newUsedNotes.add(`${catId}-0`); newResults[`${catId}-0`] = status; }
-        } else {
-          newUsedNotes.add(`${catId}-${activeNote.noteIndex}`);
-          newResults[`${catId}-${activeNote.noteIndex}`] = status;
-        }
-        
-        const isCompleted = (roundId === 2) ? (newActivationCounts[catId] >= 4) : Array.from({length: 4}).every((_, i) => newUsedNotes.has(`${catId}-${i}`));
-        const newActivatedCategories = new Set(progress.activatedCategories);
-        if (isCompleted) newActivatedCategories.add(catId);
+        newR4Progs[pId] = {
+          ...playerProg,
+          hasFinished: true,
+          wrongIndex: finalStatus === 'wrong' ? r4CurrentSongIdx : null,
+          timeSpent: playerProg.timeSpent + (timerDuration - (timeLeft || 0))
+        };
+        if (status === 'correct') newR4Progs[pId].correctIndices.add(r4CurrentSongIdx);
+
         return {
-          ...prev, players: newPlayers, currentPlayerIndex: (prev.currentPlayerIndex + 1) % prev.players.length,
-          roundProgress: { ...prev.roundProgress, [roundId]: { ...progress, usedNotes: newUsedNotes, activatedCategories: newActivatedCategories, activationCounts: newActivationCounts, persistentPoints: newPersistentPoints, results: newResults } }
+          ...prev,
+          roundProgress: {
+            ...prev.roundProgress,
+            [4]: { ...progress, r4PlayerProgress: newR4Progs, usedRows: usedRowsSet }
+          },
+          players: newPlayers
         };
       });
-      stopSong(true); setActiveNote(null); setCurrentRoundPoints(undefined); setTimeLeft(undefined); setModal(null);
-    }, status === 'correct' ? t.correct : t.noAssign, undefined, 'inline');
-  };
+      setR4IsActiveSession(false);
+      setActiveNote({ categoryId: 'r4_sprint', noteIndex: r4CurrentSongIdx, isReveal: true });
+      playSFX(finalStatus === 'wrong' ? SFX.wrong : SFX.correct);
+    };
+
+    if (isTimeOut) { finalizeR4Player('time_out'); return; }
+    
+    if (status === 'wrong') {
+      showModal(t.wrong, t.confirmAction, () => { 
+        setModal(null); 
+        finalizeR4Player('wrong'); 
+        setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
+      }, undefined, undefined, 'inline');
+      return;
+    }
+
+    if (status === 'correct') {
+      showModal(t.correct || "Correct", t.confirmAction || "Mark this song as correct?", () => {
+        setModal(null);
+        const newSet = new Set(playerProg.correctIndices);
+        newSet.add(r4CurrentSongIdx);
+        setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
+        
+        if (selectedRow !== null) {
+          const startIdx = selectedRow * 7;
+          if (newSet.size === 7) { 
+            finalizeR4Player('all_correct'); 
+            return; 
+          }
+          
+          // Find next unplayed song in the row
+          let nextIdx = r4CurrentSongIdx;
+          for (let i = 1; i <= 7; i++) {
+            const potential = startIdx + ((r4CurrentSongIdx - startIdx + i) % 7);
+            if (!newSet.has(potential)) {
+              nextIdx = potential;
+              break;
+            }
+          }
+
+          setGameState(prev => {
+            const progs = { ...progress.r4PlayerProgress };
+            progs[pId] = { 
+              ...playerProg, 
+              correctIndices: newSet, 
+              timeSpent: playerProg.timeSpent + (timerDuration - (timeLeft || 0)) 
+            };
+            return { 
+              ...prev, 
+              roundProgress: { 
+                ...prev.roundProgress, 
+                [4]: { ...progress, r4PlayerProgress: progs } 
+              } 
+            };
+          });
+          setR4CurrentSongIdx(nextIdx);
+          setActiveNote({ categoryId: 'r4_sprint', noteIndex: nextIdx });
+          playSFX(SFX.correct);
+          stopSong(true);
+        }
+      }, undefined, undefined, 'inline');
+      return;
+    }
+    return;
+  }
+
+  // =========================================================
+  // ROUND 3: DUEL LOGIC (Update state, don't return JSX)
+  // =========================================================
+  if (isFinalRound) {
+    showModal(status === 'correct' ? t.correct : t.wrong, t.confirmAction, () => {
+      setGameState(prev => {
+        const currentP = prev.players[prev.currentPlayerIndex];
+        const newStars = status === 'correct' ? (currentP.stars || 0) + 1 : (currentP.stars || 0);
+        
+        const newPlayers = prev.players.map((p, idx) => 
+          idx === prev.currentPlayerIndex ? { ...p, stars: newStars } : p
+        );
+
+        return {
+          ...prev,
+          players: newPlayers
+        };
+      });
+      
+      setIsR3Finalized(true); // Locks controls and enables "Next Turn"
+      stopSong(true);
+      setModal(null);
+      playSFX(status === 'correct' ? SFX.correct : SFX.wrong);
+    }, undefined, undefined, 'inline');
+    return;
+  }
+
+  // =========================================================
+  // ROUNDS 1 & 2: STANDARD LOGIC
+  // =========================================================
+  showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
+    const addedPoints = status === 'correct' ? (currentRoundPoints || 0) : 0;
+    if (status === 'correct') playSFX(SFX.correct);
+    else playSFX(SFX.wrong);
+
+    setGameState(prev => {
+      const newPlayers = prev.players.map((p, idx) => idx === prev.currentPlayerIndex ? { ...p, score: p.score + addedPoints } : p);
+      const newUsedNotes = new Set(progress.usedNotes);
+      const newActivationCounts = { ...progress.activationCounts };
+      const newPersistentPoints = { ...progress.persistentPoints };
+      const newResults = { ...progress.results };
+      const catId = activeNote.categoryId;
+      
+      if (roundId === 2) {
+        const count = (newActivationCounts[catId] || 0) + 1;
+        newActivationCounts[catId] = count;
+        newPersistentPoints[`${catId}-0`] = currentRoundPoints || 20; 
+        
+        const noteId = `${catId}-${activeNote.noteIndex}`;
+        newUsedNotes.add(noteId);
+        newResults[noteId] = status;
+        
+        if (count >= 4) { 
+          newUsedNotes.add(`${catId}-0`); 
+          newResults[`${catId}-0`] = status; 
+        }
+      } else {
+        newUsedNotes.add(`${catId}-${activeNote.noteIndex}`);
+        newResults[`${catId}-${activeNote.noteIndex}`] = status;
+      }
+      
+      const isCompleted = (roundId === 2) 
+        ? (newActivationCounts[catId] >= 4) 
+        : [0, 1, 2, 3].every(i => newUsedNotes.has(`${catId}-${i}`));
+
+      const newActivatedCategories = new Set(progress.activatedCategories);
+      if (isCompleted) newActivatedCategories.add(catId);
+
+      return {
+        ...prev, 
+        players: newPlayers, 
+        currentPlayerIndex: (prev.currentPlayerIndex + 1) % prev.players.length,
+        roundProgress: { 
+          ...prev.roundProgress, 
+          [roundId]: { 
+            ...progress, 
+            usedNotes: newUsedNotes, 
+            activatedCategories: newActivatedCategories, 
+            activationCounts: newActivationCounts, 
+            persistentPoints: newPersistentPoints, 
+            results: newResults 
+          } 
+        }
+      };
+    });
+
+    stopSong(true); 
+    setActiveNote(null); 
+    setCurrentRoundPoints(undefined); 
+    setTimeLeft(undefined); 
+    setModal(null);
+  }, status === 'correct' ? t.correct : t.noAssign, undefined, 'inline');
+};
 
   // UPDATED handleNextTurnNav function
   const handleNextTurnNav = () => {
