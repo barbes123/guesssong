@@ -195,9 +195,10 @@ const App: React.FC = () => {
     };
   }, [currentPage, gameState.activeRoundId, triggerBGM]);
 
-useEffect(() => {
-  // Share game state with player screen
-  const shareState = () => {
+  // Ref to hold the latest state to share, preventing interval starvation
+  const stateToShareRef = useRef<any>(null);
+
+  useEffect(() => {
     const activeId = gameState.activeRoundId;
     
     // We create a "Serialized" version of progress to fix the Set -> Array issue
@@ -220,10 +221,23 @@ useEffect(() => {
         usedRows: currentProg.usedRows instanceof Set 
           ? Array.from(currentProg.usedRows) 
           : (Array.isArray(currentProg.usedRows) ? currentProg.usedRows : []),
+
+        // Handle Round 4 player progress Sets
+        r4PlayerProgress: currentProg.r4PlayerProgress ? Object.fromEntries(
+          Object.entries(currentProg.r4PlayerProgress).map(([pid, prog]: [string, any]) => [
+            pid,
+            {
+              ...prog,
+              correctIndices: prog.correctIndices instanceof Set 
+                ? Array.from(prog.correctIndices) 
+                : (Array.isArray(prog.correctIndices) ? prog.correctIndices : [])
+            }
+          ])
+        ) : undefined
       };
     }
 
-    const stateToShare = {
+    stateToShareRef.current = {
       // Force victory page if showVictory is triggered
       currentPage: showVictory ? 'victory' : currentPage,
       activeRoundId: activeId,
@@ -246,37 +260,43 @@ useEffect(() => {
       playedButNotEvaluated: playedButNotEvaluated,
       victoryContext: victoryContext,
       showVictory: showVictory,
+      showScoreboard: showScoreboard,
       language: gameState.language
     };
-    
-    try {
-      localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShare));
-    } catch (error) {
-      console.log('Error sharing state:', error);
+  }, [
+    currentPage,
+    gameState,
+    timeLeft,
+    audioProgress,
+    isPlaying,
+    activeNote,
+    currentRoundPoints,
+    r3Selection,
+    isR3Finalized,
+    selectedDuration,
+    r4CurrentSongIdx,
+    r4IsActiveSession,
+    selectedRow,
+    timerDuration,
+    playedButNotEvaluated,
+    victoryContext,
+    showVictory,
+    showScoreboard
+  ]);
+
+useEffect(() => {
+  // Share game state with player screen
+  const interval = setInterval(() => {
+    if (stateToShareRef.current) {
+      try {
+        localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShareRef.current));
+      } catch (error) {
+        console.log('Error sharing state:', error);
+      }
     }
-  };
-  
-  const interval = setInterval(shareState, 300);
+  }, 300);
   return () => clearInterval(interval);
-}, [
-  currentPage,
-  gameState,
-  timeLeft,
-  audioProgress,
-  isPlaying,
-  activeNote,
-  currentRoundPoints,
-  r3Selection,
-  isR3Finalized,
-  selectedDuration,
-  r4CurrentSongIdx,
-  r4IsActiveSession,
-  selectedRow,
-  timerDuration,
-  playedButNotEvaluated,
-  victoryContext,
-  showVictory
-]);
+}, []);
 
 
 // useEffect(() => {
@@ -697,7 +717,9 @@ const initializeRound = (roundId: number) => {
         pointMap[cat.id] = shuffle(INITIAL_POINTS);
       } else if (roundId === 2) {
         // Round 2: Melody guess (persistent points) - was old round 4
-        persistentPoints[`${cat.id}-0`] = shuffledPool[idx];
+        const score = shuffledPool[idx];
+        persistentPoints[`${cat.id}-0`] = score;
+        pointMap[cat.id] = [score, 0, 0, 0, 0];
       }
     });
 
@@ -1156,6 +1178,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
       const newActivationCounts = { ...progress.activationCounts };
       const newPersistentPoints = { ...progress.persistentPoints };
       const newResults = { ...progress.results };
+      const newPointMap = { ...progress.pointMap };
       const catId = activeNote.categoryId;
       
       if (roundId === 2) {
@@ -1163,9 +1186,14 @@ const handleAudioControl = (action: 'start' | 'stop') => {
         newActivationCounts[catId] = count;
         newPersistentPoints[`${catId}-0`] = currentRoundPoints || 20; 
         
-        const noteId = `${catId}-${activeNote.noteIndex}`;
-        newUsedNotes.add(noteId);
-        newResults[noteId] = status;
+        if (newPointMap[catId]) {
+          newPointMap[catId] = [...newPointMap[catId]];
+          newPointMap[catId][0] = currentRoundPoints || 20;
+        }
+        
+        const resultNoteId = `${catId}-${count}`;
+        newUsedNotes.add(resultNoteId);
+        newResults[resultNoteId] = status;
         
         if (count >= 4) { 
           newUsedNotes.add(`${catId}-0`); 
@@ -1195,7 +1223,8 @@ const handleAudioControl = (action: 'start' | 'stop') => {
             activatedCategories: newActivatedCategories, 
             activationCounts: newActivationCounts, 
             persistentPoints: newPersistentPoints, 
-            results: newResults 
+            results: newResults,
+            pointMap: newPointMap
           } 
         }
       };

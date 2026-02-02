@@ -1,203 +1,567 @@
 import React, { useState, useEffect } from 'react';
+import { Music, CheckCircle, XCircle, Trophy, Star } from 'lucide-react';
+import { ROUND_DATA, getRoundData } from '../../data/index_data';
 import { translations } from '../../translations';
-import './PlayerScreen.css';
-// Import the new component
-import PlayerRoundDisplay from './PlayerRoundDisplay';
-import VictoryDisplay from './VictoryDisplay';
 
 const PlayerScreen = () => {
-  const [gameState, setGameState] = useState(null);
-  
+  const [state, setState] = useState(null);
+
   useEffect(() => {
-    const interval = setInterval(() => {
+    const syncState = () => {
       const stored = localStorage.getItem('musicQuizPlayerState');
       if (stored) {
-        setGameState(JSON.parse(stored));
+        try {
+          setState(JSON.parse(stored));
+        } catch (e) {
+          console.error("Failed to parse game state", e);
+        }
       }
-    }, 500);
-    
+    };
+
+    syncState();
+    const interval = setInterval(syncState, 300);
     return () => clearInterval(interval);
   }, []);
-  
-  if (!gameState) {
+
+  if (!state) {
     return (
-      <div className="player-screen player-loading-screen">
-        <h1 className="player-loading-title">🎵 {translations.en.title} 🎵</h1>
-        <p className="player-loading-text">Waiting for game...</p>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-slate-500 text-2xl font-bold animate-pulse">Waiting for game data...</div>
       </div>
     );
   }
-  
+
   const { 
     currentPage, 
-    players = [], 
     activeRoundId, 
-    roundProgress = {}, 
-    language = 'en'
-  } = gameState;
-  
-  const t = translations[language];
-  
-  // Setup Page Display
-  if (currentPage === 'setup') {
-    const allPlayersNamed = players.every(p => p.name && p.name.trim() !== '');
-    
-    return (
-      <div className="player-screen player-setup-screen">
-        <div className="player-header">
-          <h1 className="player-title">{t.playerSetup}</h1>
-        </div>
-        
-        <div className="player-players-list">
-          {players.map((player, idx) => (
-            <div key={player.id} className="player-item">
-              <div className="player-number">{idx + 1}.</div>
-              <div className="player-name">
-                {player.name || `${t.playerName} ${player.id + 1}`}
-              </div>
-            </div>
-          ))}
-          
-          {players.length === 0 && (
-            <div className="player-empty-state">No players yet</div>
-          )}
-        </div>
-        
-        <div className="player-footer">
-          {players.length > 0 && allPlayersNamed ? (
-            <div className="player-ready-box">
-              <div className="player-ready-text">READY TO START</div>
-              <div className="player-ready-sub">
-                {players.length} {players.length !== 1 ? t.players : t.player} {t.ready}
-              </div>
-            </div>
-          ) : (
-            <div className="player-waiting-box">
-              <div className="player-waiting-text">WAITING FOR PLAYERS...</div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-  
-  // Start Page Display
-  if (currentPage === 'start') {
+    roundProgress, 
+    roundSets, 
+    players, 
+    language,
+    currentRoundPoints,
+    activeNote,
+    isPlaying,
+    showVictory,
+    victoryContext,
+    showScoreboard
+  } = state;
+
+  const t = translations[language] || translations['en'];
+
+  // --- Render Helpers ---
+
+  const renderScoreboard = () => {
     const sortedPlayers = [...players].sort((a, b) => {
       const starsA = a.stars || 0;
       const starsB = b.stars || 0;
       if (starsB !== starsA) return starsB - starsA;
       return b.score - a.score;
     });
-    
-    const completedRounds = [1, 2, 3, 4].map(id => 
-      roundProgress[id] ? true : false
-    );
-    
+
     return (
-      <div className="player-screen player-start-screen">
-        <div className="player-header">
-          <h1 className="player-title">{t.title}</h1>
-          <div className="player-subtitle">{t.chooseRound}</div>
-        </div>
-        
-        <div className="player-content-container">
-          {/* Left Column - Rounds */}
-          <div className="player-rounds-column">
-            <div className="player-rounds-grid">
-              {[1, 2, 3, 4].map(roundId => {
-                const isActive = activeRoundId === roundId;
-                const isCompleted = completedRounds[roundId - 1];
-                
-                let roundName = '';
-                if (roundId === 1) roundName = t.songChallenge;
-                if (roundId === 2) roundName = t.melodyGuess;
-                if (roundId === 3) roundName = t.categories.superGame;
-                if (roundId === 4) roundName = 'SPRINT';
-                
-                return (
-                  <div
-                    key={roundId}
-                    className={`player-round-card ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
-                  >
-                    <div className="player-round-number">
-                      {t.round} {roundId}
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/95 backdrop-blur-xl p-10 animate-in fade-in duration-500">
+        <div className="bg-slate-900 rounded-[4rem] p-16 max-w-5xl w-full border-2 border-slate-800 shadow-2xl max-h-[90vh] flex flex-col">
+          <h3 className="text-6xl font-black text-white mb-10 flex items-center gap-6 tracking-tighter uppercase shrink-0">
+            <Trophy className="text-yellow-500" size={64} /> {t.scorePanel || "Scoreboard"}
+          </h3>
+          <div className="space-y-6 overflow-y-auto pr-4">
+            {sortedPlayers.map((p, idx) => (
+              <div key={p.id} className="flex items-center justify-between p-8 bg-slate-800/60 rounded-[2.5rem] border-2 border-slate-700/50 shadow-xl shrink-0">
+                <div className="flex items-center gap-8">
+                  <span className="text-slate-600 font-black text-4xl w-16">{idx + 1}.</span>
+                  <div>
+                    <div className="text-white font-black text-4xl">{p.name || `Player ${p.id + 1}`}</div>
+                    <div className="text-yellow-500 text-lg font-black uppercase flex items-center gap-3 mt-2">
+                      <Star size={24} fill="currentColor" /> {p.stars || 0} {t.stars || "STARS"}
                     </div>
-                    <div className="player-round-name">
-                      {roundName}
-                    </div>
-                    {isCompleted && (
-                      <div className="player-completed-badge">✓</div>
-                    )}
                   </div>
-                );
-              })}
+                </div>
+                <span className="text-6xl font-black text-indigo-400 tabular-nums">
+                  {p.score} <span className="text-xl opacity-40 uppercase ml-2">pts</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderVictory = () => {
+    // If it's a Round 3 duel victory
+    if (victoryContext?.roundId === 3) {
+      const winner = players.find((p) => p.id === victoryContext.winnerId);
+      const duelPlayerIds = roundProgress[3]?.activePlayerIds || [];
+      const loser = players.find(p => duelPlayerIds.includes(p.id) && p.id !== victoryContext.winnerId);
+
+      if (!winner) return null;
+      return (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950 p-8 text-center animate-in zoom-in duration-1000 overflow-y-auto">
+          <div className="max-w-[900px] w-full">
+            <Trophy size={120} className="text-yellow-500 mx-auto mb-10 animate-bounce" />
+            <h1 className="text-[6rem] font-black text-white mb-4 uppercase tracking-tighter leading-none">
+              {t.duelVictory || "DUEL VICTORY!"}
+            </h1>
+            <div className="bg-slate-900 p-12 rounded-[4rem] border-4 border-yellow-500/40 mb-8 shadow-[0_40px_80px_rgba(234,179,8,0.3)]">
+              <div className="text-sm font-black text-yellow-500 uppercase tracking-[0.4em] mb-4">
+                {t.duelChampion || "DUEL CHAMPION"}
+              </div>
+              <div className="text-[5rem] font-black text-white mb-6 tracking-tighter leading-none">
+                {winner.name || `Player ${winner.id + 1}`}
+              </div>
+              <div className="flex justify-center gap-16">
+                <div className="text-center">
+                  <div className="text-yellow-500/80 text-xs font-black uppercase tracking-[0.2em] mb-3">{t.stars || "STARS"}</div>
+                  <div className="text-6xl font-black text-yellow-500 tabular-nums tracking-tighter">{winner.stars || 0}</div>
+                </div>
+                <div className="w-1 h-24 bg-slate-800 rounded-full" />
+                <div className="text-center">
+                  <div className="text-yellow-500/80 text-xs font-black uppercase tracking-[0.2em] mb-3">{t.totalPoints || "TOTAL POINTS"}</div>
+                  <div className="text-6xl font-black text-yellow-500 tabular-nums tracking-tighter">{winner.score}</div>
+                </div>
+              </div>
+            </div>
+
+            {loser && (
+              <div className="bg-slate-900/60 p-8 rounded-[3rem] border-2 border-slate-700/40 shadow-xl">
+                <div className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-4">
+                  {t.runnerUp || "Runner Up"}
+                </div>
+                <div className="text-[3rem] font-black text-slate-300 mb-6 tracking-tight">
+                  {loser.name || `Player ${loser.id + 1}`}
+                </div>
+                <div className="flex justify-center gap-12">
+                  <div className="text-center">
+                    <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.stars || "STARS"}</div>
+                    <div className="text-4xl font-black text-yellow-500/80 tabular-nums">{loser.stars || 0}</div>
+                  </div>
+                  <div className="w-1 h-16 bg-slate-800/50 rounded-full" />
+                  <div className="text-center">
+                    <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.points || "POINTS"}</div>
+                    <div className="text-4xl font-black text-indigo-400/80 tabular-nums">{loser.score}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Standard Game Victory
+    const sortedPlayers = [...players].sort((a, b) => {
+      const starsA = a.stars || 0;
+      const starsB = b.stars || 0;
+      if (starsB !== starsA) return starsB - starsA;
+      return (b.score || 0) - (a.score || 0);
+    });
+    const winner = sortedPlayers[0];
+    const secondPlace = sortedPlayers[1];
+    const thirdPlace = sortedPlayers[2];
+    const otherPlayers = sortedPlayers.slice(3);
+
+    return (
+      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950 p-8 text-center animate-in zoom-in duration-1000 overflow-y-auto">
+        <div className="max-w-[900px] w-full py-12">
+          <Trophy size={120} className="text-indigo-500 mx-auto mb-10 animate-bounce" />
+          <h1 className="text-[6rem] font-black text-white mb-4 uppercase tracking-tighter leading-none">
+            {t.victory || "VICTORY!"}
+          </h1>
+          <div className="bg-slate-900 p-12 rounded-[4rem] border-4 border-indigo-500/40 mb-8 shadow-[0_40px_80px_rgba(79,70,229,0.3)]">
+            <div className="text-sm font-black text-indigo-500 uppercase tracking-[0.4em] mb-4">
+              {t.winner || "WINNER"}
+            </div>
+            <div className="text-[5rem] font-black text-white mb-6 tracking-tighter leading-none">
+              {winner.name || `Player ${winner.id + 1}`}
+            </div>
+            <div className="flex justify-center gap-16">
+              <div className="text-center">
+                <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-3">{t.stars || "STARS"}</div>
+                <div className="text-6xl font-black text-yellow-500 tabular-nums tracking-tighter">{winner.stars || 0}</div>
+              </div>
+              <div className="w-1 h-24 bg-slate-800 rounded-full" />
+              <div className="text-center">
+                <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-3">{t.points || "POINTS"}</div>
+                <div className="text-6xl font-black text-indigo-400 tabular-nums tracking-tighter">{winner.score}</div>
+              </div>
             </div>
           </div>
-          
-          {/* Right Column - Players/Scores */}
-          <div className="player-scores-column">
-            <div className="player-scores-header">
-              <div className="player-section-title">{t.scorePanel}</div>
-              <div className="player-section-subtitle">Leaderboard</div>
+
+          {secondPlace && (
+            <div className="bg-slate-900/60 p-8 rounded-[3rem] border-2 border-slate-700/40 mb-6 shadow-xl">
+              <div className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-4">{t.secondPlace || "Second Place"}</div>
+              <div className="text-[3rem] font-black text-slate-300 mb-6 tracking-tight">{secondPlace.name || `Player ${secondPlace.id + 1}`}</div>
+              <div className="flex justify-center gap-12">
+                <div className="text-center">
+                  <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.stars || "STARS"}</div>
+                  <div className="text-4xl font-black text-yellow-500/80 tabular-nums">{secondPlace.stars || 0}</div>
+                </div>
+                <div className="w-1 h-16 bg-slate-800/50 rounded-full" />
+                <div className="text-center">
+                  <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.points || "POINTS"}</div>
+                  <div className="text-4xl font-black text-indigo-400/80 tabular-nums">{secondPlace.score}</div>
+                </div>
+              </div>
             </div>
-            
-            <div className="player-scores-grid">
-              {sortedPlayers.map((player, idx) => (
-                <div 
-                  key={player.id} 
-                  className={`player-score-card ${idx === 0 ? 'leader' : ''}`}
-                >
-                  <div className="player-score-rank">#{idx + 1}</div>
-                  <div className="player-score-info">
-                    <div className="player-score-name">
-                      {player.name || `${t.playerName} ${player.id + 1}`}
-                    </div>
-                    <div className="player-score-stats">
-                      <div className="player-score-stars">
-                        {[1, 2, 3].map(star => (
-                          <span 
-                            key={star} 
-                            className={`star ${star <= (player.stars || 0) ? 'active' : 'inactive'}`}
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                      <div className="player-score-points">
-                        {player.score || 0} <span className="points-label">{t.points.toLowerCase()}</span>
-                      </div>
-                    </div>
+          )}
+
+          {thirdPlace && (
+            <div className="bg-slate-900/40 p-8 rounded-[3rem] border-2 border-slate-700/30 mb-8 shadow-lg">
+              <div className="text-sm font-black text-slate-500 uppercase tracking-[0.4em] mb-4">{t.thirdPlace || "Third Place"}</div>
+              <div className="text-[2.5rem] font-black text-slate-400 mb-6 tracking-tight">{thirdPlace.name || `Player ${thirdPlace.id + 1}`}</div>
+              <div className="flex justify-center gap-10">
+                <div className="text-center">
+                  <div className="text-slate-600 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.stars || "STARS"}</div>
+                  <div className="text-3xl font-black text-yellow-500/60 tabular-nums">{thirdPlace.stars || 0}</div>
+                </div>
+                <div className="w-1 h-12 bg-slate-800/40 rounded-full" />
+                <div className="text-center">
+                  <div className="text-slate-600 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.points || "POINTS"}</div>
+                  <div className="text-3xl font-black text-indigo-400/60 tabular-nums">{thirdPlace.score}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {otherPlayers.length > 0 && (
+            <div className="space-y-4">
+              {otherPlayers.map((player, idx) => (
+                <div key={player.id} className="bg-slate-900/20 p-4 rounded-2xl border border-slate-800 flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <span className="text-slate-600 font-bold text-lg w-8">{idx + 4}.</span>
+                    <span className="text-slate-400 font-bold text-xl">{player.name || `Player ${player.id + 1}`}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-yellow-500/50 font-bold text-lg flex items-center gap-1">
+                      <Star size={14} /> {player.stars || 0}
+                    </span>
+                    <span className="text-indigo-400/50 font-bold text-lg">{player.score} pts</span>
                   </div>
                 </div>
               ))}
             </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderPlayersFooter = () => {
+    return (
+      <div className="mt-8 pb-8 w-full max-w-[1800px] mx-auto">
+        <div className="flex justify-center gap-6">
+          {players.map((p, idx) => {
+            const isCurrent = idx === state.currentPlayerIndex;
+            return (
+              <div 
+                key={p.id} 
+                className={`
+                  relative flex-1 bg-slate-900/90 backdrop-blur-md px-6 py-4 rounded-[2rem] border-2 flex items-center justify-between shadow-xl transition-all duration-500
+                  ${isCurrent ? 'border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.4)] scale-105 z-10 bg-slate-800' : 'border-slate-800 opacity-80'}
+                `}
+              >
+                {isCurrent && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+                    Current Turn
+                  </div>
+                )}
+                <div className="flex flex-col">
+                  <div className={`text-xl font-black truncate max-w-[180px] ${isCurrent ? 'text-white' : 'text-slate-400'}`}>
+                    {p.name || `Player ${p.id + 1}`}
+                  </div>
+                  <div className="flex gap-1 mt-1">
+                    {[...Array(3)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        size={16} 
+                        className={`${i < (p.stars || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-slate-700 fill-slate-700'}`} 
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className={`text-4xl font-black tabular-nums ${isCurrent ? 'text-indigo-400' : 'text-slate-500'}`}>
+                  {p.score}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const renderHeader = (roundId, title) => (
+    <div className="w-full max-w-[1800px] mx-auto mb-8 flex items-center gap-6">
+      <div className="bg-indigo-600 text-white w-20 h-20 rounded-2xl flex items-center justify-center text-5xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">
+        {roundId}
+      </div>
+      <div>
+        <h2 className="text-5xl font-black text-white tracking-tighter uppercase">
+          {title}
+        </h2>
+      </div>
+    </div>
+  );
+
+  const renderRound1 = () => {
+    const progress = roundProgress[1] || { 
+      usedNotes: [], 
+      results: {}, 
+      pointMap: {} 
+    };
+    
+    const selectedSetId = roundSets[1] || 'default';
+    const categories = getRoundData(1, selectedSetId) || [];
+
+    return (
+      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
+        {renderHeader(1, t.songChallenge || "SONG CHALLENGE")}
+        <div className="max-w-[1800px] mx-auto w-full">
+          <div className="flex flex-col gap-6">
+            {categories.slice(0, 4).map((cat) => (
+              <div key={cat.id} className="flex gap-6 h-32">
+                {/* Category Label */}
+                <div className="w-80 bg-slate-800 rounded-3xl flex items-center justify-center p-6 border-2 border-slate-700 shadow-lg relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10">
+                    {language === 'ru' ? cat.name.ru : cat.name.en}
+                  </span>
+                </div>
+
+                {/* Notes Grid */}
+                <div className="flex-1 grid grid-cols-4 gap-4">
+                  {[0, 1, 2, 3].map((noteIdx) => {
+                    const noteId = `${cat.id}-${noteIdx}`;
+                    // Handle both Set and Array for usedNotes
+                    const isUsed = Array.isArray(progress.usedNotes) 
+                      ? progress.usedNotes.includes(noteId) 
+                      : progress.usedNotes?.has?.(noteId);
+                    
+                    const result = progress.results?.[noteId];
+                    const isActive = activeNote?.categoryId === cat.id && activeNote?.noteIndex === noteIdx;
+                    
+                    let bgColor = 'bg-slate-900';
+                    let borderColor = 'border-slate-800';
+                    let textColor = 'text-indigo-400';
+                    let shadow = '';
+                    let scale = 'scale-100';
+
+                    if (isActive) {
+                      bgColor = 'bg-indigo-600';
+                      borderColor = 'border-white';
+                      textColor = 'text-white';
+                      shadow = 'shadow-[0_0_30px_rgba(79,70,229,0.5)]';
+                      scale = 'scale-105 z-10';
+                    } else if (isUsed) {
+                      if (result === 'correct') {
+                        bgColor = 'bg-emerald-600';
+                        borderColor = 'border-emerald-400';
+                        textColor = 'text-white';
+                      } else if (result === 'wrong') {
+                        bgColor = 'bg-rose-600';
+                        borderColor = 'border-rose-400';
+                        textColor = 'text-white';
+                      } else {
+                        bgColor = 'bg-slate-800';
+                        borderColor = 'border-slate-700';
+                        textColor = 'text-slate-600';
+                      }
+                    }
+
+                    return (
+                      <div 
+                        key={noteIdx} 
+                        className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
+                      >
+                        {progress.pointMap?.[cat.id]?.[noteIdx] || 0}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {renderPlayersFooter()}
+      </div>
+    );
+  };
+
+  const renderRound2 = () => {
+    const progress = roundProgress[2] || { 
+      usedNotes: [], 
+      activationCounts: {}, 
+      persistentPoints: {},
+      results: {}
+    };
+    
+    const selectedSetId = roundSets[2] || 'default';
+    const categories = getRoundData(2, selectedSetId) || [];
+
+    return (
+      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
+        {renderHeader(2, t.melodyGuess || "MELODY GUESS")}
+        <div className="max-w-[1800px] mx-auto w-full">
+          <div className="flex flex-col gap-6">
+            {categories.slice(0, 4).map((cat) => {
+              const activationCount = progress.activationCounts?.[cat.id] || 0;
+              const isCategoryActive = activeNote?.categoryId === cat.id;
+              // Check if category is completed (all 4 songs done)
+              const isCompleted = progress.results?.[`${cat.id}-0`] !== undefined || (progress.usedNotes && (Array.isArray(progress.usedNotes) ? progress.usedNotes.includes(`${cat.id}-0`) : progress.usedNotes.has(`${cat.id}-0`)));
+              
+              let displayScore = null;
+              
+              if (activationCount > 0 || isCategoryActive) {
+                 displayScore = progress.persistentPoints?.[`${cat.id}-0`];
+              }
+              
+              if (isCategoryActive && activeNote?.noteIndex === 0 && currentRoundPoints !== undefined) {
+                displayScore = currentRoundPoints;
+              }
+
+              return (
+                <div key={cat.id} className="flex gap-6 h-32">
+                  {/* Category Label */}
+                  <div className="w-80 bg-slate-800 rounded-3xl flex items-center justify-center p-6 border-2 border-slate-700 shadow-lg relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10">
+                      {language === 'ru' ? cat.name.ru : cat.name.en}
+                    </span>
+                  </div>
+
+                  {/* Notes Grid - 5 columns (1 Price + 4 Songs) */}
+                  <div className="flex-1 grid grid-cols-5 gap-4">
+                    {/* Note 0: Price/Activator */}
+                    <div 
+                      className={`
+                        rounded-3xl border-4 flex items-center justify-center text-4xl font-black transition-all duration-500 relative overflow-hidden
+                        ${isCompleted 
+                          ? 'bg-slate-800 border-slate-700 text-slate-600' 
+                          : isCategoryActive && activeNote?.noteIndex === 0
+                            ? 'bg-indigo-600 border-white text-white shadow-[0_0_30px_rgba(79,70,229,0.5)] scale-105 z-10' 
+                            : 'bg-slate-900 border-slate-800 text-indigo-400/50'
+                        }
+                      `}
+                    >
+                      {displayScore !== null ? displayScore : '?'}
+                    </div>
+
+                    {/* Notes 1-4: Songs */}
+                    {[1, 2, 3, 4].map((noteIdx) => {
+                      const resultKey = `${cat.id}-${noteIdx}`;
+                      const result = progress.results?.[resultKey];
+                      const isNoteActive = isCategoryActive && activeNote?.noteIndex === noteIdx;
+                      
+                      let bgColor = 'bg-slate-900/50';
+                      let borderColor = 'border-slate-800';
+                      let icon = <Music size={32} className="text-slate-700" />;
+
+                      if (result === 'correct') {
+                        bgColor = 'bg-emerald-900/30';
+                        borderColor = 'border-emerald-600/50';
+                        icon = <CheckCircle size={40} className="text-emerald-500" />;
+                      } else if (result === 'wrong') {
+                        bgColor = 'bg-rose-900/30';
+                        borderColor = 'border-rose-600/50';
+                        icon = <XCircle size={40} className="text-rose-500" />;
+                      } else if (isNoteActive) {
+                        bgColor = 'bg-indigo-900/30';
+                        borderColor = 'border-indigo-500';
+                        icon = <Music size={32} className="text-indigo-400 animate-pulse" />;
+                      }
+
+                      return (
+                        <div 
+                          key={noteIdx}
+                          className={`
+                            rounded-3xl border-2 flex items-center justify-center transition-all duration-300
+                            ${bgColor} ${borderColor}
+                            ${isNoteActive ? 'scale-105 shadow-lg shadow-indigo-900/20' : ''}
+                          `}
+                        >
+                          {icon}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        {renderPlayersFooter()}
+      </div>
+    );
+  };
+
+  if (currentPage === 'victory' || showVictory) {
+    return renderVictory();
+  }
+
+  if (showScoreboard) {
+    return renderScoreboard();
+  }
+
+  if (currentPage === 'setup' || currentPage === 'start') {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-8 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600 rounded-full blur-[120px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-[30rem] h-[30rem] bg-violet-600 rounded-full blur-[150px] animate-pulse delay-1000" />
+        </div>
+
+        <div className="relative z-10 text-center">
+          <div className="mb-12 relative inline-block">
+            <div className="absolute inset-0 bg-indigo-500 blur-[60px] opacity-30 rounded-full" />
+            <Music size={120} className="text-indigo-400 relative z-10 animate-bounce" />
+          </div>
+          
+          <h1 className="text-8xl font-black text-white mb-6 tracking-tighter uppercase drop-shadow-2xl">
+            {t.gameTitle || "GUESS THE SONG"}
+          </h1>
+          
+          <div className="flex flex-wrap justify-center gap-8 mt-16">
+            {players.map((p) => (
+              <div key={p.id} className="bg-slate-900/80 backdrop-blur-md px-10 py-6 rounded-[2.5rem] border-2 border-slate-800 flex items-center gap-6 shadow-xl">
+                <div className="text-3xl font-black text-white">{p.name || `Player ${p.id + 1}`}</div>
+                <div className="w-px h-8 bg-slate-700" />
+                <div className="text-3xl font-black text-indigo-400">{p.score}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     );
   }
-  
-  // Round Display (Rounds 1 & 2)
-  if (currentPage === 'round' && (activeRoundId === 1 || activeRoundId === 2)) {
-    return <PlayerRoundDisplay gameState={gameState} t={t} />;
+
+  if (currentPage === 'round') {
+    if (activeRoundId === 1) {
+      return renderRound1();
+    }
+    if (activeRoundId === 2) {
+      return renderRound2();
+    }
+    
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-6xl font-black text-white mb-8 uppercase tracking-tighter">
+            {t.round || "ROUND"} {activeRoundId}
+          </h2>
+          {activeNote && (
+            <div className="bg-indigo-600 px-12 py-8 rounded-[3rem] inline-block shadow-[0_0_60px_rgba(79,70,229,0.4)] animate-pulse">
+              <Music size={80} className="text-white mx-auto mb-4" />
+              <div className="text-4xl font-bold text-white uppercase tracking-widest">
+                {isPlaying ? (t.playing || "PLAYING...") : (t.ready || "READY")}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
-  if (gameState.currentPage === 'victory') {
-    return <VictoryDisplay players={gameState.players} t={t} />;
-  }
-  
-  // Default for other pages/rounds
-  return (
-    <div className="player-screen player-default-screen">
-      <h1 className="player-default-title">{t.title}</h1>
-      <div className="player-default-status">
-        {currentPage === 'round' && `${t.round} ${activeRoundId}`}
-        {currentPage && currentPage !== 'setup' && currentPage !== 'start' && 
-          currentPage.toUpperCase()}
-      </div>
-    </div>
-  );
+  return null;
 };
 
 export default PlayerScreen;
