@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, Music as MusicIcon, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Music as MusicIcon, CheckCircle, XCircle, Timer } from 'lucide-react';
 import PlayerBoard from '../../components/PlayerBoard'; // Adjust path
 import ControlPanel from '../../components/ControlPanel'; // Adjust path
 import MusicTimeline from '../../components/MusicTimeline'; // Adjust path
@@ -42,6 +42,7 @@ interface RoundSprintProps {
   onSetTimerDuration: (duration: number) => void;
   onResetTimer: () => void;
   onStopSong: () => void;
+  onShowRoundSummary: () => void;
 }
 
 const RoundSprint: React.FC<RoundSprintProps> = ({
@@ -76,7 +77,8 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
   onSetPlayedButNotEvaluated,
   onSetTimerDuration,
   onResetTimer,
-  onStopSong
+  onStopSong,
+  onShowRoundSummary
 }) => {
   const roundId = 4;
   const progress = gameState.roundProgress[roundId];
@@ -158,6 +160,15 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
               </div>
             </div>
 
+            {!r4IsActiveSession && (
+              <div className="mb-10 flex justify-center">
+                <button onClick={() => onSetShowTimerSettings(true)} className="px-8 py-4 bg-slate-800 text-white rounded-3xl font-bold border-2 border-slate-700 hover:bg-slate-700 transition-all flex items-center gap-3 shadow-lg">
+                  <Timer size={24} />
+                  {t.timerSettings || "Timer Settings"}
+                </button>
+              </div>
+            )}
+
             {r4IsActiveSession && (
               <div className="mb-10 flex items-center justify-center gap-6">
                 <div className="bg-slate-800/50 px-10 py-6 rounded-3xl border-2 border-slate-700">
@@ -179,7 +190,6 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                 const isRowUsed = usedRowsSet.has(row);
                 return (
                   <div key={row} className={`mb-8 p-8 rounded-[3rem] border-4 ${isPlayerRow && r4IsActiveSession ? 'bg-slate-800/50 border-slate-600' : isRowUsed ? 'opacity-50' : 'bg-slate-900/30'}`}>
-                    <div className="text-xl font-black text-slate-400 mb-6 uppercase">Row {row + 1}</div>
                     <div className="grid grid-cols-7 gap-4">
                       {Array.from({length: 7}, (_, i) => startIdx + i).map(songIdx => {
                         const isCorrect = playerProg?.correctIndices.has(songIdx); 
@@ -216,7 +226,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                   {playerProg.correctIndices.size === 7 ? t.perfectRound || "Perfect Round!" : `${playerProg.correctIndices.size} Correct`}
                 </div>
                 <button 
-                  onClick={() => { onSetR4IsActiveSession(false); onSetSelectedRow(null); onSetPlayedButNotEvaluated([]); }} 
+                  onClick={onShowRoundSummary} 
                   className="py-8 px-20 rounded-[2.5rem] bg-indigo-600 text-white font-black text-3xl uppercase"
                 >
                   {t.continue || "Continue"}
@@ -303,8 +313,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             onSkip={() => onFinalizeTurn('skip')} 
             timeLeft={timeLeft} 
             t={t} 
-            disabledActions={!r4IsActiveSession || timeLeft === 0} 
-            isStartDisabled={false} 
+            disabledActions={!r4IsActiveSession}
           />
           
           <MusicTimeline 
