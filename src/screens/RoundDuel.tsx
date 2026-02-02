@@ -80,6 +80,8 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
   const leftPlayer = gameState.players.find(p => p.id === leftId) || gameState.players[0];
   const rightPlayer = rightId !== undefined ? (gameState.players.find(p => p.id === rightId) || null) : null;
 
+  const hasWinner = (leftPlayer.stars || 0) >= 3 || (rightPlayer?.stars || 0) >= 3;
+
   return (
     <div className="min-h-screen bg-slate-950 p-8 pt-24">
       <div className="max-w-[1600px] mx-auto flex gap-12">
@@ -174,12 +176,22 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
             </div>
             
             {isR3Finalized && (
-              <button 
-                onClick={onNextTurnNav} 
-                className="mt-16 py-8 px-20 rounded-[2.5rem] bg-emerald-600 text-white font-black text-3xl uppercase"
-              >
-                Next Turn
-              </button>
+              hasWinner ? (
+                <button 
+                  onClick={() => onShowModal("Game Over", "The duel has ended!", () => {})} 
+                  className="mt-16 py-8 px-20 rounded-[2.5rem] bg-slate-700 text-slate-400 font-black text-3xl uppercase cursor-not-allowed"
+                  disabled
+                >
+                  Next Turn Disabled
+                </button>
+              ) : (
+                <button 
+                  onClick={onNextTurnNav} 
+                  className="mt-16 py-8 px-20 rounded-[2.5rem] bg-emerald-600 text-white font-black text-3xl uppercase"
+                >
+                  Next Turn
+                </button>
+              )
             )}
           </div>
           
@@ -215,7 +227,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
                   <div className="leading-tight">{leftPlayer.name || `Player ${leftPlayer.id + 1}`}</div>
                 </div>
                 <div className="bg-indigo-900/40 px-6 py-4 rounded-3xl border-2 border-indigo-500/30 shadow-inner flex flex-col items-center">
-                  <div className="flex justify-center gap-2">
+                  <div className="flex flex-col gap-2">
                     {[1, 2, 3].map((starNum) => {
                       const isFilled = (leftPlayer.stars || 0) >= starNum;
                       return <Star key={starNum} size={28} className={`${isFilled ? 'text-yellow-400 fill-yellow-400' : 'text-indigo-900/40 fill-indigo-900/40'}`} />;
@@ -230,7 +242,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
                   <div className="leading-tight">{rightPlayer ? (rightPlayer.name || `Player ${rightPlayer.id + 1}`) : '--'}</div>
                 </div>
                 <div className="bg-rose-900/40 px-6 py-4 rounded-3xl border-2 border-rose-500/30 shadow-inner flex flex-col items-center">
-                  <div className="flex justify-center gap-2">
+                  <div className="flex flex-col gap-2">
                     {[1, 2, 3].map((starNum) => {
                       const opponentStars = rightPlayer?.stars || 0;
                       const isFilled = opponentStars >= starNum;

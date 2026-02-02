@@ -78,6 +78,7 @@ const App: React.FC = () => {
   const [showTimerSettings, setShowTimerSettings] = useState(false);
   const [playedButNotEvaluated, setPlayedButNotEvaluated] = useState<number[]>([]);
   const [playerWindow, setPlayerWindow] = useState<Window | null>(null);
+  const [r4SelectedPlayerId, setR4SelectedPlayerId] = useState<number | null>(null);
 
   const roundPointsTimerRef = useRef<number | null>(null);
   const autoStopTimerRef = useRef<number | null>(null);
@@ -95,8 +96,14 @@ const App: React.FC = () => {
 
   const t = translations[gameState.language] as any;
 
+  const isMusicEnabledRef = useRef(gameState.isMusicEnabled);
+  
+  useEffect(() => {
+    isMusicEnabledRef.current = gameState.isMusicEnabled;
+  }, [gameState.isMusicEnabled]);
+
   const playSFX = useCallback((url: string) => {
-    if (!gameState.isMusicEnabled) return;
+    if (!isMusicEnabledRef.current) return;
     if (sfxRef.current) {
       sfxRef.current.pause();
       sfxRef.current = null;
@@ -105,7 +112,7 @@ const App: React.FC = () => {
     sfxRef.current = audio;
     audio.volume = volume;
     audio.play().catch(e => console.log("SFX block", e));
-  }, [gameState.isMusicEnabled]);
+  }, [volume]);
 
   const handleVolumeChange = useCallback((newVolume: number) => {
     setVolume(newVolume);
@@ -261,6 +268,7 @@ const App: React.FC = () => {
       victoryContext: victoryContext,
       showVictory: showVictory,
       showScoreboard: showScoreboard,
+      r4SelectedPlayerId: r4SelectedPlayerId,
       language: gameState.language
     };
   }, [
@@ -281,7 +289,8 @@ const App: React.FC = () => {
     playedButNotEvaluated,
     victoryContext,
     showVictory,
-    showScoreboard
+    showScoreboard,
+    r4SelectedPlayerId
   ]);
 
 useEffect(() => {
@@ -483,16 +492,22 @@ const handleOpenPlayerWindow = () => {
   };
 
   const toggleMusic = () => {
-    setGameState(prev => {
-      const next = !prev.isMusicEnabled;
-      if (!next) {
-        stopSong();
-        stopBGM();
-      } else {
-        triggerBGM(currentPage, prev.activeRoundId);
+    const next = !gameState.isMusicEnabled;
+    
+    if (!next) {
+      isMusicEnabledRef.current = false;
+      stopSong();
+      stopBGM();
+      if (sfxRef.current) {
+        sfxRef.current.pause();
+        sfxRef.current = null;
       }
-      return { ...prev, isMusicEnabled: next };
-    });
+    } else {
+      // Delay enabling SFX ref slightly to prevent the unmute button click sound
+      setTimeout(() => { isMusicEnabledRef.current = true; }, 500);
+      // BGM will be triggered by the useEffect when state updates
+    }
+    setGameState(prev => ({ ...prev, isMusicEnabled: next }));
   };
 
   const toggleFullscreen = () => {
@@ -605,6 +620,7 @@ const handleOpenPlayerWindow = () => {
         setTimeLeft(undefined);
         setShowTimerSettings(false);
         setPlayedButNotEvaluated([]);
+        setR4SelectedPlayerId(null);
       }
     };
 
@@ -772,9 +788,10 @@ const initializeRound = (roundId: number) => {
           t.round, 
           `Choose row ${row + 1}?`,
           () => {
+            const firstNoteInRow = row * 7;
             setSelectedRow(row);
-            setR4CurrentSongIdx(noteIndex);
-            setActiveNote({ categoryId: 'r4_sprint', noteIndex });
+            setR4CurrentSongIdx(firstNoteInRow);
+            setActiveNote({ categoryId: 'r4_sprint', noteIndex: firstNoteInRow });
             setR4IsActiveSession(true);
             setTimeLeft(timerDuration);
             stopBGM();
@@ -948,9 +965,14 @@ const handleAudioControl = (action: 'start' | 'stop') => {
             setTimeLeft(prev => {
               if (prev === undefined) return prev;
               if (prev > 0) return prev - 1;
+              
               window.clearInterval(countdownIntervalRef.current!);
               countdownIntervalRef.current = null;
-              if (isSprintRound && r4IsActiveSession) handleFinalizeTurn('skip', true);
+              
+              if (isSprintRound && r4IsActiveSession) {
+                stopSong(false);
+                playSFX(SFX.wrong); // Play wrong sound once when time is up
+              }
               else handleAudioControl('stop');
               return 0;
             });
@@ -1074,6 +1096,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
       setR4IsActiveSession(false);
       setActiveNote({ categoryId: 'r4_sprint', noteIndex: r4CurrentSongIdx, isReveal: true });
       playSFX(finalStatus === 'wrong' ? SFX.wrong : SFX.correct);
+      setTimeout(() => setShowScoreboard(true), 1000);
     };
 
     if (isTimeOut) { finalizeR4Player('time_out'); return; }
@@ -1096,7 +1119,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
         
         if (selectedRow !== null) {
           const startIdx = selectedRow * 7;
-          if (newSet.size === 7) { 
+          if (newSet.size === 7 || (timeLeft !== undefined && timeLeft <= 0)) { 
             finalizeR4Player('all_correct'); 
             return; 
           }
@@ -1142,17 +1165,37 @@ const handleAudioControl = (action: 'start' | 'stop') => {
   // =========================================================
   if (isFinalRound) {
     showModal(status === 'correct' ? t.correct : t.wrong, t.confirmAction, () => {
+      let winnerId: number | null = null;
+
       setGameState(prev => {
         const currentP = prev.players[prev.currentPlayerIndex];
-        const newStars = status === 'correct' ? (currentP.stars || 0) + 1 : (currentP.stars || 0);
+        const progress = prev.roundProgress[3];
+        const duelIds = progress.activePlayerIds || [];
+        const opponentId = duelIds.find(id => id !== currentP.id);
         
-        const newPlayers = prev.players.map((p, idx) => 
-          idx === prev.currentPlayerIndex ? { ...p, stars: newStars } : p
-        );
+        let newPlayers = [...prev.players];
+        let nextPlayerIndex = prev.currentPlayerIndex;
+
+        if (status === 'correct') {
+           newPlayers = newPlayers.map(p => p.id === currentP.id ? { ...p, stars: (p.stars || 0) + 1 } : p);
+        } else if (status === 'wrong' && opponentId !== undefined) {
+           newPlayers = newPlayers.map(p => p.id === opponentId ? { ...p, stars: (p.stars || 0) + 1 } : p);
+           // Switch active player on wrong answer
+           const opponentIndex = prev.players.findIndex(p => p.id === opponentId);
+           if (opponentIndex !== -1) nextPlayerIndex = opponentIndex;
+        }
+        
+        // Check for winner (3 stars)
+        const updatedCurrentP = newPlayers.find(p => p.id === currentP.id);
+        const updatedOpponentP = opponentId !== undefined ? newPlayers.find(p => p.id === opponentId) : undefined;
+        
+        if ((updatedCurrentP?.stars || 0) >= 3) winnerId = updatedCurrentP!.id;
+        if ((updatedOpponentP?.stars || 0) >= 3) winnerId = updatedOpponentP!.id;
 
         return {
           ...prev,
-          players: newPlayers
+          players: newPlayers,
+          currentPlayerIndex: nextPlayerIndex
         };
       });
       
@@ -1160,6 +1203,11 @@ const handleAudioControl = (action: 'start' | 'stop') => {
       stopSong(true);
       setModal(null);
       playSFX(status === 'correct' ? SFX.correct : SFX.wrong);
+
+      if (winnerId !== null) {
+          setVictoryContext({ roundId: 3, winnerId });
+          setTimeout(() => setShowVictory(true), 500);
+      }
     }, undefined, undefined, 'inline');
     return;
   }
@@ -1314,15 +1362,29 @@ const handleAudioControl = (action: 'start' | 'stop') => {
     }
   };
 
-  // const TimerSettings = () => (
-  //   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-  //     <div className="bg-slate-900 rounded-3xl p-8 max-w-md w-full border-2 border-slate-700">
-  //       <h3 className="text-2xl font-black text-white mb-6">{t.timerSettings || "Timer Settings"}</h3>
-  //       <div className="space-y-4 mb-6"><div><label className="block text-sm font-bold text-slate-400 mb-2">{t.timerDuration || "Timer Duration (seconds)"}</label><input type="number" min="10" max="300" value={timerDuration} onChange={(e) => setTimerDuration(parseInt(e.target.value) || 60)} className="w-full bg-slate-800 border-2 border-slate-700 rounded-2xl px-4 py-3 text-white text-xl font-bold outline-none focus:border-indigo-500" /></div></div>
-  //       <div className="flex gap-4"><button onClick={() => setShowTimerSettings(false)} className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-2xl hover:bg-slate-700">{t.cancel}</button><button onClick={() => { setShowTimerSettings(false); resetTimer(); }} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500">{t.save || "Save"}</button></div>
-  //     </div>
-  //   </div>
-  // );
+  const TimerSettings = () => (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-8">
+      <div className="bg-slate-900 rounded-[3rem] p-12 max-w-lg w-full border-2 border-slate-700 shadow-2xl">
+        <h3 className="text-4xl font-black text-white mb-8 text-center uppercase tracking-tight">{t.timerSettings || "Timer Settings"}</h3>
+        <div className="space-y-6 mb-10">
+          <div>
+            <label className="block text-lg font-bold text-slate-400 mb-4 uppercase tracking-widest">{t.timerDuration || "Timer Duration (seconds)"}</label>
+            <div className="flex items-center gap-4">
+               <button onClick={() => setTimerDuration(Math.max(10, timerDuration - 10))} className="w-16 h-16 rounded-2xl bg-slate-800 border-2 border-slate-600 flex items-center justify-center text-2xl font-black hover:bg-slate-700">-</button>
+               <div className="flex-1 bg-slate-800 border-2 border-slate-700 rounded-2xl px-4 py-4 text-white text-4xl font-black text-center tabular-nums">
+                 {timerDuration}
+               </div>
+               <button onClick={() => setTimerDuration(Math.min(300, timerDuration + 10))} className="w-16 h-16 rounded-2xl bg-slate-800 border-2 border-slate-600 flex items-center justify-center text-2xl font-black hover:bg-slate-700">+</button>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-6">
+          <button onClick={() => setShowTimerSettings(false)} className="flex-1 py-6 bg-slate-800 text-white font-black text-xl rounded-[2rem] hover:bg-slate-700 uppercase tracking-widest">{t.cancel}</button>
+          <button onClick={() => { setShowTimerSettings(false); resetTimer(); }} className="flex-1 py-6 bg-indigo-600 text-white font-black text-xl rounded-[2rem] hover:bg-indigo-500 uppercase tracking-widest shadow-lg">{t.save || "Save"}</button>
+        </div>
+      </div>
+    </div>
+  );
 
   // UPDATED RoundView component
   const RoundView = () => {
@@ -1405,6 +1467,16 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                     </button>
                   </div>
                 </div>
+                
+                {!r4IsActiveSession && (
+                  <div className="mb-10 flex justify-center">
+                    <button onClick={() => setShowTimerSettings(true)} className="px-8 py-4 bg-slate-800 text-white rounded-3xl font-bold border-2 border-slate-700 hover:bg-slate-700 transition-all flex items-center gap-3 shadow-lg">
+                      <Timer size={24} />
+                      {t.timerSettings || "Timer Settings"}
+                    </button>
+                  </div>
+                )}
+
                 {r4IsActiveSession && (
                   <div className="mb-10 flex items-center justify-center gap-6"><div className="bg-slate-800/50 px-10 py-6 rounded-3xl border-2 border-slate-700"><div className="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">{t.timeLeft || "Time Left"}</div><div className={`text-6xl font-black tabular-nums ${timeLeft && timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>{formatTime(timeLeft)}</div></div><button onClick={() => setShowTimerSettings(true)} className="px-8 py-6 bg-slate-800 text-white rounded-3xl font-bold border-2 border-slate-700">{t.settings || "Settings"}</button></div>
                 )}
@@ -1584,8 +1656,12 @@ const handleAudioControl = (action: 'start' | 'stop') => {
                           "Go to Round 4 (Sprint)?", 
                           () => {
                             stopSong();
-                            initializeRound(4);
-                            navigateTo('round', 4);
+                            if (gameState.players.length > 1) {
+                              setCurrentPage('r4_select');
+                            } else {
+                              initializeRound(4);
+                              navigateTo('round', 4);
+                            }
                             setModal(null);
                           }
                         );
@@ -1778,6 +1854,7 @@ const handleAudioControl = (action: 'start' | 'stop') => {
       onFinalizeTurn={handleFinalizeTurn}
       onSeek={handleSeek}
       formatTime={formatTime}
+      onShowRoundSummary={() => setShowScoreboard(true)}
     />
    );
   };  
@@ -1785,9 +1862,10 @@ const handleAudioControl = (action: 'start' | 'stop') => {
   // UPDATED R3SelectView component (was R6SelectView)
   const R3SelectView = () => (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8">
-      <div className="bg-slate-900/90 backdrop-blur-xl p-20 rounded-[5rem] border-2 border-slate-800 max-w-3xl w-full text-center shadow-2xl">
-        <div className="mb-12"><h2 className="text-7xl font-black text-white mb-4 tracking-tighter uppercase">{t.selectTeams}</h2><p className="text-xl font-bold text-slate-400 uppercase tracking-widest">{t.selectTwo}</p></div>
-        <div className="space-y-8 mb-16">{gameState.players.map(p => (<button key={p.id} onClick={() => setR3Selection(prev => prev.includes(p.id) ? prev.filter(i => i !== p.id) : prev.length < 2 ? [...prev, p.id] : prev)} className={`w-full p-10 rounded-[3rem] border-4 transition-all flex items-center justify-between ${r3Selection.includes(p.id) ? 'bg-indigo-600/20 border-indigo-500 scale-[1.03]' : 'bg-slate-800 border-slate-700 shadow-xl'}`}><div className="text-left"><div className="text-4xl font-black text-white">{p.name || `Player ${p.id+1}`}</div><div className="text-lg font-bold text-slate-500 uppercase">{p.score} {t.points}</div></div>{r3Selection.includes(p.id) && <CheckCircle size={48} className="text-indigo-500" />}</button>))}</div>
+      <div className="bg-slate-900/90 backdrop-blur-xl p-16 rounded-[4rem] border border-slate-800 max-w-4xl w-full text-center shadow-2xl">
+        <Users size={80} className="text-indigo-500 mx-auto mb-10 animate-pulse" />
+        <div className="mb-12"><h2 className="text-6xl font-black text-white mb-4 tracking-tighter uppercase">{t.selectTeams}</h2><p className="text-xl font-bold text-slate-400 uppercase tracking-widest">{t.selectTwo}</p></div>
+        <div className="space-y-6 mb-14">{gameState.players.map(p => (<button key={p.id} onClick={() => setR3Selection(prev => prev.includes(p.id) ? prev.filter(i => i !== p.id) : prev.length < 2 ? [...prev, p.id] : prev)} className={`w-full px-10 py-6 rounded-[2rem] border-2 transition-all flex items-center justify-between ${r3Selection.includes(p.id) ? 'bg-indigo-600/20 border-indigo-500 scale-[1.02]' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}><div className="text-left"><div className="text-2xl font-black text-white">{p.name || `Player ${p.id+1}`}</div><div className="text-sm font-bold text-slate-500 uppercase">{p.score} {t.points}</div></div>{r3Selection.includes(p.id) ? <CheckCircle size={36} className="text-indigo-500" /> : <div className="w-9 h-9 rounded-full border-2 border-slate-600" />}</button>))}</div>
         <div className="grid grid-cols-2 gap-6"><button onClick={() => navigateTo('start')} className="py-10 rounded-[2.5rem] bg-slate-800 text-white font-black text-3xl uppercase">{t.cancel}</button><button onClick={() => { if(r3Selection.length !== 2) return; setGameState(prev => ({ ...prev, currentPlayerIndex: prev.players.findIndex(p => p.id === r3Selection[0]), roundProgress: { ...prev.roundProgress, [3]: { usedNotes: new Set(), activatedCategories: new Set(), pointMap: {}, activationCounts: {}, results: {}, activePlayerIds: r3Selection, currentTurnIndex: 0 } }, activeRoundId: 3 })); setCurrentPage('round'); setActiveNote({ categoryId: 'r3_final', noteIndex: 0 }); setSelectedDuration(null); setIsR3Finalized(false); }} className={`py-10 rounded-[2.5rem] font-black text-3xl uppercase ${r3Selection.length === 2 ? 'bg-indigo-600 text-white shadow-2xl' : 'bg-slate-900 text-slate-700 cursor-not-allowed'}`}>{t.startGame}</button></div>
       </div>
     </div>
@@ -1795,50 +1873,66 @@ const handleAudioControl = (action: 'start' | 'stop') => {
 
   const R4SelectView = () => (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8">
-      <div className="bg-slate-900/90 backdrop-blur-xl p-20 rounded-[5rem] border-2 border-slate-800 max-w-3xl w-full text-center shadow-2xl">
+      <div className="bg-slate-900/90 backdrop-blur-xl p-16 rounded-[4rem] border border-slate-800 max-w-4xl w-full text-center shadow-2xl">
+        <Users size={80} className="text-indigo-500 mx-auto mb-10 animate-pulse" />
         <div className="mb-12">
-          <h2 className="text-7xl font-black text-white mb-4 tracking-tighter uppercase">
+          <h2 className="text-6xl font-black text-white mb-4 tracking-tighter uppercase">
             {t.playerName}
           </h2>
           <p className="text-xl font-bold text-slate-400 uppercase tracking-widest">
             {t.confirmPlayerActive}
           </p>
         </div>
-        <div className="space-y-8 mb-16">
+        <div className="space-y-6 mb-14">
           {gameState.players.map((p, idx) => (
             <button
               key={p.id}
               onClick={() => {
-                // nominate player and start Round 4 immediately
-                stopSong();
-                initializeRound(4);
-                setActiveNote(null);
-                setCurrentRoundPoints(undefined);
-                setTimeLeft(undefined);
-                setR4IsActiveSession(false);
-                setSelectedRow(null);
-                setR4CurrentSongIdx(0);
-                setShowTimerSettings(false);
-                setPlayedButNotEvaluated([]);
-                setGameState(prev => ({ ...prev, currentPlayerIndex: idx, activeRoundId: 4 }));
-                setCurrentPage('round');
+                setR4SelectedPlayerId(p.id);
+                playSFX(SFX.select);
               }}
-              className="w-full p-10 rounded-[3rem] border-4 transition-all flex items-center justify-between bg-slate-800 border-slate-700 shadow-xl hover:border-indigo-500 hover:bg-slate-700"
+              className={`w-full px-10 py-6 rounded-[2rem] border-2 transition-all flex items-center justify-between ${r4SelectedPlayerId === p.id ? 'bg-indigo-900/40 border-indigo-500 scale-[1.02]' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}
             >
               <div className="text-left">
-                <div className="text-4xl font-black text-white">{p.name || `Player ${p.id + 1}`}</div>
-                <div className="text-lg font-bold text-slate-500 uppercase">{p.score} {t.points}</div>
+                <div className="text-2xl font-black text-white">{p.name || `Player ${p.id + 1}`}</div>
+                <div className="text-sm font-bold text-slate-500 uppercase">{p.score} {t.points}</div>
               </div>
-              <CheckCircle size={48} className="text-indigo-500 opacity-40" />
+              {r4SelectedPlayerId === p.id ? <CheckCircle size={36} className="text-indigo-500" /> : <div className="w-9 h-9 rounded-full border-2 border-slate-600" />}
             </button>
           ))}
         </div>
-        <button
-          onClick={() => navigateTo('start')}
-          className="w-full py-10 rounded-[2.5rem] bg-slate-800 text-white font-black text-3xl uppercase"
-        >
-          {t.cancel}
-        </button>
+        <div className="grid grid-cols-2 gap-6">
+          <button
+            onClick={() => showModal(t.mainMenu, t.confirmNav, () => navigateTo('start'))}
+            className="py-10 rounded-[2.5rem] bg-slate-800 text-white font-black text-3xl uppercase hover:bg-slate-700 transition-colors"
+          >
+            {t.cancel || "Cancel"}
+          </button>
+          <button
+            onClick={() => {
+              if (r4SelectedPlayerId === null) return;
+              const playerIdx = gameState.players.findIndex(p => p.id === r4SelectedPlayerId);
+              if (playerIdx === -1) return;
+
+              stopSong();
+              initializeRound(4);
+              setActiveNote(null);
+              setCurrentRoundPoints(undefined);
+              setTimeLeft(undefined);
+              setR4IsActiveSession(false);
+              setSelectedRow(null);
+              setR4CurrentSongIdx(0);
+              setShowTimerSettings(false);
+              setPlayedButNotEvaluated([]);
+              setGameState(prev => ({ ...prev, currentPlayerIndex: playerIdx, activeRoundId: 4 }));
+              setCurrentPage('round');
+            }}
+            className={`py-10 rounded-[2.5rem] font-black text-3xl uppercase transition-all ${r4SelectedPlayerId !== null ? 'bg-indigo-600 text-white shadow-2xl hover:scale-105' : 'bg-slate-900 text-slate-700 cursor-not-allowed'}`}
+            disabled={r4SelectedPlayerId === null}
+          >
+            {t.startGame || "Start Game"}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -1964,7 +2058,7 @@ const Round3VictoryView = () => {
             onClick={handleSuperGame} 
             className="px-10 py-6 bg-emerald-600 text-white rounded-[2rem] font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-emerald-900/40 uppercase tracking-[0.2em] flex items-center gap-4"
           >
-            <Zap size={28} /> {t.superGame || "SUPER GAME"}
+            <Zap size={28} /> {t.nextRound || "NEXT"}
           </button>
         </div>
       </div>
@@ -2177,13 +2271,20 @@ const Round3VictoryView = () => {
       {currentPage === 'r3_select' && <R3SelectView />} {/* Changed from r6_select */}
       {currentPage === 'r4_select' && <R4SelectView />}
       {modal && modal.position === 'center' && <ConfirmationModal isOpen={modal.isOpen} title={modal.title} message={modal.message} onConfirm={modal.onConfirm} onCancel={() => setModal(null)} confirmLabel={modal.confirmLabel} cancelLabel={modal.cancelLabel} position={modal.position} />}
-      {/* {showTimerSettings && <TimerSettings />} */}
+      {showTimerSettings && <TimerSettings />}
       {showScoreboard && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-3xl p-10 animate-in fade-in duration-500">
           <div className="bg-slate-900 rounded-[4rem] p-16 max-w-2xl w-full border-2 border-slate-800 shadow-2xl">
             <h3 className="text-6xl font-black text-white mb-14 flex items-center gap-6 tracking-tighter uppercase"><Trophy className="text-yellow-500" size={64} /> {t.scorePanel}</h3>
             <div className="space-y-6">{sortedPlayersScoreboard.map((p, idx) => (<div key={p.id} className="flex items-center justify-between p-8 bg-slate-800/60 rounded-[2.5rem] border-2 border-slate-700/50 shadow-xl"><div className="flex items-center gap-8"><span className="text-slate-600 font-black text-4xl w-10">{idx + 1}.</span><div><div className="text-white font-black text-3xl">{p.name || `Player ${p.id+1}`}</div><div className="text-yellow-500 text-sm font-black uppercase flex items-center gap-3 mt-2"><Star size={16} fill="currentColor" /> {p.stars || 0} {t.stars}</div></div></div><span className="text-5xl font-black text-indigo-400 tabular-nums">{p.score} <span className="text-xs opacity-40 uppercase ml-2">pts</span></span></div>))}</div>
-            <button onClick={() => setShowScoreboard(false)} className="w-full mt-14 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl">{t.close}</button>
+            {gameState.activeRoundId === 4 ? (
+              <div className="flex gap-6 mt-14">
+                <button onClick={() => setShowScoreboard(false)} className="flex-1 py-8 bg-slate-800 text-white font-black text-2xl rounded-[2rem] uppercase shadow-xl hover:bg-slate-700">{t.cancel || "Cancel"}</button>
+                <button onClick={() => { setShowScoreboard(false); navigateTo('start'); }} className="flex-1 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl hover:bg-indigo-500">{t.continue || "Continue"}</button>
+              </div>
+            ) : (
+              <button onClick={() => setShowScoreboard(false)} className="w-full mt-14 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl">{t.close}</button>
+            )}
           </div>
         </div>
       )}

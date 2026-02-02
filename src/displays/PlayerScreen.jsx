@@ -43,7 +43,9 @@ const PlayerScreen = () => {
     isPlaying,
     showVictory,
     victoryContext,
-    showScoreboard
+    showScoreboard,
+    r3Selection,
+    r4SelectedPlayerId
   } = state;
 
   const t = translations[language] || translations['en'];
@@ -285,6 +287,254 @@ const PlayerScreen = () => {
               </div>
             );
           })}
+        </div>
+      </div>
+    );
+  };
+
+  const renderRound3 = () => {
+    const progress = roundProgress[3] || { activePlayerIds: [], currentTurnIndex: 0, usedNotes: [] };
+    const selectedSetId = roundSets[3] || 'default';
+    const roundData = getRoundData(3, selectedSetId) || [];
+    const turnIdx = progress.currentTurnIndex || 0;
+    const song = roundData[0]?.songs[turnIdx];
+
+    const duelIds = progress.activePlayerIds || [];
+    const leftPlayer = players.find(p => p.id === duelIds[0]);
+    const rightPlayer = players.find(p => p.id === duelIds[1]);
+
+    if (!leftPlayer || !rightPlayer) {
+      return (
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+          <div className="text-slate-500 text-2xl font-bold animate-pulse">Waiting for duel players...</div>
+        </div>
+      );
+    }
+    
+    const isFinalized = state.isR3Finalized;
+
+    return (
+      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
+        {renderHeader(3, t.categories.superGame || "SUPER GAME")}
+        <div className="max-w-[1800px] mx-auto w-full flex gap-12">
+          {/* Left Player */}
+          <div className={`flex-1 p-12 rounded-[4rem] border-4 transition-all duration-500 ${state.currentPlayerIndex === players.indexOf(leftPlayer) ? 'bg-indigo-900/50 border-indigo-500 shadow-2xl shadow-indigo-900/30' : 'bg-slate-900 border-slate-800'}`}>
+            <h3 className="text-6xl font-black text-white text-center mb-8 truncate drop-shadow-lg">{leftPlayer.name || `Player ${leftPlayer.id + 1}`}</h3>
+            <div className="flex justify-center gap-4 mb-8">
+              {[1, 2, 3].map(s => <Star key={s} size={64} className={s <= (leftPlayer.stars || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-slate-700'} />)}
+            </div>
+            <div className="text-center text-7xl font-black text-indigo-400 tabular-nums">{leftPlayer.score}</div>
+          </div>
+
+          {/* Center Info */}
+          <div className="flex-[2] flex flex-col items-center justify-center bg-slate-900/50 rounded-[4rem] p-12 border-2 border-slate-800">
+            <div className="text-2xl font-black text-slate-400 uppercase tracking-[0.3em] mb-6">
+              {t.turn || "TURN"} {turnIdx + 1} / 5
+            </div>
+            <div className="text-center bg-slate-800/70 rounded-3xl p-8 border-2 border-slate-700 mb-8 w-full">
+              <p className="text-4xl font-bold text-white italic">"{language === 'en' ? song?.hint?.en : song?.hint?.ru}"</p>
+            </div>
+            <div className="flex justify-center gap-4">
+              {[1, 2, 3, 4, 5].map(s => (
+                <div key={s} className={`w-20 h-20 rounded-2xl border-4 flex items-center justify-center transition-all ${state.selectedDuration === s ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
+                  <span className="text-4xl font-black">{s}</span>
+                </div>
+              ))}
+              <div className={`w-32 h-20 rounded-2xl border-4 flex items-center justify-center transition-all ${state.selectedDuration === null && isPlaying ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
+                <span className="text-2xl font-black uppercase">{t.full || 'FULL'}</span>
+              </div>
+            </div>
+             {isFinalized && (
+              <div className="mt-8 text-2xl font-black text-emerald-400 uppercase animate-pulse tracking-widest">
+                {t.nextTurn || "Next Turn Pending..."}
+              </div>
+            )}
+          </div>
+
+          {/* Right Player */}
+          <div className={`flex-1 p-12 rounded-[4rem] border-4 transition-all duration-500 ${state.currentPlayerIndex === players.indexOf(rightPlayer) ? 'bg-rose-900/50 border-rose-500 shadow-2xl shadow-rose-900/30' : 'bg-slate-900 border-slate-800'}`}>
+            <h3 className="text-6xl font-black text-white text-center mb-8 truncate drop-shadow-lg">{rightPlayer.name || `Player ${rightPlayer.id + 1}`}</h3>
+            <div className="flex justify-center gap-4 mb-8">
+              {[1, 2, 3].map(s => <Star key={s} size={64} className={s <= (rightPlayer.stars || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-slate-700'} />)}
+            </div>
+            <div className="text-center text-7xl font-black text-rose-400 tabular-nums">{rightPlayer.score}</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderRound4 = () => {
+    const progress = roundProgress[4] || { usedRows: [], r4PlayerProgress: {} };
+    const selectedSetId = roundSets[4] || 'default';
+    const roundData = getRoundData(4, selectedSetId) || [];
+    const songs = roundData[0]?.songs || [];
+
+    const currentPlayer = players[state.currentPlayerIndex];
+    if (!currentPlayer) return null;
+
+    const playerProg = progress.r4PlayerProgress?.[currentPlayer.id] || { correctIndices: [], hasFinished: false };
+    const correctIndices = new Set(playerProg.correctIndices);
+    
+    const formatTime = (seconds) => {
+      if (seconds === undefined) return "0:00";
+      const m = Math.floor(Math.abs(seconds) / 60);
+      const s = Math.floor(Math.abs(seconds) % 60);
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    };
+
+    return (
+      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
+        {renderHeader(4, "SPRINT")}
+        <div className="max-w-[1800px] mx-auto w-full flex gap-8">
+          {/* Main Grid */}
+          <div className="flex-[3] bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-8">
+            {state.r4IsActiveSession ? (
+              <div className="flex flex-col h-full">
+                <div className="text-center mb-6">
+                  <div className="text-lg font-black text-slate-400 uppercase tracking-widest">Time Left</div>
+                  <div className={`text-8xl font-black tabular-nums ${state.timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>
+                    {formatTime(state.timeLeft)}
+                  </div>
+                </div>
+                <div className="flex-1 grid grid-cols-7 gap-4">
+                  {songs.slice(state.selectedRow * 7, state.selectedRow * 7 + 7).map((song, i) => {
+                    const songIdx = state.selectedRow * 7 + i;
+                    const isCorrect = correctIndices.has(songIdx);
+                    const isWrong = playerProg.wrongIndex === songIdx;
+                    const isActive = state.activeNote?.noteIndex === songIdx;
+                    const isPlayed = state.playedButNotEvaluated?.includes(songIdx);
+
+                    let bg = 'bg-slate-800';
+                    let border = 'border-slate-700';
+                    let iconColor = 'text-slate-600';
+                    let scale = '';
+
+                    if (isActive) {
+                      bg = 'bg-indigo-600';
+                      border = 'border-white';
+                      iconColor = 'text-white animate-pulse';
+                      scale = 'scale-110 z-10';
+                    } else if (isCorrect) {
+                      bg = 'bg-emerald-600';
+                      border = 'border-emerald-400';
+                      iconColor = 'text-white';
+                    } else if (isWrong) {
+                      bg = 'bg-rose-600';
+                      border = 'border-rose-400';
+                      iconColor = 'text-white';
+                    } else if (isPlayed) {
+                      bg = 'bg-yellow-600';
+                      border = 'border-yellow-400';
+                      iconColor = 'text-white';
+                    }
+
+                    return (
+                      <div key={songIdx} className={`rounded-3xl border-4 flex items-center justify-center transition-all ${bg} ${border} ${scale}`}>
+                        {isCorrect ? <CheckCircle size={48} className={iconColor} /> : isWrong ? <XCircle size={48} className={iconColor} /> : <Music size={48} className={iconColor} />}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {Array.from({ length: Math.ceil(songs.length / 7) }).map((_, rowIdx) => {
+                  const isUsed = progress.usedRows?.includes(rowIdx);
+                  const isSelected = state.selectedRow === rowIdx;
+                  return (
+                    <div key={rowIdx} className={`p-4 rounded-2xl border-2 transition-all ${isUsed ? 'bg-slate-800/30 border-slate-700/30 opacity-50' : isSelected ? 'bg-indigo-600/20 border-indigo-500' : 'bg-slate-800 border-slate-700'}`}>
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1 grid grid-cols-7 gap-3">
+                          {Array.from({ length: 7 }).map((_, i) => (
+                            <div key={i} className={`h-12 rounded-lg flex items-center justify-center ${isUsed ? 'bg-slate-700/50' : 'bg-slate-900'}`}>
+                              <Music size={24} className="text-slate-600" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Player Info */}
+          <div className="flex-1 bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-8 flex flex-col items-center justify-center text-center">
+            <h3 className="text-5xl font-black text-white mb-6 truncate w-full drop-shadow-md">{currentPlayer.name || `Player ${currentPlayer.id + 1}`}</h3>
+            <div className="text-7xl font-black text-indigo-400 tabular-nums mb-8">{currentPlayer.score}</div>
+            <div className="w-full bg-slate-800 rounded-2xl p-6 border-2 border-slate-700">
+              <div className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Sprint Progress</div>
+              <div className="text-5xl font-black text-emerald-400">
+                {correctIndices.size} / 7
+              </div>
+              <div className="flex gap-1 mt-4">
+                {Array.from({length: 7}).map((_, i) => (
+                  <div key={i} className={`h-2 flex-1 rounded-full ${i < correctIndices.size ? 'bg-emerald-500' : 'bg-slate-700'}`} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderR3Select = () => {
+    const selectedIds = r3Selection || [];
+    
+    return (
+      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center items-center">
+        {renderHeader(3, t.categories.superGame || "SUPER GAME")}
+        <div className="w-full max-w-[1400px]">
+           <h3 className="text-4xl text-slate-400 font-bold text-center mb-12 uppercase tracking-widest">{t.selectTeams || "SELECT PLAYERS"}</h3>
+           <div className="flex justify-center gap-12">
+             {[0, 1].map(idx => {
+               const playerId = selectedIds[idx];
+               const player = playerId !== undefined ? players.find(p => p.id === playerId) : null;
+               
+               return (
+                 <div key={idx} className={`w-96 h-96 rounded-[3rem] border-4 flex flex-col items-center justify-center p-8 transition-all duration-500 ${player ? 'bg-indigo-900/40 border-indigo-500 shadow-[0_0_60px_rgba(99,102,241,0.3)]' : 'bg-slate-900/50 border-slate-800 border-dashed'}`}>
+                   {player ? (
+                     <>
+                       <div className="text-5xl font-black text-white mb-6 text-center leading-tight">{player.name || `Player ${player.id + 1}`}</div>
+                       <div className="flex gap-2">
+                         {[...Array(player.stars || 0)].map((_, i) => <Star key={i} size={32} className="text-yellow-500 fill-yellow-500" />)}
+                       </div>
+                       <div className="mt-6 text-3xl font-bold text-indigo-400">{player.score} pts</div>
+                     </>
+                   ) : (
+                     <div className="text-slate-700 font-black text-3xl uppercase tracking-widest">
+                       {idx === 0 ? "Player 1" : "Player 2"}
+                     </div>
+                   )}
+                 </div>
+               );
+             })}
+           </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderR4Select = () => {
+    return (
+      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center items-center">
+        {renderHeader(4, "SPRINT")}
+        <div className="w-full max-w-[1400px]">
+           <h3 className="text-4xl text-slate-400 font-bold text-center mb-12 uppercase tracking-widest">{t.playerName || "SELECT PLAYER"}</h3>
+           <div className="grid grid-cols-3 gap-8">
+             {players.map((p, idx) => (
+               <div key={p.id} className={`p-10 rounded-[3rem] border-4 flex flex-col items-center justify-center gap-6 shadow-xl transition-all duration-500 ${r4SelectedPlayerId === p.id ? 'bg-indigo-900/60 border-indigo-500 scale-105 opacity-100' : 'bg-slate-900/80 border-slate-800 opacity-60'}`}>
+                 <div className="text-4xl font-black text-white text-center leading-tight">{p.name || `Player ${p.id + 1}`}</div>
+                 <div className="flex gap-2">
+                    {[...Array(p.stars || 0)].map((_, i) => <Star key={i} size={32} className="text-yellow-500 fill-yellow-500" />)}
+                 </div>
+                 <div className="text-3xl font-bold text-indigo-400">{p.score} pts</div>
+               </div>
+             ))}
+           </div>
         </div>
       </div>
     );
@@ -541,6 +791,12 @@ const PlayerScreen = () => {
     if (activeRoundId === 2) {
       return renderRound2();
     }
+    if (activeRoundId === 3) {
+      return renderRound3();
+    }
+    if (activeRoundId === 4) {
+      return renderRound4();
+    }
     
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -560,6 +816,15 @@ const PlayerScreen = () => {
       </div>
     );
   }
+
+  if (currentPage === 'r3_select') {
+    return renderR3Select();
+  }
+
+  if (currentPage === 'r4_select') {
+    return renderR4Select();
+  }
+    
 
   return null;
 };
