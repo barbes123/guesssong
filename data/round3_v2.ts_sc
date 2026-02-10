@@ -31,8 +31,8 @@ export const round3v2Set: RoundSet = {
       songs: [
         {
           id: 'q6',
-          title: 'Два кусочка колбаски',
-          artist: 'Михаил Шуфутинский',
+          title: 'Song 6 Title',
+          artist: 'Artist 6',
           audioUrl: R66,
           audioUrlFull: R66f,
           hint: {
@@ -42,8 +42,8 @@ export const round3v2Set: RoundSet = {
         },
         {
           id: 'q7',
-          title: 'Dolce & Gabbana',
-          artist: 'Ленинград',
+          title: 'Song 7 Title',
+          artist: 'Artist 7',
           audioUrl: R67,
           audioUrlFull: R67f,
           hint: {
@@ -53,8 +53,8 @@ export const round3v2Set: RoundSet = {
         },
         {
           id: 'q8',
-          title: 'Катюша',
-          artist: 'Русская народная песня',
+          title: 'Song 8 Title',
+          artist: 'Artist 8',
           audioUrl: R68,
           audioUrlFull: R68f,
           hint: {
@@ -64,8 +64,8 @@ export const round3v2Set: RoundSet = {
         },
         {
           id: 'q9',
-          title: 'Течёт ручей',
-          artist: 'Надежда Кадышева',
+          title: 'Song 9 Title',
+          artist: 'Artist 9',
           audioUrl: R69,
           audioUrlFull: R69f,
           hint: {
@@ -75,8 +75,8 @@ export const round3v2Set: RoundSet = {
         },
         {
           id: 'q10',
-          title: 'Тополиный пух',
-          artist: 'Иванушки International',
+          title: 'Song 10 Title',
+          artist: 'Artist 10',
           audioUrl: R610,
           audioUrlFull: R610f,
           hint: {
@@ -88,3 +88,4 @@ export const round3v2Set: RoundSet = {
     }
   ]
 };
+

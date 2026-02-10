@@ -2,7 +2,8 @@ import { RoundSet } from '../types';
 import { audioUrl } from './audioUtils';
 
 // ==================== ROUND 3 (DUEL) - SET 3 (Q11–Q15) ====================
-// Note: this set reuses existing audio assets; update with new songs when available.
+// ВНИМАНИЕ: этот набор использует те же аудиофайлы, что и Set 1
+// Нужно добавить новые аудиофайлы для уникальных песен
 
 const R61 = audioUrl('pesenka-krokodila-geny-minus_ebmqsh', '/music/round6/pesenka-krokodila-geny-minus.mp3');
 const R61f = audioUrl('pesenka-krokodila-geny_ggehic', '/music/round6/pesenka-krokodila-geny.mp3');
@@ -32,8 +33,8 @@ export const round3v3Set: RoundSet = {
       songs: [
         {
           id: 'q11',
-          title: 'Smooth Criminal',
-          artist: 'Michael Jackson',
+          title: 'Песенка крокодила Гены',
+          artist: 'Из м/ф "Чебурашка"',
           audioUrl: R61,
           audioUrlFull: R61f,
           hint: {
@@ -43,8 +44,8 @@ export const round3v3Set: RoundSet = {
         },
         {
           id: 'q12',
-          title: 'Billie Jean',
-          artist: 'Michael Jackson',
+          title: 'Кукушка',
+          artist: 'Виктор Цой',
           audioUrl: R62,
           audioUrlFull: R62f,
           hint: {
@@ -54,8 +55,8 @@ export const round3v3Set: RoundSet = {
         },
         {
           id: 'q13',
-          title: 'Bohemian Rhapsody',
-          artist: 'Queen',
+          title: 'Ветер перемен',
+          artist: 'Из м/ф "Бременские музыканты"',
           audioUrl: R63,
           audioUrlFull: R63f,
           hint: {
@@ -65,8 +66,8 @@ export const round3v3Set: RoundSet = {
         },
         {
           id: 'q14',
-          title: 'Take On Me',
-          artist: 'a-ha',
+          title: 'Выйду ночью в поле с конём',
+          artist: 'Русская народная песня',
           audioUrl: R64,
           audioUrlFull: R64f,
           hint: {
@@ -76,8 +77,8 @@ export const round3v3Set: RoundSet = {
         },
         {
           id: 'q15',
-          title: 'Rolling in the Deep',
-          artist: 'Adele',
+          title: 'Антошка',
+          artist: 'Детская песня',
           audioUrl: R65,
           audioUrlFull: R65f,
           hint: {
@@ -89,4 +90,3 @@ export const round3v3Set: RoundSet = {
     }
   ]
 };
-

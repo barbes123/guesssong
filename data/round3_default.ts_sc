@@ -20,7 +20,7 @@ const R65 = audioUrl('antoshka_minus_ttcnms', '/music/round6/antoshka_minus.mp3'
 const R65f = audioUrl('antoshka_fpdxti', '/music/round6/antoshka.mp3');
 
 export const defaultSet: RoundSet = {
-  id: 'duel_set_1',
+  id: 'default',
   name: { en: 'Duel – Set 1', ru: 'Дуэль – Набор 1' },
   description: { en: '5 questions (Q1–Q5)', ru: '5 вопросов (1–5)' },
   author: 'DT',
@@ -32,19 +32,19 @@ export const defaultSet: RoundSet = {
       songs: [
         {
           id: 'q1',
-          title: 'Песенка крокодила Гены',
-          artist: 'Из м/ф "Чебурашка"',
+          title: 'Smooth Criminal',
+          artist: 'Michael Jackson',
           audioUrl: R61,
           audioUrlFull: R61f,
           hint: {
-            en: 'This song sounds at a moment of loneliness. In the song there are noisy running heroes. There is a contrast between the grayness of the surrounding world and the joyful occasion.',
+            en: 'This song sounds in the moment of loneliness. In the song there are noisy running heroes. In the song there is a contrast between the grayness of the surrounding world and the joyful occasion.',
             ru: 'Эта песня звучит в момент одиночества. В песне есть шумные бегущие герои, подчеркивается контраст между серостью окружающего мира и радостным поводом.'
           }
         },
         {
           id: 'q2',
-          title: 'Кукушка',
-          artist: 'Виктор Цой',
+          title: 'Billie Jean',
+          artist: 'Michael Jackson',
           audioUrl: R62,
           audioUrlFull: R62f,
           hint: {
@@ -54,8 +54,8 @@ export const defaultSet: RoundSet = {
         },
         {
           id: 'q3',
-          title: 'Ветер перемен',
-          artist: 'Из м/ф "Бременские музыканты"',
+          title: 'Bohemian Rhapsody',
+          artist: 'Queen',
           audioUrl: R63,
           audioUrlFull: R63f,
           hint: {
@@ -65,8 +65,8 @@ export const defaultSet: RoundSet = {
         },
         {
           id: 'q4',
-          title: 'Выйду ночью в поле с конём',
-          artist: 'Русская народная песня',
+          title: 'Take On Me',
+          artist: 'a-ha',
           audioUrl: R64,
           audioUrlFull: R64f,
           hint: {
@@ -76,8 +76,8 @@ export const defaultSet: RoundSet = {
         },
         {
           id: 'q5',
-          title: 'Антошка',
-          artist: 'Детская песня',
+          title: 'Rolling in the Deep',
+          artist: 'Adele',
           audioUrl: R65,
           audioUrlFull: R65f,
           hint: {
@@ -89,3 +89,4 @@ export const defaultSet: RoundSet = {
     }
   ]
 };
+

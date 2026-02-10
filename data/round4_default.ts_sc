@@ -48,56 +48,15 @@ export const defaultSet: RoundSet = {
       id: 'r4_sprint',
       name: { en: 'Sprint', ru: 'Спринт' },
       songs: [
-        { 
-          id: 's5_1', 
-          title: 'Улыбка', 
-          artist: 'Из м/ф "Крошка Енот"', 
-          audioUrl: R5R11minus, 
-          audioUrlFull: R5R11full 
-        },
-        { 
-          id: 's5_2', 
-          title: 'Снег кружится', 
-          artist: 'Из к/ф "Ирония судьбы"', 
-          audioUrl: R5R12minus, 
-          audioUrlFull: R5R12full 
-        },
-        { 
-          id: 's5_3', 
-          title: 'Спи, моя радость, усни', 
-          artist: 'Колыбельная', 
-          audioUrl: R5R13minus, 
-          audioUrlFull: R5R13full 
-        },
-        { 
-          id: 's5_4', 
-          title: 'Всё, что в жизни есть у меня', 
-          artist: 'Александр Серов', 
-          audioUrl: R5R14minus, 
-          audioUrlFull: R5R14full 
-        },
-        { 
-          id: 's5_5', 
-          title: 'Реет в вышине (Олимпиада-80)', 
-          artist: 'Гимн Олимпиады-80', 
-          audioUrl: R5R15minus, 
-          audioUrlFull: R5R15full 
-        },
-        { 
-          id: 's5_6', 
-          title: 'Песня о родине', 
-          artist: 'Из к/ф "Бриллиантовая рука"', 
-          audioUrl: R5R16minus, 
-          audioUrlFull: R5R16full 
-        },
-        { 
-          id: 's5_7', 
-          title: 'Комарovo', 
-          artist: 'Игорь Скляр', 
-          audioUrl: R5R17minus, 
-          audioUrlFull: R5R17full 
-        },
+        { id: 's5_1', title: 'Sprint 1 (P1)', artist: 'Artist 1', audioUrl: R5R11minus, audioUrlFull: R5R11full },
+        { id: 's5_2', title: 'Sprint 2 (P1)', artist: 'Artist 2', audioUrl: R5R12minus, audioUrlFull: R5R12full },
+        { id: 's5_3', title: 'Sprint 3 (P1)', artist: 'Artist 3', audioUrl: R5R13minus, audioUrlFull: R5R13full },
+        { id: 's5_4', title: 'Sprint 4 (P1)', artist: 'Artist 4', audioUrl: R5R14minus, audioUrlFull: R5R14full },
+        { id: 's5_5', title: 'Sprint 5 (P1)', artist: 'Artist 5', audioUrl: R5R15minus, audioUrlFull: R5R15full },
+        { id: 's5_6', title: 'Sprint 6 (P1)', artist: 'Artist 6', audioUrl: R5R16minus, audioUrlFull: R5R16full },
+        { id: 's5_7', title: 'Sprint 7 (P1)', artist: 'Artist 7', audioUrl: R5R17minus, audioUrlFull: R5R17full },
       ],
     },
   ],
 };
+

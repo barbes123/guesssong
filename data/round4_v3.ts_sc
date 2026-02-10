@@ -51,56 +51,15 @@ export const round4v3Set: RoundSet = {
       id: 'r4_sprint',
       name: { en: 'Sprint', ru: 'Спринт' },
       songs: [
-        { 
-          id: 's5_15', 
-          title: 'Настоящий друг', 
-          artist: 'Из м/ф "Тимка и Димка"', 
-          audioUrl: R5R31minus, 
-          audioUrlFull: R5R31full 
-        },
-        { 
-          id: 's5_16', 
-          title: 'Мы маленькие дети', 
-          artist: 'Из к/ф "Приключения Электроника"', 
-          audioUrl: R5R32minus, 
-          audioUrlFull: R5R32full 
-        },
-        { 
-          id: 's5_17', 
-          title: 'Лесной олень', 
-          artist: 'Из к/ф "Ох, уж эта Настя!"', 
-          audioUrl: R5R33minus, 
-          audioUrlFull: R5R33full 
-        },
-        { 
-          id: 's5_18', 
-          title: 'Куда уходит детство', 
-          artist: 'Алла Пугачёва', 
-          audioUrl: R5R34minus, 
-          audioUrlFull: R5R34full 
-        },
-        { 
-          id: 's5_19', 
-          title: 'Если б я был султан', 
-          artist: 'Юрий Никулин (из к/ф "Кавказская пленница")', 
-          audioUrl: R5R35minus, 
-          audioUrlFull: R5R35full 
-        },
-        { 
-          id: 's5_20', 
-          title: 'Разговор со счастьем', 
-          artist: 'Из к/ф "Иван Васильевич меняет профессию"', 
-          audioUrl: R5R36minus, 
-          audioUrlFull: R5R36full 
-        },
-        { 
-          id: 's5_21', 
-          title: 'Ландыши', 
-          artist: 'Гелена Великанова', 
-          audioUrl: R5R37minus, 
-          audioUrlFull: R5R37full 
-        },
+        { id: 's5_15', title: 'Sprint 1 (P3)', artist: 'Artist 15', audioUrl: R5R31minus, audioUrlFull: R5R31full },
+        { id: 's5_16', title: 'Sprint 2 (P3)', artist: 'Artist 16', audioUrl: R5R32minus, audioUrlFull: R5R32full },
+        { id: 's5_17', title: 'Sprint 3 (P3)', artist: 'Artist 17', audioUrl: R5R33minus, audioUrlFull: R5R33full },
+        { id: 's5_18', title: 'Sprint 4 (P3)', artist: 'Artist 18', audioUrl: R5R34minus, audioUrlFull: R5R34full },
+        { id: 's5_19', title: 'Sprint 5 (P3)', artist: 'Artist 19', audioUrl: R5R35minus, audioUrlFull: R5R35full },
+        { id: 's5_20', title: 'Sprint 6 (P3)', artist: 'Artist 20', audioUrl: R5R36minus, audioUrlFull: R5R36full },
+        { id: 's5_21', title: 'Sprint 7 (P3)', artist: 'Artist 21', audioUrl: R5R37minus, audioUrlFull: R5R37full },
       ],
     },
   ],
 };
+

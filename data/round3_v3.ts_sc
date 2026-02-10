@@ -1,8 +1,8 @@
 import { RoundSet } from '../types';
 import { audioUrl } from './audioUtils';
 
-// ==================== ROUND 3 (DUEL) - DEFAULT SET (Q1–Q5) ====================
-// Uses Round 6 audio assets (legacy) but is presented as Round 3 in the app.
+// ==================== ROUND 3 (DUEL) - SET 3 (Q11–Q15) ====================
+// Note: this set reuses existing audio assets; update with new songs when available.
 
 const R61 = audioUrl('pesenka-krokodila-geny-minus_ebmqsh', '/music/round6/pesenka-krokodila-geny-minus.mp3');
 const R61f = audioUrl('pesenka-krokodila-geny_ggehic', '/music/round6/pesenka-krokodila-geny.mp3');
@@ -19,10 +19,10 @@ const R64f = audioUrl('vyydu-noch-yu-v-pole-s-konem_x004md', '/music/round6/vyyd
 const R65 = audioUrl('antoshka_minus_ttcnms', '/music/round6/antoshka_minus.mp3');
 const R65f = audioUrl('antoshka_fpdxti', '/music/round6/antoshka.mp3');
 
-export const defaultSet: RoundSet = {
-  id: 'duel_set_1',
-  name: { en: 'Duel – Set 1', ru: 'Дуэль – Набор 1' },
-  description: { en: '5 questions (Q1–Q5)', ru: '5 вопросов (1–5)' },
+export const round3v3Set: RoundSet = {
+  id: 'round3_v3',
+  name: { en: 'Duel – Set 3', ru: 'Дуэль – Набор 3' },
+  description: { en: '5 questions (Q11–Q15)', ru: '5 вопросов (11–15)' },
   author: 'DT',
   version: '1.0',
   data: [
@@ -31,20 +31,20 @@ export const defaultSet: RoundSet = {
       name: { en: 'Duel', ru: 'Дуэль' },
       songs: [
         {
-          id: 'q1',
-          title: 'Песенка крокодила Гены',
-          artist: 'Из м/ф "Чебурашка"',
+          id: 'q11',
+          title: 'Smooth Criminal',
+          artist: 'Michael Jackson',
           audioUrl: R61,
           audioUrlFull: R61f,
           hint: {
-            en: 'This song sounds at a moment of loneliness. In the song there are noisy running heroes. There is a contrast between the grayness of the surrounding world and the joyful occasion.',
+            en: 'This song sounds in the moment of loneliness. In the song there are noisy running heroes. In the song there is a contrast between the grayness of the surrounding world and the joyful occasion.',
             ru: 'Эта песня звучит в момент одиночества. В песне есть шумные бегущие герои, подчеркивается контраст между серостью окружающего мира и радостным поводом.'
           }
         },
         {
-          id: 'q2',
-          title: 'Кукушка',
-          artist: 'Виктор Цой',
+          id: 'q12',
+          title: 'Billie Jean',
+          artist: 'Michael Jackson',
           audioUrl: R62,
           audioUrlFull: R62f,
           hint: {
@@ -53,9 +53,9 @@ export const defaultSet: RoundSet = {
           }
         },
         {
-          id: 'q3',
-          title: 'Ветер перемен',
-          artist: 'Из м/ф "Бременские музыканты"',
+          id: 'q13',
+          title: 'Bohemian Rhapsody',
+          artist: 'Queen',
           audioUrl: R63,
           audioUrlFull: R63f,
           hint: {
@@ -64,9 +64,9 @@ export const defaultSet: RoundSet = {
           }
         },
         {
-          id: 'q4',
-          title: 'Выйду ночью в поле с конём',
-          artist: 'Русская народная песня',
+          id: 'q14',
+          title: 'Take On Me',
+          artist: 'a-ha',
           audioUrl: R64,
           audioUrlFull: R64f,
           hint: {
@@ -75,9 +75,9 @@ export const defaultSet: RoundSet = {
           }
         },
         {
-          id: 'q5',
-          title: 'Антошка',
-          artist: 'Детская песня',
+          id: 'q15',
+          title: 'Rolling in the Deep',
+          artist: 'Adele',
           audioUrl: R65,
           audioUrlFull: R65f,
           hint: {
@@ -89,3 +89,4 @@ export const defaultSet: RoundSet = {
     }
   ]
 };
+

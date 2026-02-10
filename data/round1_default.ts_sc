@@ -25,9 +25,8 @@ const R1C2B2full = audioUrl('zvenit-janvarskaja-vjuga_mrwszb', '/music/round1/zv
 const R1C2B3minus = audioUrl('pesenka-o-medvedjah-minus_ccuru1', '/music/round1/pesenka-o-medvedjah-minus.mp3');
 const R1C2B3full = audioUrl('pesenka-o-medvedjah_ptrxzr', '/music/round1/pesenka-o-medvedjah.mp3');
 
-// ОСТАВЛЯЕМ КАК В ОРИГИНАЛЕ:
 const R1C2B4minus = audioUrl('dzhentelmeny-udachi_dlwpir', '/music/round1/dzhentelmeny-udachi.mp3');
-const R1C2B4full = audioUrl('dzhentelmeny-udachi_dlwpir', '/music/round1/dzhentelmeny-udachi.mp3');
+const R1C2B4full = audioUrl('dzhentelmeny-udachi_dlwpir', '/music/round1/dzhentelmeny-udachi.mp3'); // Same ID for both minus/full
 
 // Category 3: School Songs
 const R1C3B1minus = audioUrl('dvazhdy_dva_chetyre-minus_itvint', '/music/round1/dvazhdy_dva_chetyre-minus.mp3');
@@ -56,7 +55,7 @@ const R1C4B4minus = audioUrl('33_korovy_minus_wgviha', '/music/round1/33_korovy_
 const R1C4B4full = audioUrl('33_korovy_siv4yd', '/music/round1/33_korovy.mp3');
 
 export const defaultSet: RoundSet = {
-  id: 'default',
+  id: 'default',  // Set ID
   name: {
     en: 'Round1-V1',
     ru: 'Роунд1-1'
@@ -67,36 +66,36 @@ export const defaultSet: RoundSet = {
   },
   author: 'DT',
   version: '1.0',
-  data: [
+  data: [  // This is the array of categories
     {
       id: 'newyear',
       name: { en: 'New Year', ru: 'Новый Год' },
       songs: [
         { 
           id: 'p1_1', 
-          title: 'Бубенцы', 
-          artist: 'Русская народная песня', 
+          title: 'Song 1', 
+          artist: 'Artist 1', 
           audioUrl: R1C1B1minus, 
           audioUrlFull: R1C1B1full 
         },
         { 
           id: 'p1_2', 
-          title: 'В лесу родилась ёлочка', 
-          artist: 'Детская новогодняя песня', 
+          title: 'Song 2', 
+          artist: 'Artist 2', 
           audioUrl: R1C1B2minus, 
           audioUrlFull: R1C1B2full 
         },
         { 
           id: 'p1_3', 
-          title: 'Ёлочка, ёлка, лесной аромат', 
-          artist: 'Детская новогодняя песня', 
+          title: 'Song 3', 
+          artist: 'Artist 3', 
           audioUrl: R1C1B3minus, 
           audioUrlFull: R1C1B3full 
         },
         { 
           id: 'p1_4', 
-          title: 'Новогодние игрушки', 
-          artist: 'Детская новогодняя песня', 
+          title: 'Song 4', 
+          artist: 'Artist 4', 
           audioUrl: R1C1B4minus, 
           audioUrlFull: R1C1B4full 
         },
@@ -108,29 +107,29 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'r1_1', 
-          title: 'Песня мушкетёров', 
-          artist: 'Из к/ф "Д\'Артаньян и три мушкетёра"', 
+          title: 'Rock 1', 
+          artist: 'Artist 1', 
           audioUrl: R1C2B1minus, 
           audioUrlFull: R1C2B1full 
         },
         { 
           id: 'r1_2', 
-          title: 'Звенит январская вьюга', 
-          artist: 'Из к/ф "Карнавальная ночь"', 
+          title: 'Rock 2', 
+          artist: 'Artist 2', 
           audioUrl: R1C2B2minus, 
           audioUrlFull: R1C2B2full 
         },
         { 
           id: 'r1_3', 
-          title: 'Песенка о медведях', 
-          artist: 'Из к/ф "Кавказская пленница"', 
+          title: 'Rock 3', 
+          artist: 'Artist 3', 
           audioUrl: R1C2B3minus, 
           audioUrlFull: R1C2B3full 
         },
         { 
           id: 'r1_4', 
-          title: 'Джентльмены удачи', 
-          artist: 'Из к/ф "Джентльмены удачи"', 
+          title: 'Rock 4', 
+          artist: 'Artist 4', 
           audioUrl: R1C2B4minus, 
           audioUrlFull: R1C2B4full 
         },
@@ -142,29 +141,29 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'c1_1', 
-          title: 'Дважды два — четыре', 
-          artist: 'Детская песня', 
+          title: 'Movie 1', 
+          artist: 'Artist 1', 
           audioUrl: R1C3B1minus, 
           audioUrlFull: R1C3B1full 
         },
         { 
           id: 'c1_2', 
-          title: 'Чему учат в школе', 
-          artist: 'Владимир Шаинский', 
+          title: 'Movie 2', 
+          artist: 'Artist 2', 
           audioUrl: R1C3B2minus, 
           audioUrlFull: R1C3B2full 
         },
         { 
           id: 'c1_3', 
-          title: 'Песенка первоклассника', 
-          artist: 'Детская песня', 
+          title: 'Movie 3', 
+          artist: 'Artist 3', 
           audioUrl: R1C3B3minus, 
           audioUrlFull: R1C3B3full 
         },
         { 
           id: 'c1_4', 
-          title: 'Мой добрый учитель', 
-          artist: 'Детская песня', 
+          title: 'Movie 4', 
+          artist: 'Artist 4', 
           audioUrl: R1C3B4minus, 
           audioUrlFull: R1C3B4full 
         },
@@ -176,29 +175,29 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'rt1_1', 
-          title: 'В траве сидел кузнечик', 
-          artist: 'Из м/ф "Приключения Незнайки"', 
+          title: 'Retro 1', 
+          artist: 'Artist 1', 
           audioUrl: R1C4B1minus, 
           audioUrlFull: R1C4B1full 
         },
         { 
           id: 'rt1_2', 
-          title: 'Два весёлых гуся', 
-          artist: 'Детская песня', 
+          title: 'Retro 2', 
+          artist: 'Artist 2', 
           audioUrl: R1C4B2minus, 
           audioUrlFull: R1C4B2full 
         },
         { 
           id: 'rt1_3', 
-          title: 'Чёрный кот', 
-          artist: 'Юрий Савичев', 
+          title: 'Retro 3', 
+          artist: 'Artist 3', 
           audioUrl: R1C4B3minus, 
           audioUrlFull: R1C4B3full 
         },
         { 
           id: 'rt1_4', 
-          title: '33 коровы', 
-          artist: 'Из м/ф "Мэри Поппинс, до свидания!"', 
+          title: 'Retro 4', 
+          artist: 'Artist 4', 
           audioUrl: R1C4B4minus, 
           audioUrlFull: R1C4B4full 
         },

@@ -15,9 +15,8 @@ const R1_2_C1B3full = audioUrl('my_malenkie_deti_ixn2ct', '/music/round2/my_male
 const R1_2_C1B4minus = audioUrl('krylatye_kacheli_minus_exthl0', '/music/round2/krylatye_kacheli_minus.mp3');
 const R1_2_C1B4full = audioUrl('krylatye_kacheli_gmtcac', '/music/round2/krylatye_kacheli.mp3');
 
-
 const R1_2_C2B1minus = audioUrl('berezy-minus_sff6l8', '/music/round2/berezy-minus.mp3');
-const R1_2_C2B1full = '/music/round2/berezy.mpga'; // Note: .mpga extension - might be wrong
+const R1_2_C2B1full = audioUrl('berezy', '/music/round2/berezy.mp3'); // Исправлено расширение
 
 const R1_2_C2B2minus = audioUrl('kak-upoitel-ny-v-rossii-vechera-minus_qo6pfx', '/music/round2/kak-upoitel-ny-v-rossii-vechera-minus.mp3');
 const R1_2_C2B2full = audioUrl('kak-upoitel-ny-v-rossii-vechera_por3ci', '/music/round2/kak-upoitel-ny-v-rossii-vechera.mp3');
@@ -27,7 +26,6 @@ const R1_2_C2B3full = audioUrl('s_chego_nachinaetsya_Rodina_c4ghwp', '/music/rou
 
 const R1_2_C2B4minus = audioUrl('russkoe-pole-minus_ruymua', '/music/round2/russkoe-pole-minus.mp3');
 const R1_2_C2B4full = audioUrl('russkoe-pole_vtnc6o', '/music/round2/russkoe-pole.mp3');
-
 
 const R1_2_C3B1minus = audioUrl('est-tolko-mig-minus_kk13xz', '/music/round2/est-tolko-mig-minus.mp3');
 const R1_2_C3B1full = audioUrl('est-tolko-mig_fmgvto', '/music/round2/est-tolko-mig.mp3');
@@ -41,7 +39,6 @@ const R1_2_C3B3full = audioUrl('tri-tankista_cb59ui', '/music/round2/tri-tankist
 const R1_2_C3B4minus = audioUrl('smuglyanka-minus_ncekac', '/music/round2/smuglyanka-minus.mp3');
 const R1_2_C3B4full = audioUrl('smuglyanka_mtiuoy', '/music/round2/smuglyanka.mp3');
 
-// Round 2 Category 4
 const R1_2_C4B1minus = audioUrl('landyshi-minus_xhiisn', '/music/round2/landyshi-minus.mp3');
 const R1_2_C4B1full = audioUrl('landyshi_xtruct', '/music/round2/landyshi.mp3');
 
@@ -55,49 +52,65 @@ const R1_2_C4B4minus = audioUrl('nadezhda_minus_h24xio', '/music/round2/nadezhda
 const R1_2_C4B4full = audioUrl('nadezhda_ujmrfc', '/music/round2/nadezhda.mp3');
 
 export const round1v2Set: RoundSet = {
-  id: 'round1_v2',  // Set ID
-   name: {
-    en: 'Round1-V2',
-    ru: 'Роунд1-2'
+  id: 'round1_v2',
+  name: {
+    en: 'Round 1: Set 2',
+    ru: 'Раунд 1: Набор 2'
   },
   description: {
-    en: '',
-    ru: ''
+    en: 'Themed categories: Children\'s Songs, Russia, Soviet Films, 60s-70s Hits',
+    ru: 'Тематические категории: Детские песни, Россия, Советские фильмы, Хиты 60-70-х'
   },
   author: 'DT',
   version: '1.0',
-  data: [  // This is the array of categories
+  data: [
     {
       id: 'children',
-      name: { en: 'Childrens songs', ru: 'Детские песни' },
+      name: { en: 'Children\'s Songs', ru: 'Детские песни' },
       songs: [
         { 
           id: 'p1_2_1', 
-          title: 'Song 1', 
-          artist: 'Artist 1', 
+          title: 'Улыбка', 
+          artist: 'Из м/ф "Крошка Енот"', 
           audioUrl: R1_2_C1B1minus, 
-          audioUrlFull: R1_2_C1B1full 
+          audioUrlFull: R1_2_C1B1full,
+          hint: {
+            en: 'Famous children\'s song from a cartoon about a little raccoon with the words "From a smile it will become brighter for everyone".',
+            ru: 'Знаменитая детская песня из мультфильма о маленьком еноте со словами «От улыбки станет всем светлей».'
+          }
         },
         { 
           id: 'p1_2_2', 
-          title: 'Song 2', 
-          artist: 'Artist 2', 
+          title: 'Настоящий друг', 
+          artist: 'Из м/ф "Тимка и Димка"', 
           audioUrl: R1_2_C1B2minus, 
-          audioUrlFull: R1_2_C1B2full 
+          audioUrlFull: R1_2_C1B2full,
+          hint: {
+            en: 'Children\'s song about friendship from the cartoon: "A friend will not leave in trouble, will not ask too much".',
+            ru: 'Детская песня о дружбе из мультфильма: «Друг в беде не бросит, лишнего не спросит».'
+          }
         },
         { 
           id: 'p1_2_3', 
-          title: 'Song 3', 
-          artist: 'Artist 3', 
+          title: 'Мы маленькие дети', 
+          artist: 'Из к/ф "Приключения Электроника"', 
           audioUrl: R1_2_C1B3minus, 
-          audioUrlFull: R1_2_C1B3full 
+          audioUrlFull: R1_2_C1B3full,
+          hint: {
+            en: 'Song from the cult film "The Adventures of Electronics": "We are little children, we want to walk".',
+            ru: 'Песня из культового фильма «Приключения Электроника»: «Мы маленькие дети, нам хочется гулять».'
+          }
         },
         { 
           id: 'p1_2_4', 
-          title: 'Song 4', 
-          artist: 'Artist 4', 
+          title: 'Крылатые качели', 
+          artist: 'Из к/ф "Приключения Электроника"', 
           audioUrl: R1_2_C1B4minus, 
-          audioUrlFull: R1_2_C1B4full 
+          audioUrlFull: R1_2_C1B4full,
+          hint: {
+            en: 'Another famous song from the same film about dreams and hopes: "Winged swings fly, fly, fly".',
+            ru: 'Ещё одна знаменитая песня из того же фильма о мечтах и надеждах: «Крылатые качели летят, летят, летят».'
+          }
         },
       ]
     },
@@ -107,99 +120,147 @@ export const round1v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_5', 
-          title: 'Rock 1', 
-          artist: 'Artist 1', 
+          title: 'Берёзы', 
+          artist: 'Лев Лещенко', 
           audioUrl: R1_2_C2B1minus, 
-          audioUrlFull: R1_2_C2B1full 
+          audioUrlFull: R1_2_C2B1full,
+          hint: {
+            en: 'Lyrical song about Russian nature, birches as a symbol of Russia.',
+            ru: 'Лирическая песня о русской природе, берёзах как символе России.'
+          }
         },
         { 
           id: 'p1_2_6', 
-          title: 'Rock 2', 
-          artist: 'Artist 2', 
+          title: 'Как упоительны в России вечера', 
+          artist: 'Валентина Пономарёва', 
           audioUrl: R1_2_C2B2minus, 
-          audioUrlFull: R1_2_C2B2full 
+          audioUrlFull: R1_2_C2B2full,
+          hint: {
+            en: 'Romance about the beauty of Russian evenings from the repertoire of Valentina Ponomareva.',
+            ru: 'Романс о красоте русских вечеров из репертуара Валентины Пономарёвой.'
+          }
         },
         { 
           id: 'p1_2_7', 
-          title: 'Rock 3', 
-          artist: 'Artist 3', 
+          title: 'С чего начинается Родина', 
+          artist: 'Марк Бернес', 
           audioUrl: R1_2_C2B3minus, 
-          audioUrlFull: R1_2_C2B3full 
+          audioUrlFull: R1_2_C2B3full,
+          hint: {
+            en: 'Patriotic song about what the Motherland begins with for each person.',
+            ru: 'Патриотическая песня о том, с чего для каждого человека начинается Родина.'
+          }
         },
         { 
           id: 'p1_2_8', 
-          title: 'Rock 4', 
-          artist: 'Artist 4', 
+          title: 'Русское поле', 
+          artist: 'Из к/ф "Новые приключения неуловимых"', 
           audioUrl: R1_2_C2B4minus, 
-          audioUrlFull: R1_2_C2B4full 
+          audioUrlFull: R1_2_C2B4full,
+          hint: {
+            en: 'Song about the expanses of the Russian land from the film "The New Adventures of the Elusive".',
+            ru: 'Песня о просторах русской земли из кинофильма «Новые приключения неуловимых».'
+          }
         },
       ]
     },
     {
-      id: 'cinema2026',
-      name: { en: 'Soviet films', ru: 'Советские фильмы' },
+      id: 'cinema',
+      name: { en: 'Soviet Films', ru: 'Советские фильмы' },
       songs: [
         { 
           id: 'p1_2_9', 
-          title: 'Movie 1', 
-          artist: 'Artist 1', 
+          title: 'Есть только миг', 
+          artist: 'Из к/ф "Земля Санникова"', 
           audioUrl: R1_2_C3B1minus, 
-          audioUrlFull: R1_2_C3B1full 
+          audioUrlFull: R1_2_C3B1full,
+          hint: {
+            en: 'Philosophical song from the adventure film "Sannikov Land" performed by Oleg Anofriev.',
+            ru: 'Философская песня из приключенческого фильма «Земля Санникова» в исполнении Олега Анофриева.'
+          }
         },
         { 
           id: 'p1_2_10', 
-          title: 'Movie 2', 
-          artist: 'Artist 2', 
+          title: 'Позвони мне, позвони', 
+          artist: 'Из к/ф "Карнавал"', 
           audioUrl: R1_2_C3B2minus, 
-          audioUrlFull: R1_2_C3B2full 
+          audioUrlFull: R1_2_C3B2full,
+          hint: {
+            en: 'Popular song from the film "Carnival" performed by Irina Muravyova.',
+            ru: 'Популярная песня из фильма «Карнавал» в исполнении Ирины Муравьёвой.'
+          }
         },
         { 
           id: 'p1_2_11', 
-          title: 'Movie 3', 
-          artist: 'Artist 3', 
+          title: 'Три танкиста', 
+          artist: 'Из к/ф "Трактористы"', 
           audioUrl: R1_2_C3B3minus, 
-          audioUrlFull: R1_2_C3B3full 
+          audioUrlFull: R1_2_C3B3full,
+          hint: {
+            en: 'Legendary military song from the film "Tractor Drivers" about three tanker friends.',
+            ru: 'Легендарная военная песня из фильма «Трактористы» о трёх танкистах-друзьях.'
+          }
         },
         { 
           id: 'p1_2_12', 
-          title: 'Movie 4', 
-          artist: 'Artist 4', 
+          title: 'Смуглянка', 
+          artist: 'Из к/ф "В бой идут одни старики"', 
           audioUrl: R1_2_C3B4minus, 
-          audioUrlFull: R1_2_C3B4full 
+          audioUrlFull: R1_2_C3B4full,
+          hint: {
+            en: 'Famous military song from Leonid Bykov\'s film about a partisan girl.',
+            ru: 'Знаменитая военная песня из фильма Леонида Быкова о девушке-партизанке.'
+          }
         },
       ]
     },
     {
       id: 'hit60',
-      name: { en: 'Hits of the 60s and 70s', ru: 'Хиты 60-х и 70-х годов' },
+      name: { en: '60s-70s Hits', ru: 'Хиты 60-70-х' },
       songs: [
         { 
           id: 'p1_2_13', 
-          title: 'Retro 1', 
-          artist: 'Artist 1', 
+          title: 'Ландыши', 
+          artist: 'Гелена Великанова', 
           audioUrl: R1_2_C4B1minus, 
-          audioUrlFull: R1_2_C4B1full 
+          audioUrlFull: R1_2_C4B1full,
+          hint: {
+            en: 'Light, spring song of the 1950s, which became a hit performed by Helena Velikanova.',
+            ru: 'Лёгкая, весенняя песня 50-х годов, ставшая хитом в исполнении Гелены Великановой.'
+          }
         },
         { 
           id: 'p1_2_14', 
-          title: 'Retro 2', 
-          artist: 'Artist 2', 
+          title: 'А снег идёт', 
+          artist: 'Майя Кристалинская', 
           audioUrl: R1_2_C4B2minus, 
-          audioUrlFull: R1_2_C4B2full 
+          audioUrlFull: R1_2_C4B2full,
+          hint: {
+            en: 'Lyrical song by Maya Kristalinskaya about snow as a metaphor for time and memories.',
+            ru: 'Лирическая песня Майи Кристалинской о снеге как метафоре времени и воспоминаний.'
+          }
         },
         { 
           id: 'p1_2_15', 
-          title: 'Retro 3', 
-          artist: 'Artist 3', 
+          title: 'На дальней станции сойду', 
+          artist: 'Валерий Ободзинский', 
           audioUrl: R1_2_C4B3minus, 
-          audioUrlFull: R1_2_C4B3full 
+          audioUrlFull: R1_2_C4B3full,
+          hint: {
+            en: 'Romantic song about parting and distant stations performed by Valery Obodzinsky.',
+            ru: 'Романтическая песня о расставании и дальних станциях в исполнении Валерия Ободзинского.'
+          }
         },
         { 
           id: 'p1_2_16', 
-          title: 'Retro 4', 
-          artist: 'Artist 4', 
+          title: 'Надежда', 
+          artist: 'Анна Герман', 
           audioUrl: R1_2_C4B4minus, 
-          audioUrlFull: R1_2_C4B4full 
+          audioUrlFull: R1_2_C4B4full,
+          hint: {
+            en: 'One of the most famous songs by Anna German, which became a symbol of hope for a whole generation.',
+            ru: 'Одна из самых известных песен Анны Герман, ставшая символом надежды для целого поколения.'
+          }
         },
       ]
     }
