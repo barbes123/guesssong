@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw } from 'lucide-react';
+import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff } from 'lucide-react';
 import { Language } from '../types';
 
 interface SettingsOverlayProps {
@@ -14,9 +14,10 @@ interface SettingsOverlayProps {
   onGoStart: () => void;
   onReset: () => void;
   volume?: number;
-  onVolumeChange?: (volume: number) => void;
+  onVolumeChange?: (volume: number) => void;  
   t: any;
   isLocked?: boolean;
+  isBuzzerConnected: boolean;
 }
 
 const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
@@ -32,7 +33,8 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   volume = 0.7,
   onVolumeChange = () => {},
   t,
-  isLocked = false
+  isLocked = false,
+  isBuzzerConnected
 }) => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
@@ -42,6 +44,22 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   return (
     <div className="fixed top-6 right-6 flex items-center gap-3 z-50">
       <div className="bg-slate-800/95 backdrop-blur-xl rounded-full shadow-2xl border border-slate-700/50 p-2 flex items-center gap-2">
+
+      {/* --- BUZZER CONNECTION STATUS --- */}
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${
+          isBuzzerConnected 
+            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+            : 'bg-rose-500/20 text-rose-500 border border-rose-500/40 animate-pulse'
+        }`}>
+          {isBuzzerConnected ? <Wifi size={16} /> : <WifiOff size={16} />}
+          <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
+            {isBuzzerConnected ? 'Linked' : 'Offline'}
+          </span>
+        </div>
+
+        <div className="w-px h-8 bg-slate-700 mx-1" />
+
+
         {/* Volume Control */}
         <div className="flex items-center gap-2 px-2">
           <VolumeX size={18} className="text-slate-500" />
