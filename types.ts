@@ -6,6 +6,7 @@ export interface Player {
   name: string;
   score: number;
   stars: number; // New: Stars for Round 6
+  hubId?: string;
 }
 
 export interface Song {

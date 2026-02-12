@@ -14,6 +14,7 @@ interface SetupViewProps {
   onTogglePlayerWindow: () => void;
   isBuzzerConnected: boolean;
   onCheckConnection: () => void;
+availableHubPlayers: any[];
 }
 
 const SetupView: React.FC<SetupViewProps> = ({
@@ -26,7 +27,8 @@ const SetupView: React.FC<SetupViewProps> = ({
   isPlayerWindowOpen,
   onTogglePlayerWindow,
   isBuzzerConnected, 
-  onCheckConnection
+  onCheckConnection,
+  availableHubPlayers = []
 }) => {
   const [localPlayers, setLocalPlayers] = useState<Player[]>(players);
   
@@ -90,7 +92,34 @@ const SetupView: React.FC<SetupViewProps> = ({
           </button>
         </div>
 
-
+        {/* WAITING ROOM PLAYERS BUZZER */}
+        {availableHubPlayers.length > 0 && (
+          <div className="mb-8 p-6 bg-indigo-900/20 border-2 border-dashed border-indigo-500/50 rounded-[2rem]">
+            <h3 className="text-indigo-400 font-black text-sm uppercase tracking-widest mb-4 px-2">
+              Phones Ready to Join:
+            </h3>
+            <div className="flex flex-wrap gap-4">
+              {availableHubPlayers
+                .filter(hp => !players.find(p => p.hubId === hp.id)) // Use hubId to check if already linked
+                .map(hp => (
+                  <div key={hp.id} className="flex flex-col gap-2 p-2 bg-slate-900/50 rounded-2xl border border-indigo-500/30">
+                    <span className="text-white font-bold px-2">{hp.name}</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3].map(slot => (
+                        <button
+                          key={slot}
+                          onClick={() => onAddPlayer(hp.name, hp.id, slot)} // Now passes Name, SocketID, and Slot!
+                          className="px-3 py-1 bg-indigo-600 hover:bg-indigo-400 text-white rounded-lg text-[10px] font-black"
+                        >
+                          SLOT {slot}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
 
 
 
