@@ -31,14 +31,15 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   onGoStart,
   onReset,
   volume = 0.7,
-  onVolumeChange = () => {},
+  // onVolumeChange = () => {},
+  onVolumeChange = (_v: number) => {},
   t,
   isLocked = false,
   isBuzzerConnected
 }) => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    onVolumeChange(newVolume);
+    const val4vol = parseFloat(e.target.value);
+    onVolumeChange(val4vol);
   };
 
   return (
