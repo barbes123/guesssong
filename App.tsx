@@ -19,10 +19,40 @@ import PlayerScreen from './src/displays/PlayerScreen'; // Adjust path if needed
 
 import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
 
+/////////// Buzz---------------------------
+import configBuzz from './configBuzz.json';
+import { io } from 'socket.io-client';
+const socket = io(configBuzz.SOCKET_URL);
+// ----------------------------------------
 
 
 const App: React.FC = () => {
   const isPlayerScreen = window.location.pathname === '/display';
+  // --- Connection to buzzer ---
+  const [isBuzzerConnected, setIsBuzzerConnected] = useState(false);
+  const [buzzerBuzzes, setBuzzerBuzzes] = useState<any[]>([]);
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log("✅ TASK 0: Game linked to Buzzer Hub");
+      setIsBuzzerConnected(true);
+    });
+
+    socket.on('connect_error', (err) => {
+      console.error("❌ TASK 0: Link failed:", err.message);
+      setIsBuzzerConnected(false);
+    });
+
+    socket.on('disconnect', () => {
+      setIsBuzzerConnected(false);
+    });
+
+    return () => {
+      socket.off('connect');
+      socket.off('connect_error');
+      socket.off('disconnect');
+    };
+  }, []);
+  // --------------------------------
   const [gameState, setGameState] = useState<GameState>({
     players: [{ id: 0, name: '', score: 0, stars: 0 }],
     currentPlayerIndex: 0,
