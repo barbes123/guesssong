@@ -2263,7 +2263,23 @@ const Round3VictoryView = () => {
   // Final return statement
   return (
     <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
-      <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} />
+      {/* <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} /> */}
+      <SettingsOverlay 
+      language={gameState.language} 
+      onLanguageToggle={toggleLanguage} 
+      isMusicEnabled={gameState.isMusicEnabled} 
+      onMusicToggle={toggleMusic} 
+      isFullscreen={isFullscreen} 
+      onFullscreenToggle={toggleFullscreen} 
+      onGoHome={() => navigateTo('setup')} 
+      onGoStart={() => navigateTo('start')} 
+      onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} 
+      volume={volume} 
+      onVolumeChange={handleVolumeChange} 
+      t={t} 
+      isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} 
+      isBuzzerConnected={isBuzzerConnected} // <--- PLACE IT HERE
+    />      
       {currentPage === 'setup' && (
         <SetupView
           players={gameState.players}
@@ -2278,6 +2294,9 @@ const Round3VictoryView = () => {
           onCheckConnection={() => { socket.connect(); }}
         />
       )}
+
+      
+
       {/* {currentPage === 'start' && <StartView />} */}
 
       {currentPage === 'start' && (
