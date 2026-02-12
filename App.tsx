@@ -2264,9 +2264,6 @@ const Round3VictoryView = () => {
   return (
     <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
       <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} />
-      {/* {currentPage === 'setup' && <SetupView />} */}
-       {/* In your App.js render logic, find where SetupView is rendered */}
-      {/* // In your App.js render section: */}
       {currentPage === 'setup' && (
         <SetupView
           players={gameState.players}
@@ -2277,6 +2274,8 @@ const Round3VictoryView = () => {
           onStartGame={handleStartGameFromSetup}
           isPlayerWindowOpen={playerWindow && !playerWindow.closed}
           onTogglePlayerWindow={handleOpenPlayerWindow}
+          isBuzzerConnected={isBuzzerConnected}
+          onCheckConnection={() => { socket.connect(); }}
         />
       )}
       {/* {currentPage === 'start' && <StartView />} */}

@@ -12,6 +12,8 @@ interface SetupViewProps {
   onStartGame: () => void;
   isPlayerWindowOpen: boolean;
   onTogglePlayerWindow: () => void;
+  isBuzzerConnected: boolean;
+  onCheckConnection: () => void;
 }
 
 const SetupView: React.FC<SetupViewProps> = ({
@@ -22,7 +24,9 @@ const SetupView: React.FC<SetupViewProps> = ({
   onRemovePlayer, 
   onStartGame,
   isPlayerWindowOpen,
-  onTogglePlayerWindow
+  onTogglePlayerWindow,
+  isBuzzerConnected, 
+  onCheckConnection
 }) => {
   const [localPlayers, setLocalPlayers] = useState<Player[]>(players);
   
@@ -53,6 +57,44 @@ const SetupView: React.FC<SetupViewProps> = ({
         <h1 className="text-6xl font-black text-white mb-12 uppercase tracking-tighter">
           {t.playerSetup}
         </h1>
+
+
+
+        {/* CONNECTION DASHBOARD */}
+        <div className="mb-12 p-8 bg-slate-900/50 rounded-[3rem] border-2 border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 ${
+              isBuzzerConnected 
+                ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]' 
+                : 'bg-rose-500/20 border-rose-500 text-rose-500 animate-pulse'
+            }`}>
+              <Users size={32} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black text-white uppercase tracking-tight">Smartphone Hub</h3>
+              <p className={`text-xs font-bold uppercase tracking-[0.2em] ${isBuzzerConnected ? 'text-emerald-500' : 'text-rose-500'}`}>
+                {isBuzzerConnected ? '● System Linked' : '○ Hub Disconnected'}
+              </p>
+            </div>
+          </div>
+
+          <button 
+            onClick={onCheckConnection}
+            className={`px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
+              isBuzzerConnected 
+                ? 'bg-slate-800 text-slate-400 hover:bg-slate-700' 
+                : 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/40 hover:scale-105 active:scale-95'
+            }`}
+          >
+            {isBuzzerConnected ? 'Refresh Link' : 'Try Connect'}
+          </button>
+        </div>
+
+
+
+
+
+
         
         {/* Player Setup Form */}
         <div className="space-y-8 mb-14">
