@@ -36,7 +36,7 @@ const App: React.FC = () => {
   const [buzzerMapping, setBuzzerMapping] = useState<Record<string, number>>({});
 
 
-    const handleConnect = () => {
+  const handleConnect = () => {
     if (socket) {
       socket.connect();
       socket.emit('register', { name: 'GameEngine', role: 'host', code: '' });
@@ -49,9 +49,9 @@ const App: React.FC = () => {
       socket.disconnect();
     }
     setIsBuzzerConnected(false);
-    setHubPlayers([]); 
+    setHubPlayers([]);
   };
-  
+
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -87,9 +87,10 @@ const App: React.FC = () => {
 
     socket.on('playerListUpdate', (list) => {
       console.log("📥 RECEIVED PLAYER LIST:", list);
+      setHubPlayers(list)
       // Filter out the 'Host' or 'GameEngine' so they don't appear in your sliding list
-      const onlyPlayers = list.filter((p: any) => p.role === 'player');
-      setHubPlayers(onlyPlayers);
+      // const onlyPlayers = list.filter((p: any) => p.role === 'player');
+      // setHubPlayers(onlyPlayers);
     });
     // --- ADDED THIS PART ---
     socket.on('buzzer_pressed', (data: { playerId: string }) => {
@@ -621,35 +622,56 @@ const App: React.FC = () => {
     }));
   };
 
-  const handleAddPlayer = (name?: string, socketId?: string, slotNumber?: number) => {
-    setGameState(prev => {
-      // 1. Determine the ID (Slot Number)
-      // Use the slotNumber from buzzer, or find the next available number
-      const newId = slotNumber ?? (prev.players.length > 0
-        ? Math.max(...prev.players.map(p => p.id)) + 1
-        : 1);
+const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: number) => {
+  const actualName = typeof nameOrEvent === 'string' ? nameOrEvent : '';
 
-      // 2. If it's a buzzer player, update the mapping
-      if (socketId) {
-        setBuzzerMapping(prevMap => ({
-          ...prevMap,
-          [socketId]: newId
-        }));
+  setGameState(prev => {
+    // 1. Identify which slot we are targeting (1, 2, or 3)
+    let targetId: number;
+    
+    if (slotNumber) {
+      targetId = slotNumber;
+    } else {
+      // If manual "Add Player" was clicked, find the first slot without a name
+      const emptySlot = [1, 2, 3].find(id => {
+        const p = prev.players.find(player => player.id === id);
+        return !p || !p.name;
+      });
+      targetId = emptySlot || 0;
+    }
+
+    if (targetId === 0 || targetId > 3) return prev;
+
+    // 2. Prepare the updated list
+    // Ensure we have slots 1, 2, and 3 represented
+    const slots = [1, 2, 3];
+    const updatedPlayers = slots.map(id => {
+      const existing = prev.players.find(p => p.id === id);
+      
+      if (id === targetId) {
+        return {
+          id: id,
+          name: actualName || (existing ? existing.name : ''),
+          score: existing ? existing.score : 0,
+          stars: existing ? existing.stars : 0,
+          hubId: socketId || (existing ? existing.hubId : ''),
+        };
       }
-
-      // 3. Create the player object
-      const newPlayer: Player = {
-        id: newId,
-        name: name || '', // Use buzzer name OR leave empty for manual typing
-        score: 0,
-        stars: 0,
-        hubId: socketId || '' // The "Password" link to the buzzer
-      };
-
-      return { ...prev, players: [...prev.players, newPlayer] };
+      
+      // If not the target, return existing or a blank template
+      return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
     });
-  };
 
+    if (socketId) {
+      setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
+    }
+
+    return {
+      ...prev,
+      players: updatedPlayers
+    };
+  });
+};
   const handleRemovePlayer = (id: number) => {
     setGameState(prev => ({
       ...prev,
@@ -2335,7 +2357,7 @@ const App: React.FC = () => {
   };
 
 
-
+console.log("PARENT HUB STATE:", hubPlayers);
   // Final return statement
   return (
     <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
@@ -2370,6 +2392,7 @@ const App: React.FC = () => {
           // onCheckConnection={() => { socket.connect(); }}
           onCheckConnection={handleConnect} // Whatever your connection function is named
           onForceDisconnect={handleForceDisconnect} // Pass the new kill switch here
+          availableHubPlayers={hubPlayers}
         />
       )}
 
