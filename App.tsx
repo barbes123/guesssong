@@ -622,102 +622,102 @@ const App: React.FC = () => {
     }));
   };
 
-const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: number) => {
-  const actualName = typeof nameOrEvent === 'string' ? nameOrEvent : '';
+  const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: number) => {
+    const actualName = typeof nameOrEvent === 'string' ? nameOrEvent : '';
 
-  setGameState(prev => {
-    // 1. Identify which slot we are targeting (1, 2, or 3)
-    let targetId: number;
-    
-    if (slotNumber) {
-      targetId = slotNumber;
-    } else {
-      // If manual "Add Player" was clicked, find the first slot without a name
-      const emptySlot = [1, 2, 3].find(id => {
-        const p = prev.players.find(player => player.id === id);
-        return !p || !p.name;
-      });
-      targetId = emptySlot || 0;
-    }
+    setGameState(prev => {
+      // 1. Identify which slot we are targeting (1, 2, or 3)
+      let targetId: number;
 
-    if (targetId === 0 || targetId > 3) return prev;
+      if (slotNumber) {
+        targetId = slotNumber;
+      } else {
+        // If manual "Add Player" was clicked, find the first slot without a name
+        const emptySlot = [1, 2, 3].find(id => {
+          const p = prev.players.find(player => player.id === id);
+          return !p || !p.name;
+        });
+        targetId = emptySlot || 0;
+      }
 
-    // 2. For buzz mode: ensure we have slots 1, 2, and 3 represented
-    // For manual mode: only update the target slot
-    if (socketId) {
-      // BUZZ MODE: Create/update all 3 slots
-      const slots = [1, 2, 3];
-      const updatedPlayers = slots.map(id => {
-        const existing = prev.players.find(p => p.id === id);
-        
-        if (id === targetId) {
-          return {
-            id: id,
-            name: actualName,
-            score: existing ? existing.score : 0,
-            stars: existing ? existing.stars : 0,
-            hubId: socketId,
-          };
-        }
-        
-        // If another slot has the same phone, clear it
-        if (existing && existing.hubId === socketId) {
-          return { id: id, name: '', score: 0, stars: 0, hubId: '' };
-        }
-        
-        // Keep existing or empty
-        return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
-      });
+      if (targetId === 0 || targetId > 3) return prev;
 
-      setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
-      return {
-        ...prev,
-        players: updatedPlayers
-      };
-    } else {
-      // MANUAL MODE: Ensure all 3 slots exist, but only add names when user clicks "Add Player"
-      if (prev.players.length >= 3) return prev;
-      const nextId = prev.players.length + 1;
-      const newPlayer = {
-        id: nextId,
-        name: actualName || '', // Start with empty name
-        score: 0,
-        stars: 0,
-        hubId: '',
-      };
+      // 2. For buzz mode: ensure we have slots 1, 2, and 3 represented
+      // For manual mode: only update the target slot
+      if (socketId) {
+        // BUZZ MODE: Create/update all 3 slots
+        const slots = [1, 2, 3];
+        const updatedPlayers = slots.map(id => {
+          const existing = prev.players.find(p => p.id === id);
+
+          if (id === targetId) {
+            return {
+              id: id,
+              name: actualName,
+              score: existing ? existing.score : 0,
+              stars: existing ? existing.stars : 0,
+              hubId: socketId,
+            };
+          }
+
+          // If another slot has the same phone, clear it
+          if (existing && existing.hubId === socketId) {
+            return { id: id, name: '', score: 0, stars: 0, hubId: '' };
+          }
+
+          // Keep existing or empty
+          return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
+        });
+
+        setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
+        return {
+          ...prev,
+          players: updatedPlayers
+        };
+      } else {
+        // MANUAL MODE: Ensure all 3 slots exist, but only add names when user clicks "Add Player"
+        if (prev.players.length >= 3) return prev;
+        const nextId = prev.players.length + 1;
+        const newPlayer = {
+          id: nextId,
+          name: actualName || '', // Start with empty name
+          score: 0,
+          stars: 0,
+          hubId: '',
+        };
 
 
 
-      // const slots = [1, 2, 3];
-      // const updatedPlayers = slots.map(id => {
-      //   const existing = prev.players.find(p => p.id === id);
-          
-      //   if (id === targetId) {
-      //     return {
-      //       id: id,
-      //       name: actualName || (existing ? existing.name : ''),
-      //       score: existing ? existing.score : 0,
-      //       stars: existing ? existing.stars : 0,
-      //       hubId: '',
-      //     };
-      //   }
-        
-      //   // Return existing or empty
-      //   return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
-      // });
+        // const slots = [1, 2, 3];
+        // const updatedPlayers = slots.map(id => {
+        //   const existing = prev.players.find(p => p.id === id);
 
-      return {
-        ...prev,
-        players: [...prev.players, newPlayer]
-      };
+        //   if (id === targetId) {
+        //     return {
+        //       id: id,
+        //       name: actualName || (existing ? existing.name : ''),
+        //       score: existing ? existing.score : 0,
+        //       stars: existing ? existing.stars : 0,
+        //       hubId: '',
+        //     };
+        //   }
 
-      // return {
-      //   ...prev,
-      //   players: updatedPlayers
-      // };
-    }
-  });
-};
+        //   // Return existing or empty
+        //   return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
+        // });
+
+        return {
+          ...prev,
+          players: [...prev.players, newPlayer]
+        };
+
+        // return {
+        //   ...prev,
+        //   players: updatedPlayers
+        // };
+      }
+    });
+  };
   const handleRemovePlayer = (id: number) => {
     setGameState(prev => ({
       ...prev,
@@ -1190,15 +1190,50 @@ const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: numb
     };
 
     if (action === 'start') {
+console.log("🔄 STARTING: isBuzzerConnected is:", isBuzzerConnected);
+
+const initiateSequence = () => {
+  if (isBuzzerConnected) {
+    // 1. "CLEAN SLATE": Tell the server to clear old buzzes and go to IDLE
+    console.log("🛠️ Sending DISARM (IDLE)");
+    socket.emit('gameAction', { 
+      type: 'SET_STATE', 
+      data: { state: 'IDLE' } 
+    });
+
+    // 2. DELAY: Wait 150ms for the "Reset" signal to clear all phones
+    setTimeout(() => {
+      console.log("🛠️ Sending ARM (BATTLE)");
+      
+      // 3. ARM: Turn all phone buttons RED for the music
+      socket.emit('gameAction', { 
+        type: 'SET_STATE', 
+        data: { state: 'BATTLE' } 
+      });
+
+      // 4. PLAY: Start the song exactly as the buttons turn red
+      startPlayback();
+    }, 150);
+  } else {
+    // Fallback: If buzzer server is down, just play the music
+    startPlayback();
+  }
+};
+
       if (isFinalRound && !isPlaying && !isR3Finalized && selectedDuration === null) {
         showModal(t.currentTurn, t.confirmPlayerActive, () => {
           setModal(null);
-          startPlayback();
+          initiateSequence(); // Sequence triggered here
         });
         return;
       }
-      startPlayback();
+      initiateSequence(); // Sequence triggered here
     } else {
+      // Start of your 'stop' leg - Added DISARM here
+      if (isBuzzerConnected) {
+        socket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+      }
+
       if (isSprintRound && r4IsActiveSession) {
         if (songRef.current) songRef.current.pause();
         setIsPlaying(false);
@@ -2403,7 +2438,7 @@ const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: numb
   };
 
 
-console.log("PARENT HUB STATE:", hubPlayers);
+  // console.log("PARENT HUB STATE:", hubPlayers);
   // Final return statement
   return (
     <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
