@@ -642,34 +642,80 @@ const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: numb
 
     if (targetId === 0 || targetId > 3) return prev;
 
-    // 2. Prepare the updated list
-    // Ensure we have slots 1, 2, and 3 represented
-    const slots = [1, 2, 3];
-    const updatedPlayers = slots.map(id => {
-      const existing = prev.players.find(p => p.id === id);
-      
-      if (id === targetId) {
-        return {
-          id: id,
-          name: actualName || (existing ? existing.name : ''),
-          score: existing ? existing.score : 0,
-          stars: existing ? existing.stars : 0,
-          hubId: socketId || (existing ? existing.hubId : ''),
-        };
-      }
-      
-      // If not the target, return existing or a blank template
-      return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
-    });
-
+    // 2. For buzz mode: ensure we have slots 1, 2, and 3 represented
+    // For manual mode: only update the target slot
     if (socketId) {
-      setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
-    }
+      // BUZZ MODE: Create/update all 3 slots
+      const slots = [1, 2, 3];
+      const updatedPlayers = slots.map(id => {
+        const existing = prev.players.find(p => p.id === id);
+        
+        if (id === targetId) {
+          return {
+            id: id,
+            name: actualName,
+            score: existing ? existing.score : 0,
+            stars: existing ? existing.stars : 0,
+            hubId: socketId,
+          };
+        }
+        
+        // If another slot has the same phone, clear it
+        if (existing && existing.hubId === socketId) {
+          return { id: id, name: '', score: 0, stars: 0, hubId: '' };
+        }
+        
+        // Keep existing or empty
+        return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
+      });
 
-    return {
-      ...prev,
-      players: updatedPlayers
-    };
+      setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
+      return {
+        ...prev,
+        players: updatedPlayers
+      };
+    } else {
+      // MANUAL MODE: Ensure all 3 slots exist, but only add names when user clicks "Add Player"
+      if (prev.players.length >= 3) return prev;
+      const nextId = prev.players.length + 1;
+      const newPlayer = {
+        id: nextId,
+        name: actualName || '', // Start with empty name
+        score: 0,
+        stars: 0,
+        hubId: '',
+      };
+
+
+
+      // const slots = [1, 2, 3];
+      // const updatedPlayers = slots.map(id => {
+      //   const existing = prev.players.find(p => p.id === id);
+          
+      //   if (id === targetId) {
+      //     return {
+      //       id: id,
+      //       name: actualName || (existing ? existing.name : ''),
+      //       score: existing ? existing.score : 0,
+      //       stars: existing ? existing.stars : 0,
+      //       hubId: '',
+      //     };
+      //   }
+        
+      //   // Return existing or empty
+      //   return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
+      // });
+
+      return {
+        ...prev,
+        players: [...prev.players, newPlayer]
+      };
+
+      // return {
+      //   ...prev,
+      //   players: updatedPlayers
+      // };
+    }
   });
 };
   const handleRemovePlayer = (id: number) => {
