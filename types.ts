@@ -15,6 +15,7 @@ export interface Song {
   artist: string;
   audioUrl: string;
   audioUrlFull?: string;
+  notes?: string; // Host notes about the song
   hint?: { // New: Hint for Round 6
     en: string;
     ru: string;
