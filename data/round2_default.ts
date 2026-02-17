@@ -74,31 +74,35 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'p2_1', 
-          title: 'Song 1', 
-          artist: 'Artist 1', 
+          title: 'Я русский', 
+          artist: 'Шаман', 
           audioUrl: R2_1_C1B1minus, 
-          audioUrlFull: R2_1_C1B1full 
+          audioUrlFull: R2_1_C1B1full,
+          notes: 'Современная патриотическая песня с мощным вокалом и энергичным звучанием. Одна из самых известных песен исполнителя.'
         },
         { 
           id: 'p2_2', 
-          title: 'Song 2', 
-          artist: 'Artist 2', 
+          title: 'Гимн России', 
+          artist: 'Любэ', 
           audioUrl: R2_1_C1B2minus, 
-          audioUrlFull: R2_1_C1B2full 
+          audioUrlFull: R2_1_C1B2full,
+          notes: 'Патриотическая песня группы Любэ, посвящённая России. Характерное звучание и мощные аранжировки группы.'
         },
         { 
           id: 'p2_3', 
-          title: 'Song 3', 
-          artist: 'Artist 3', 
+          title: 'Проект "Жить"', 
+          artist: 'Кипелов', 
           audioUrl: R2_1_C1B3minus, 
-          audioUrlFull: R2_1_C1B3full 
+          audioUrlFull: R2_1_C1B3full,
+          notes: 'Патриотический рок-гимн с мощным вокалом Валерия Кипелова и эпическим звучанием.'
         },
         { 
           id: 'p2_4', 
-          title: 'Song 4', 
-          artist: 'Artist 4', 
+          title: 'Встанем', 
+          artist: 'Шаман', 
           audioUrl: R2_1_C1B4minus, 
-          audioUrlFull: R2_1_C1B4full 
+          audioUrlFull: R2_1_C1B4full,
+          notes: 'Ещё одна патриотическая песня Шамана с призывом к единению и силе духа.'
         },
       ]
     },
@@ -108,31 +112,35 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'p2_5', 
-          title: 'Rock 1', 
-          artist: 'Artist 1', 
+          title: 'Вечер бродит', 
+          artist: 'Юрий Визбор', 
           audioUrl: R2_1_C2B1minus, 
-          audioUrlFull: R2_1_C2B1full 
+          audioUrlFull: R2_1_C2B1full,
+          notes: 'Классическая туристическая песня Визбора о вечернем костре и походной романтике.'
         },
         { 
           id: 'p2_6', 
-          title: 'Rock 2', 
-          artist: 'Artist 2', 
+          title: 'Милая моя, солнышко лесное', 
+          artist: 'Юрий Визбор', 
           audioUrl: R2_1_C2B2minus, 
-          audioUrlFull: R2_1_C2B2full 
+          audioUrlFull: R2_1_C2B2full,
+          notes: 'Нежная лирическая песня Визбора о природе и любви, ставшая гимном туристов.'
         },
         { 
           id: 'p2_7', 
-          title: 'Rock 3', 
-          artist: 'Artist 3', 
+          title: 'Домбайский вальс', 
+          artist: 'Юрий Визбор', 
           audioUrl: R2_1_C2B3minus, 
-          audioUrlFull: R2_1_C2B3full 
+          audioUrlFull: R2_1_C2B3full,
+          notes: 'Одна из самых известных песен Визбора, посвящённая горнолыжному курорту Домбай.'
         },
         { 
           id: 'p2_8', 
-          title: 'Rock 4', 
-          artist: 'Artist 4', 
+          title: 'А всё кончается', 
+          artist: 'Валерий Канер', 
           audioUrl: R2_1_C2B4minus, 
-          audioUrlFull: R2_1_C2B4full 
+          audioUrlFull: R2_1_C2B4full,
+          notes: 'Философская песня о путешествиях и жизни в пути в исполнении барда Валерия Канера.'
         },
       ]
     },
@@ -142,31 +150,35 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'p2_9', 
-          title: 'Movie 1', 
-          artist: 'Artist 1', 
+          title: 'Однажды морем я плыла', 
+          artist: 'Надежда Кадышева / ансамбль «Золотое кольцо»', 
           audioUrl: R2_1_C3B1minus, 
-          audioUrlFull: R2_1_C3B1full 
+          audioUrlFull: R2_1_C3B1full,
+          notes: 'Русская народная песня в современной обработке, популярная на застольях.'
         },
         { 
           id: 'p2_10', 
-          title: 'Movie 2', 
-          artist: 'Artist 2', 
+          title: 'Да не вечер', 
+          artist: 'Русская народная песня', 
           audioUrl: R2_1_C3B2minus, 
-          audioUrlFull: R2_1_C3B2full 
+          audioUrlFull: R2_1_C3B2full,
+          notes: 'Классическая русская народная песня, часто исполняемая на застольях и праздниках.'
         },
         { 
           id: 'p2_11', 
-          title: 'Movie 3', 
-          artist: 'Artist 3', 
+          title: 'Напилась я пьяна', 
+          artist: 'Русская народная песня', 
           audioUrl: R2_1_C3B3minus, 
-          audioUrlFull: R2_1_C3B3full 
+          audioUrlFull: R2_1_C3B3full,
+          notes: 'Шуточная народная песня, популярная в застольных исполнениях.'
         },
         { 
           id: 'p2_12', 
-          title: 'Movie 4', 
-          artist: 'Artist 4', 
+          title: 'Вот кто-то с горочки спустился', 
+          artist: 'Русская народная песня', 
           audioUrl: R2_1_C3B4minus, 
-          audioUrlFull: R2_1_C3B4full 
+          audioUrlFull: R2_1_C3B4full,
+          notes: 'Лирическая русская народная песня с красивой мелодией.'
         },
       ]
     },
@@ -176,31 +188,35 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'p2_13', 
-          title: 'Retro 1', 
-          artist: 'Artist 1', 
+          title: 'Дельтаплан', 
+          artist: 'Алла Пугачёва', 
           audioUrl: R2_1_C4B1minus, 
-          audioUrlFull: R2_1_C4B1full 
+          audioUrlFull: R2_1_C4B1full,
+          notes: 'Популярный хит Примадонны 80-х годов с запоминающейся мелодией.'
         },
         { 
           id: 'p2_14', 
-          title: 'Retro 2', 
-          artist: 'Artist 2', 
+          title: 'Плот', 
+          artist: 'Александр Малинин', 
           audioUrl: R2_1_C4B2minus, 
-          audioUrlFull: R2_1_C4B2full 
+          audioUrlFull: R2_1_C4B2full,
+          notes: 'Лирическая баллада Александра Малинина, один из его главных хитов 80-х.'
         },
         { 
           id: 'p2_15', 
-          title: 'Retro 3', 
-          artist: 'Artist 3', 
+          title: 'Музыка нас связала', 
+          artist: 'Группа «Мираж»', 
           audioUrl: R2_1_C4B3minus, 
-          audioUrlFull: R2_1_C4B3full 
+          audioUrlFull: R2_1_C4B3full,
+          notes: 'Культовая песня советской диско-группы «Мираж», символ эпохи 80-х.'
         },
         { 
           id: 'p2_16', 
-          title: 'Retro 4', 
-          artist: 'Artist 4', 
+          title: 'Белые розы', 
+          artist: 'Группа «Ласковый май»', 
           audioUrl: R2_1_C4B4minus, 
-          audioUrlFull: R2_1_C4B4full 
+          audioUrlFull: R2_1_C4B4full,
+          notes: 'Самый известный хит группы «Ласковый май», символ молодёжной культуры конца 80-х.'
         },
       ]
     }

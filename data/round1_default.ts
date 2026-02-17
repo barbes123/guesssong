@@ -73,31 +73,35 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'p1_1', 
-          title: 'Song 1', 
-          artist: 'Artist 1', 
+          title: 'Бубенцы', 
+          artist: 'Русская народная песня', 
           audioUrl: R1C1B1minus, 
-          audioUrlFull: R1C1B1full 
+          audioUrlFull: R1C1B1full,
+          notes: 'Народная зимняя песня про бубенцы, популярная на новогодних праздниках.'
         },
         { 
           id: 'p1_2', 
-          title: 'Song 2', 
-          artist: 'Artist 2', 
+          title: 'В лесу родилась ёлочка', 
+          artist: 'Детская новогодняя песня', 
           audioUrl: R1C1B2minus, 
-          audioUrlFull: R1C1B2full 
+          audioUrlFull: R1C1B2full,
+          notes: 'Самая известная новогодняя детская песня, которую знают все поколения.'
         },
         { 
           id: 'p1_3', 
-          title: 'Song 3', 
-          artist: 'Artist 3', 
+          title: 'Ёлочка, ёлка, лесной аромат', 
+          artist: 'Детская новогодняя песня', 
           audioUrl: R1C1B3minus, 
-          audioUrlFull: R1C1B3full 
+          audioUrlFull: R1C1B3full,
+          notes: 'Ещё одна популярная детская песня о новогодней ёлке и праздничном настроении.'
         },
         { 
           id: 'p1_4', 
-          title: 'Song 4', 
-          artist: 'Artist 4', 
+          title: 'Новогодние игрушки', 
+          artist: 'Детская новогодняя песня', 
           audioUrl: R1C1B4minus, 
-          audioUrlFull: R1C1B4full 
+          audioUrlFull: R1C1B4full,
+          notes: 'Весёлая песня о ёлочных игрушках и подготовке к Новому году.'
         },
       ]
     },
@@ -107,31 +111,35 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'r1_1', 
-          title: 'Rock 1', 
-          artist: 'Artist 1', 
+          title: 'Песня мушкетёров', 
+          artist: 'Из к/ф «Д\'Артаньян и три мушкетёра»', 
           audioUrl: R1C2B1minus, 
-          audioUrlFull: R1C2B1full 
+          audioUrlFull: R1C2B1full,
+          notes: 'Знаменитая песня мушкетёров из культового фильма: «Пора-пора-порадуемся на своём веку...»'
         },
         { 
           id: 'r1_2', 
-          title: 'Rock 2', 
-          artist: 'Artist 2', 
+          title: 'Звенит январская вьюга', 
+          artist: 'Из к/ф «Карнавальная ночь»', 
           audioUrl: R1C2B2minus, 
-          audioUrlFull: R1C2B2full 
+          audioUrlFull: R1C2B2full,
+          notes: 'Новогодняя песня из фильма «Карнавальная ночь» в исполнении Людмилы Гурченко.'
         },
         { 
           id: 'r1_3', 
-          title: 'Rock 3', 
-          artist: 'Artist 3', 
+          title: 'Песенка о медведях', 
+          artist: 'Из к/ф «Кавказская пленница»', 
           audioUrl: R1C2B3minus, 
-          audioUrlFull: R1C2B3full 
+          audioUrlFull: R1C2B3full,
+          notes: 'Шуточная песня из комедии «Кавказская пленница» про медведей в дремучем лесу.'
         },
         { 
           id: 'r1_4', 
-          title: 'Rock 4', 
-          artist: 'Artist 4', 
+          title: 'Джентльмены удачи', 
+          artist: 'Из к/ф «Джентльмены удачи»', 
           audioUrl: R1C2B4minus, 
-          audioUrlFull: R1C2B4full 
+          audioUrlFull: R1C2B4full,
+          notes: 'Песня из одноимённого фильма о детском саде и воспитателях.'
         },
       ]
     },
@@ -141,31 +149,35 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'c1_1', 
-          title: 'Movie 1', 
-          artist: 'Artist 1', 
+          title: 'Дважды два — четыре', 
+          artist: 'Детская песня', 
           audioUrl: R1C3B1minus, 
-          audioUrlFull: R1C3B1full 
+          audioUrlFull: R1C3B1full,
+          notes: 'Весёлая обучающая песня о таблице умножения: «Дважды два — четыре, это всем известно в целом мире».'
         },
         { 
           id: 'c1_2', 
-          title: 'Movie 2', 
-          artist: 'Artist 2', 
+          title: 'Чему учат в школе', 
+          artist: 'Владимир Шаинский', 
           audioUrl: R1C3B2minus, 
-          audioUrlFull: R1C3B2full 
+          audioUrlFull: R1C3B2full,
+          notes: 'Песня о школьных предметах и знаниях, которые получают дети в школе.'
         },
         { 
           id: 'c1_3', 
-          title: 'Movie 3', 
-          artist: 'Artist 3', 
+          title: 'Песенка первоклассника', 
+          artist: 'Детская песня', 
           audioUrl: R1C3B3minus, 
-          audioUrlFull: R1C3B3full 
+          audioUrlFull: R1C3B3full,
+          notes: 'Песня о первом классе, школьных принадлежностях и начале учёбы.'
         },
         { 
           id: 'c1_4', 
-          title: 'Movie 4', 
-          artist: 'Artist 4', 
+          title: 'Мой добрый учитель', 
+          artist: 'Детская песня', 
           audioUrl: R1C3B4minus, 
-          audioUrlFull: R1C3B4full 
+          audioUrlFull: R1C3B4full,
+          notes: 'Трогательная песня о первом учителе и школьных годах.'
         },
       ]
     },
@@ -175,31 +187,35 @@ export const defaultSet: RoundSet = {
       songs: [
         { 
           id: 'rt1_1', 
-          title: 'Retro 1', 
-          artist: 'Artist 1', 
+          title: 'В траве сидел кузнечик', 
+          artist: 'Из м/ф «Приключения Незнайки»', 
           audioUrl: R1C4B1minus, 
-          audioUrlFull: R1C4B1full 
+          audioUrlFull: R1C4B1full,
+          notes: 'Весёлая детская песня из мультфильма про кузнечика, который «сидел в траве».'
         },
         { 
           id: 'rt1_2', 
-          title: 'Retro 2', 
-          artist: 'Artist 2', 
+          title: 'Два весёлых гуся', 
+          artist: 'Детская песня', 
           audioUrl: R1C4B2minus, 
-          audioUrlFull: R1C4B2full 
+          audioUrlFull: R1C4B2full,
+          notes: 'Игровая песня-потешка о двух гусях, популярная в детских садах.'
         },
         { 
           id: 'rt1_3', 
-          title: 'Retro 3', 
-          artist: 'Artist 3', 
+          title: 'Чёрный кот', 
+          artist: 'Юрий Савичев / группа «Браво»', 
           audioUrl: R1C4B3minus, 
-          audioUrlFull: R1C4B3full 
+          audioUrlFull: R1C4B3full,
+          notes: 'Энергичная песня о чёрном коте как символе неудачи, ставшая хитом 80-х.'
         },
         { 
           id: 'rt1_4', 
-          title: 'Retro 4', 
-          artist: 'Artist 4', 
+          title: '33 коровы', 
+          artist: 'Из м/ф «Мэри Поппинс, до свидания!»', 
           audioUrl: R1C4B4minus, 
-          audioUrlFull: R1C4B4full 
+          audioUrlFull: R1C4B4full,
+          notes: 'Забавная песня из фильма-мюзикла про 33 коровы и свежее молоко.'
         },
       ]
     }

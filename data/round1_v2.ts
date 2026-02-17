@@ -73,31 +73,35 @@ export const round1v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_1', 
-          title: 'Song 1', 
-          artist: 'Artist 1', 
+          title: 'Улыбка', 
+          artist: 'Из м/ф «Крошка Енот»', 
           audioUrl: R1_2_C1B1minus, 
-          audioUrlFull: R1_2_C1B1full 
+          audioUrlFull: R1_2_C1B1full,
+          notes: 'Знаменитая детская песня из мультфильма «Крошка Енот» со словами «От улыбки станет всем светлей».'
         },
         { 
           id: 'p1_2_2', 
-          title: 'Song 2', 
-          artist: 'Artist 2', 
+          title: 'Настоящий друг', 
+          artist: 'Из м/ф «Тимка и Димка»', 
           audioUrl: R1_2_C1B2minus, 
-          audioUrlFull: R1_2_C1B2full 
+          audioUrlFull: R1_2_C1B2full,
+          notes: 'Детская песня о дружбе из мультфильма «Тимка и Димка»: «Друг в беде не бросит, лишнего не спросит».'
         },
         { 
           id: 'p1_2_3', 
-          title: 'Song 3', 
-          artist: 'Artist 3', 
+          title: 'Мы маленькие дети', 
+          artist: 'Из к/ф «Приключения Электроника»', 
           audioUrl: R1_2_C1B3minus, 
-          audioUrlFull: R1_2_C1B3full 
+          audioUrlFull: R1_2_C1B3full,
+          notes: 'Песня из культового фильма «Приключения Электроника»: «Мы маленькие дети, нам хочется гулять».'
         },
         { 
           id: 'p1_2_4', 
-          title: 'Song 4', 
-          artist: 'Artist 4', 
+          title: 'Крылатые качели', 
+          artist: 'Из к/ф «Приключения Электроника»', 
           audioUrl: R1_2_C1B4minus, 
-          audioUrlFull: R1_2_C1B4full 
+          audioUrlFull: R1_2_C1B4full,
+          notes: 'Ещё одна знаменитая песня из того же фильма о мечтах и надеждах: «Крылатые качели летят, летят, летят».'
         },
       ]
     },
@@ -107,31 +111,35 @@ export const round1v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_5', 
-          title: 'Rock 1', 
-          artist: 'Artist 1', 
+          title: 'Берёзы', 
+          artist: 'Лев Лещенко', 
           audioUrl: R1_2_C2B1minus, 
-          audioUrlFull: R1_2_C2B1full 
+          audioUrlFull: R1_2_C2B1full,
+          notes: 'Лирическая песня о русской природе, берёзах как символе России.'
         },
         { 
           id: 'p1_2_6', 
-          title: 'Rock 2', 
-          artist: 'Artist 2', 
+          title: 'Как упоительны в России вечера', 
+          artist: 'Валентина Пономарёва', 
           audioUrl: R1_2_C2B2minus, 
-          audioUrlFull: R1_2_C2B2full 
+          audioUrlFull: R1_2_C2B2full,
+          notes: 'Романс о красоте русских вечеров из репертуара Валентины Пономарёвой.'
         },
         { 
           id: 'p1_2_7', 
-          title: 'Rock 3', 
-          artist: 'Artist 3', 
+          title: 'С чего начинается Родина', 
+          artist: 'Марк Бернес', 
           audioUrl: R1_2_C2B3minus, 
-          audioUrlFull: R1_2_C2B3full 
+          audioUrlFull: R1_2_C2B3full,
+          notes: 'Патриотическая песня о том, с чего для каждого человека начинается Родина.'
         },
         { 
           id: 'p1_2_8', 
-          title: 'Rock 4', 
-          artist: 'Artist 4', 
+          title: 'Русское поле', 
+          artist: 'Из к/ф «Новые приключения неуловимых»', 
           audioUrl: R1_2_C2B4minus, 
-          audioUrlFull: R1_2_C2B4full 
+          audioUrlFull: R1_2_C2B4full,
+          notes: 'Песня о просторах русской земли из кинофильма «Новые приключения неуловимых».'
         },
       ]
     },
@@ -141,31 +149,35 @@ export const round1v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_9', 
-          title: 'Movie 1', 
-          artist: 'Artist 1', 
+          title: 'Есть только миг', 
+          artist: 'Из к/ф «Земля Санникова»', 
           audioUrl: R1_2_C3B1minus, 
-          audioUrlFull: R1_2_C3B1full 
+          audioUrlFull: R1_2_C3B1full,
+          notes: 'Философская песня из приключенческого фильма «Земля Санникова» в исполнении Олега Анофриева.'
         },
         { 
           id: 'p1_2_10', 
-          title: 'Movie 2', 
-          artist: 'Artist 2', 
+          title: 'Позвони мне, позвони', 
+          artist: 'Из к/ф «Карнавал»', 
           audioUrl: R1_2_C3B2minus, 
-          audioUrlFull: R1_2_C3B2full 
+          audioUrlFull: R1_2_C3B2full,
+          notes: 'Популярная песня из фильма «Карнавал» в исполнении Ирины Муравьёвой.'
         },
         { 
           id: 'p1_2_11', 
-          title: 'Movie 3', 
-          artist: 'Artist 3', 
+          title: 'Три танкиста', 
+          artist: 'Из к/ф «Трактористы»', 
           audioUrl: R1_2_C3B3minus, 
-          audioUrlFull: R1_2_C3B3full 
+          audioUrlFull: R1_2_C3B3full,
+          notes: 'Легендарная военная песня из фильма «Трактористы» о трёх танкистах-друзьях.'
         },
         { 
           id: 'p1_2_12', 
-          title: 'Movie 4', 
-          artist: 'Artist 4', 
+          title: 'Смуглянка', 
+          artist: 'Из к/ф «В бой идут одни старики»', 
           audioUrl: R1_2_C3B4minus, 
-          audioUrlFull: R1_2_C3B4full 
+          audioUrlFull: R1_2_C3B4full,
+          notes: 'Знаменитая военная песня из фильма Леонида Быкова о девушке-партизанке.'
         },
       ]
     },
@@ -175,31 +187,35 @@ export const round1v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_13', 
-          title: 'Retro 1', 
-          artist: 'Artist 1', 
+          title: 'Ландыши', 
+          artist: 'Гелена Великанова', 
           audioUrl: R1_2_C4B1minus, 
-          audioUrlFull: R1_2_C4B1full 
+          audioUrlFull: R1_2_C4B1full,
+          notes: 'Лёгкая, весенняя песня 1950-х годов, ставшая хитом в исполнении Гелены Великановой.'
         },
         { 
           id: 'p1_2_14', 
-          title: 'Retro 2', 
-          artist: 'Artist 2', 
+          title: 'А снег идёт', 
+          artist: 'Майя Кристалинская', 
           audioUrl: R1_2_C4B2minus, 
-          audioUrlFull: R1_2_C4B2full 
+          audioUrlFull: R1_2_C4B2full,
+          notes: 'Лирическая песня Майи Кристалинской о снеге как метафоре времени и воспоминаний.'
         },
         { 
           id: 'p1_2_15', 
-          title: 'Retro 3', 
-          artist: 'Artist 3', 
+          title: 'На дальней станции сойду', 
+          artist: 'Валерий Ободзинский', 
           audioUrl: R1_2_C4B3minus, 
-          audioUrlFull: R1_2_C4B3full 
+          audioUrlFull: R1_2_C4B3full,
+          notes: 'Романтическая песня о расставании и дальних станциях в исполнении Валерия Ободзинского.'
         },
         { 
           id: 'p1_2_16', 
-          title: 'Retro 4', 
-          artist: 'Artist 4', 
+          title: 'Надежда', 
+          artist: 'Анна Герман', 
           audioUrl: R1_2_C4B4minus, 
-          audioUrlFull: R1_2_C4B4full 
+          audioUrlFull: R1_2_C4B4full,
+          notes: 'Одна из самых известных песен Анны Герман, ставшая символом надежды для целого поколения.'
         },
       ]
     }
