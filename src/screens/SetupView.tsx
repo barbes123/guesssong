@@ -299,6 +299,20 @@ const SetupView: React.FC<SetupViewProps> = ({
         {/* START GAME BUTTON (FULL WIDTH) */}
         <button
           onClick={onStartGame}
+          // CHANGE: Check if there's at least one player with a name, 
+          // rather than requiring ALL slots to be filled.
+          disabled={!players.some(p => p.name && p.name.trim() !== "")}
+          className={`w-full py-10 rounded-[3rem] font-black text-4xl uppercase tracking-tighter transition-all flex items-center justify-center gap-6 shadow-2xl ${
+            !players.some(p => p.name && p.name.trim() !== "")
+            ? 'bg-slate-900 text-slate-700 cursor-not-allowed border-2 border-slate-800'
+            : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-[1.01] active:scale-[0.99] shadow-indigo-900/20'
+            }`}
+        >
+          <PlayCircle size={40} fill="currentColor" />
+          {t.startGame}
+        </button>
+        {/* <button
+          onClick={onStartGame}
           disabled={players.some(p => !p.name) || players.length === 0}
           className={`w-full py-10 rounded-[3rem] font-black text-4xl uppercase tracking-tighter transition-all flex items-center justify-center gap-6 shadow-2xl ${players.some(p => !p.name) || players.length === 0
             ? 'bg-slate-900 text-slate-700 cursor-not-allowed border-2 border-slate-800'
@@ -307,7 +321,7 @@ const SetupView: React.FC<SetupViewProps> = ({
         >
           <PlayCircle size={40} fill="currentColor" />
           {t.startGame}
-        </button>
+        </button> */}
 
       </div>
     </div >
