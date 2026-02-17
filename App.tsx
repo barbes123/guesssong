@@ -494,6 +494,10 @@ const App: React.FC = () => {
   const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: number) => {
     const actualName = typeof nameOrEvent === 'string' ? nameOrEvent : '';
 
+    if (socketId && slotNumber) {
+      setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: slotNumber }));
+    }
+
     setGameState(prev => {
       // 1. Identify which slot we are targeting (1, 2, or 3)
       let targetId: number;
@@ -538,7 +542,7 @@ const App: React.FC = () => {
           return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
         });
 
-        setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
+        // setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
         return {
           ...prev,
           players: updatedPlayers
@@ -1066,7 +1070,7 @@ const App: React.FC = () => {
         }
 
 
-        if (isBuzzerConnected && !isRevealMode ) {
+        if (isBuzzerConnected && !isRevealMode) {
 
           // 1. "CLEAN SLATE": Tell the server to clear old buzzes and go to IDLE
           console.log("🛠️ Sending DISARM (IDLE)");
@@ -1127,8 +1131,40 @@ const App: React.FC = () => {
 
   // UPDATED handleFinalizeTurn function
   const handleFinalizeTurn = (status: 'correct' | 'wrong' | 'skip', isTimeOut = false) => {
-    if (!activeNote || activeNote.isReveal) return;
     const roundId = gameState.activeRoundId!;
+
+    // const buzzerIdx = gameState.players.findIndex(p => p.hubId === activeResponder);
+    // const isBuzzing = activeResponder && buzzerIdx !== -1;
+
+    // if (isBuzzing) {
+    //   if (status === 'correct') {
+    //     const winner = gameState.players[buzzerIdx];
+
+    //     // A. Give points ONLY to the buzzer winner
+    //     handleUpdatePlayer(winner.id, winner.name, winner.score + (currentRoundPoints || 0));
+
+    //     // B. Make this winner the "Current Player" officially
+    //     setGameState(prev => ({ ...prev, currentPlayerIndex: buzzerIdx }));
+    //   }
+
+    //   // C. Clear the buzzer and STOP (no turn rotation happens)
+    //   setActiveResponder(null);
+    //   return;
+    // }
+
+    // // --- REGULAR TURN LOGIC (If no one buzzed) ---
+    // if (status === 'correct') {
+    //   const p = gameState.players[gameState.currentPlayerIndex];
+    //   handleUpdatePlayer(p.id, p.name, p.score + (currentRoundPoints || 0));
+    // }
+
+    // // NOTE: Simply DO NOT include any "currentPlayerIndex + 1" code here 
+    // // to prevent automatic rotation.
+
+
+
+    if (!activeNote || activeNote.isReveal) return;
+    // const roundId = gameState.activeRoundId!;
     const progress = gameState.roundProgress[roundId];
     if (!progress) return;
 
@@ -1295,13 +1331,23 @@ const App: React.FC = () => {
     // =========================================================
     // ROUNDS 1 & 2: STANDARD LOGIC
     // =========================================================
+
+    const buzzerIdx = gameState.players.findIndex(p => p.hubId === activeResponder);
+    const targetPlayerIndex = (activeResponder && buzzerIdx !== -1)
+      ? buzzerIdx
+      : gameState.currentPlayerIndex;
+
+
     showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
       const addedPoints = status === 'correct' ? (currentRoundPoints || 0) : 0;
       if (status === 'correct') playSFX(SFX.correct);
       else playSFX(SFX.wrong);
 
+      setActiveResponder(null);//*** */
+
       setGameState(prev => {
-        const newPlayers = prev.players.map((p, idx) => idx === prev.currentPlayerIndex ? { ...p, score: p.score + addedPoints } : p);
+        // const newPlayers = prev.players.map((p, idx) => idx === prev.currentPlayerIndex ? { ...p, score: p.score + addedPoints } : p);
+        const newPlayers = prev.players.map((p, idx) => idx === targetPlayerIndex ? { ...p, score: p.score + addedPoints } : p);
         const newUsedNotes = new Set(progress.usedNotes);
         const newActivationCounts = { ...progress.activationCounts };
         const newPersistentPoints = { ...progress.persistentPoints };
@@ -1342,8 +1388,10 @@ const App: React.FC = () => {
         return {
           ...prev,
           players: newPlayers,
-          currentPlayerIndex: (prev.currentPlayerIndex + 1) % prev.players.length,
-          roundProgress: {
+          //uncomment for auto-switch next player in rounds 1 & 2
+          // currentPlayerIndex: (prev.currentPlayerIndex + 1) % prev.players.length,
+          currentPlayerIndex: targetPlayerIndex,roundProgress: {
+          // roundProgress: {
             ...prev.roundProgress,
             [roundId]: {
               ...progress,
@@ -1906,7 +1954,9 @@ const App: React.FC = () => {
     }
     return (
       <RoundStandard
+        activeResponder={activeResponder}
         gameState={gameState}
+        players={gameState.players}
         activeNote={activeNote}
         currentRoundPoints={currentRoundPoints}
         isPlaying={isPlaying}
@@ -2341,6 +2391,7 @@ const App: React.FC = () => {
           onCheckConnection={handleConnect} // Whatever your connection function is named
           onForceDisconnect={handleForceDisconnect} // Pass the new kill switch here
           availableHubPlayers={hubPlayers}
+          activeResponder={activeResponder}
         />
       )}
 
