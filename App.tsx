@@ -359,6 +359,7 @@ const App: React.FC = () => {
       currentPage: showVictory ? 'victory' : currentPage,
       activeRoundId: activeId,
       players: gameState.players,
+      activeResponder: activeResponder,
       currentPlayerIndex: gameState.currentPlayerIndex,
       roundProgress: serializedRoundProgress, // Pass the fixed data
       roundSets: gameState.roundSets,
@@ -400,7 +401,8 @@ const App: React.FC = () => {
     victoryContext,
     showVictory,
     showScoreboard,
-    r4SelectedPlayerId
+    r4SelectedPlayerId,
+    activeResponder
   ]);
 
   useEffect(() => {
