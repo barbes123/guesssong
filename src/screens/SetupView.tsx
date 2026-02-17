@@ -15,10 +15,12 @@ interface SetupViewProps {
   onCheckConnection: () => void;
   onForceDisconnect: () => void;
   availableHubPlayers: any[];
+  activeResponder: string | null;
 }
 
 const SetupView: React.FC<SetupViewProps> = ({
   players,
+  activeResponder,
   t,
   onUpdatePlayer,
   onAddPlayer,
@@ -216,10 +218,11 @@ const SetupView: React.FC<SetupViewProps> = ({
               {[1, 2, 3].map((slotNumber) => {
                 const assignedPlayer = isBuzzerConnected && players.find(p => p.id === slotNumber && p.name) || null;
                 const availablePhones = availableHubPlayers.filter(hp => !players.some(p => p.hubId === hp.id));
+                // const isWinner = assignedPlayer && activeResponder === assignedPlayer.hubId;
+                // const winner = players.find(p => p.hubId === activeResponder);
                 console.log(`Slot ${slotNumber} | Hub Count: ${availableHubPlayers.length} | Available: ${availablePhones.length}`);
                 return (
                   <div key={slotNumber} className="flex gap-6 items-end">
-
 
                     {/* NAME BOX */}
                     <div className="flex-1 flex flex-col">
