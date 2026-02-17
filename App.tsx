@@ -16,8 +16,9 @@ import RoundSprint from './src/screens/RoundSprint'; // (Adjust path if needed)
 import MusicTimeline from './components/MusicTimeline'; // The file you just created
 
 import PlayerScreen from './src/displays/PlayerScreen'; // Adjust path if needed
+import LeaderDisplay from './src/displays/LeaderDisplay'; // Leader display for host notes
 import { useBuzzer } from './src/hooks/useBuzzer';
-
+import { saveScoreSnapshot, downloadFinalLog } from './src/utils/logger';
 import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
 
 /////////// Buzz---------------------------
@@ -29,6 +30,11 @@ import { io } from 'socket.io-client';
 
 const App: React.FC = () => {
   const isPlayerScreen = window.location.pathname === '/display';
+  
+  // Check for role query parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const role = urlParams.get('role');
+  const isLeaderScreen = role === 'leader';
 
   // // --- Connection to buzzer ---
   // const [isBuzzerConnected, setIsBuzzerConnected] = useState(false);
@@ -178,6 +184,11 @@ const App: React.FC = () => {
   const roundPointsTimerRef = useRef<number | null>(null);
   const autoStopTimerRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
+  
+  if (isLeaderScreen) {
+    return <LeaderDisplay />;
+  }
+  
   if (isPlayerScreen) {
     return <PlayerScreen />;
   }
@@ -394,6 +405,19 @@ const App: React.FC = () => {
       };
     }
 
+    // Get current song data
+    // CHANGE: Only update song info when activeNote changes (new song selected with PLAY)
+    // Song info persists even if music is stopped (STOP) or buzzer is pressed
+    let currentSong: any = null;
+    if (activeNote && activeId) {
+      const selectedSetId = gameState.roundSets[activeId] || 'default';
+      const roundData = getRoundData(activeId, selectedSetId) || [];
+      const category = roundData.find(c => c.id === activeNote.categoryId);
+      if (category) {
+        currentSong = category.songs[activeNote.noteIndex];
+      }
+    }
+
     stateToShareRef.current = {
       // Force victory page if showVictory is triggered
       currentPage: showVictory ? 'victory' : currentPage,
@@ -420,7 +444,8 @@ const App: React.FC = () => {
       showVictory: showVictory,
       showScoreboard: showScoreboard,
       r4SelectedPlayerId: r4SelectedPlayerId,
-      language: gameState.language
+      language: gameState.language,
+      currentSong: currentSong
     };
   }, [
     currentPage,
@@ -640,6 +665,7 @@ const App: React.FC = () => {
   };
 
   const resetGameAction = () => {
+    downloadFinalLog();
     setGameState(prev => ({
       ...prev,
       players: prev.players.map(p => ({ ...p, score: 0, stars: 0 })),
@@ -1175,36 +1201,6 @@ const App: React.FC = () => {
   const handleFinalizeTurn = (status: 'correct' | 'wrong' | 'skip', isTimeOut = false) => {
     const roundId = gameState.activeRoundId!;
 
-    // const buzzerIdx = gameState.players.findIndex(p => p.hubId === activeResponder);
-    // const isBuzzing = activeResponder && buzzerIdx !== -1;
-
-    // if (isBuzzing) {
-    //   if (status === 'correct') {
-    //     const winner = gameState.players[buzzerIdx];
-
-    //     // A. Give points ONLY to the buzzer winner
-    //     handleUpdatePlayer(winner.id, winner.name, winner.score + (currentRoundPoints || 0));
-
-    //     // B. Make this winner the "Current Player" officially
-    //     setGameState(prev => ({ ...prev, currentPlayerIndex: buzzerIdx }));
-    //   }
-
-    //   // C. Clear the buzzer and STOP (no turn rotation happens)
-    //   setActiveResponder(null);
-    //   return;
-    // }
-
-    // // --- REGULAR TURN LOGIC (If no one buzzed) ---
-    // if (status === 'correct') {
-    //   const p = gameState.players[gameState.currentPlayerIndex];
-    //   handleUpdatePlayer(p.id, p.name, p.score + (currentRoundPoints || 0));
-    // }
-
-    // // NOTE: Simply DO NOT include any "currentPlayerIndex + 1" code here 
-    // // to prevent automatic rotation.
-
-
-
     if (!activeNote || activeNote.isReveal) return;
     // const roundId = gameState.activeRoundId!;
     const progress = gameState.roundProgress[roundId];
@@ -1313,6 +1309,7 @@ const App: React.FC = () => {
                 }
               };
             });
+            saveScoreSnapshot(gameState.players, 4);
             setR4CurrentSongIdx(nextIdx);
             setActiveNote({ categoryId: 'r4_sprint', noteIndex: nextIdx });
             playSFX(SFX.correct);
@@ -1388,7 +1385,11 @@ const App: React.FC = () => {
 
     showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
       const addedPoints = status === 'correct' ? (currentRoundPoints || 0) : 0;
-      if (status === 'correct') playSFX(SFX.correct);
+      if (status === 'correct') 
+        {
+          playSFX(SFX.correct);
+          saveScoreSnapshot(gameState.players, roundId);
+        }
       else playSFX(SFX.wrong);
 
       setActiveResponder(null);//*** */
