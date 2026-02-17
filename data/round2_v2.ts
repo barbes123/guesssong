@@ -70,31 +70,35 @@ export const round2v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_1', 
-          title: 'Song 1', 
-          artist: 'Artist 1', 
+          title: 'Капитан, капитан, улыбнитесь', 
+          artist: 'Леонид Утёсов', 
           audioUrl: R4_2_C1B1minus, 
-          audioUrlFull: R4_2_C1B1full 
+          audioUrlFull: R4_2_C1B1full,
+          notes: 'Весёлая песня из советской кинокомедии. Легко узнаваемая по жизнерадостной мелодии и призыву капитану улыбнуться.'
         },
         { 
           id: 'p1_2_2', 
-          title: 'Song 2', 
-          artist: 'Artist 2', 
+          title: 'Я убью тебя, лодочник', 
+          artist: 'Николай Караченцов', 
           audioUrl: R4_2_C1B2minus, 
-          audioUrlFull: R4_2_C1B2full 
+          audioUrlFull: R4_2_C1B2full,
+          notes: 'Страстная песня из легендарной рок-оперы "Юнона и Авось". Мощное драматическое исполнение Караченцова.'
         },
         { 
           id: 'p1_2_3', 
-          title: 'Song 3', 
-          artist: 'Artist 3', 
+          title: 'Песенка шофёра', 
+          artist: 'Михаил Боярский', 
           audioUrl: R4_2_C1B3minus, 
-          audioUrlFull: R4_2_C1B3full 
+          audioUrlFull: R4_2_C1B3full,
+          notes: 'Шуточная песня о философии дальнобойщика из фильма "Не бойся, я с тобой". Характерный голос Боярского.'
         },
         { 
           id: 'p1_2_4', 
-          title: 'Song 4', 
-          artist: 'Artist 4', 
+          title: 'Всё могут короли', 
+          artist: 'Алла Пугачёва', 
           audioUrl: R4_2_C1B4minus, 
-          audioUrlFull: R4_2_C1B4full 
+          audioUrlFull: R4_2_C1B4full,
+          notes: 'Знаменитая песня о пределах власти в вопросах сердца. Визитная карточка Примадонны 80-х.'
         },
       ]
     },
@@ -104,31 +108,35 @@ export const round2v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_5', 
-          title: 'Rock 1', 
-          artist: 'Artist 1', 
+          title: 'Я встретил Вас', 
+          artist: 'Иван Козловский', 
           audioUrl: R4_2_C2B1minus, 
-          audioUrlFull: R4_2_C2B1full 
+          audioUrlFull: R4_2_C2B1full,
+          notes: 'Классический романс на стихи Тютчева. Неповторимый тенор великого оперного певца.'
         },
         { 
           id: 'p1_2_6', 
-          title: 'Rock 2', 
-          artist: 'Artist 2', 
+          title: 'Очи чёрные', 
+          artist: 'Фёдор Шаляпин', 
           audioUrl: R4_2_C2B2minus, 
-          audioUrlFull: R4_2_C2B2full 
+          audioUrlFull: R4_2_C2B2full,
+          notes: 'Самый известный русский романс в эталонном исполнении великого баса.'
         },
         { 
           id: 'p1_2_7', 
-          title: 'Rock 3', 
-          artist: 'Artist 3', 
+          title: 'Издалека долго течёт река Волга', 
+          artist: 'Людмила Зыкина', 
           audioUrl: R4_2_C2B3minus, 
-          audioUrlFull: R4_2_C2B3full 
+          audioUrlFull: R4_2_C2B3full,
+          notes: 'Лирическая народная песня-символ родины в исполнении "голоса России".'
         },
         { 
           id: 'p1_2_8', 
-          title: 'Rock 4', 
-          artist: 'Artist 4', 
+          title: 'Гори, гори, моя звезда', 
+          artist: 'Александр Вертинский', 
           audioUrl: R4_2_C2B4minus, 
-          audioUrlFull: R4_2_C2B4full 
+          audioUrlFull: R4_2_C2B4full,
+          notes: 'Трогательный старинный романс в аристократичном исполнении Вертинского.'
         },
       ]
     },
@@ -138,31 +146,35 @@ export const round2v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_9', 
-          title: 'Movie 1', 
-          artist: 'Artist 1', 
+          title: 'Звенит январская вьюга', 
+          artist: 'Клавдия Шульженко', 
           audioUrl: R4_2_C3B1minus, 
-          audioUrlFull: R4_2_C3B1full 
+          audioUrlFull: R4_2_C3B1full,
+          notes: 'Лирическая зимняя песня с тёплым, бархатным голосом Шульженко.'
         },
         { 
           id: 'p1_2_10', 
-          title: 'Movie 2', 
-          artist: 'Artist 2', 
+          title: 'Белые снежинки', 
+          artist: 'Гелена Великанова', 
           audioUrl: R4_2_C3B2minus, 
-          audioUrlFull: R4_2_C3B2full 
+          audioUrlFull: R4_2_C3B2full,
+          notes: 'Лёгкая танцевальная песня, сравнивающая снежинки со свадебным конфетти.'
         },
         { 
           id: 'p1_2_11', 
-          title: 'Movie 3', 
-          artist: 'Artist 3', 
+          title: 'А снег идёт', 
+          artist: 'Майя Кристалинская', 
           audioUrl: R4_2_C3B3minus, 
-          audioUrlFull: R4_2_C3B3full 
+          audioUrlFull: R4_2_C3B3full,
+          notes: 'Философская песня, где снег — метафора времени и воспоминаний.'
         },
         { 
           id: 'p1_2_12', 
-          title: 'Movie 4', 
-          artist: 'Artist 4', 
+          title: 'Три белых коня', 
+          artist: 'Лариса Долина', 
           audioUrl: R4_2_C3B4minus, 
-          audioUrlFull: R4_2_C3B4full 
+          audioUrlFull: R4_2_C3B4full,
+          notes: 'Песня из новогоднего фильма "Чародеи" о зимних месяцах как белых конях.'
         },
       ]
     },
@@ -172,31 +184,35 @@ export const round2v2Set: RoundSet = {
       songs: [
         { 
           id: 'p1_2_13', 
-          title: 'Retro 1', 
-          artist: 'Artist 1', 
+          title: 'Не плачь, Алиса', 
+          artist: 'Группа «Браво»', 
           audioUrl: R4_2_C4B1minus, 
-          audioUrlFull: R4_2_C4B1full 
+          audioUrlFull: R4_2_C4B1full,
+          notes: 'Энергичный пост-панк с саксофонным риффом, утешающий в день рождения.'
         },
         { 
           id: 'p1_2_14', 
-          title: 'Retro 2', 
-          artist: 'Artist 2', 
+          title: 'День рождения', 
+          artist: 'Игорь Николаев', 
           audioUrl: R4_2_C4B2minus, 
-          audioUrlFull: R4_2_C4B2full 
+          audioUrlFull: R4_2_C4B2full,
+          notes: 'Лирический поп-хит 90-х о праздновании и загадывании желаний.'
         },
         { 
           id: 'p1_2_15', 
-          title: 'Retro 3', 
-          artist: 'Artist 3', 
+          title: 'День рождения', 
+          artist: 'Группа «Чай вдвоём»', 
           audioUrl: R4_2_C4B3minus, 
-          audioUrlFull: R4_2_C4B3full 
+          audioUrlFull: R4_2_C4B3full,
+          notes: 'Весёлая танцевальная песня-приглашение отметить день рождения вместе.'
         },
         { 
           id: 'p1_2_16', 
-          title: 'Retro 4', 
-          artist: 'Artist 4', 
+          title: 'С днём рождения', 
+          artist: 'Ирина Аллегрова', 
           audioUrl: R4_2_C4B4minus, 
-          audioUrlFull: R4_2_C4B4full 
+          audioUrlFull: R4_2_C4B4full,
+          notes: 'Праздничная поздравительная песня от знаменитой поп-дивы.'
         },
       ]
     }
