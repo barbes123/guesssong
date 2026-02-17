@@ -238,21 +238,26 @@ const App: React.FC = () => {
     }
     setIsPlaying(false);
 
+    // --- MOVE THESE OUTSIDE THE IF BLOCK ---
+    // This ensures that whenever the music stops (Buzz or Manual Stop), 
+    // the clock freezes immediately for ALL rounds.
+    if (countdownIntervalRef.current) {
+      window.clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    if (roundPointsTimerRef.current) {
+      window.clearInterval(roundPointsTimerRef.current);
+      roundPointsTimerRef.current = null;
+    }
+    // ---------------------------------------
+
     const roundId = gameState.activeRoundId;
-    const isR4 = roundId === 4; // Changed from isR5
+    const isR4 = roundId === 4;
 
     if (fullyClear || (!isR4 || !r4IsActiveSession)) {
-      if (roundPointsTimerRef.current) {
-        window.clearInterval(roundPointsTimerRef.current);
-        roundPointsTimerRef.current = null;
-      }
       if (autoStopTimerRef.current) {
         window.clearTimeout(autoStopTimerRef.current);
         autoStopTimerRef.current = null;
-      }
-      if (countdownIntervalRef.current) {
-        window.clearInterval(countdownIntervalRef.current);
-        countdownIntervalRef.current = null;
       }
     }
 
@@ -263,6 +268,41 @@ const App: React.FC = () => {
       }
     }
   }, [gameState.activeRoundId, r4IsActiveSession]);
+
+  // const stopSong = useCallback((fullyClear = true) => {
+  //   if (songRef.current) {
+  //     songRef.current.pause();
+  //     if (fullyClear) {
+  //       songRef.current = null;
+  //     }
+  //   }
+  //   setIsPlaying(false);
+
+  //   const roundId = gameState.activeRoundId;
+  //   const isR4 = roundId === 4; // Changed from isR5
+
+  //   if (fullyClear || (!isR4 || !r4IsActiveSession)) {
+  //     // if (roundPointsTimerRef.current) {
+  //     //   window.clearInterval(roundPointsTimerRef.current);
+  //     //   roundPointsTimerRef.current = null;
+  //     // }
+  //     if (autoStopTimerRef.current) {
+  //       window.clearTimeout(autoStopTimerRef.current);
+  //       autoStopTimerRef.current = null;
+  //     }
+  //     if (countdownIntervalRef.current) {
+  //       window.clearInterval(countdownIntervalRef.current);
+  //       countdownIntervalRef.current = null;
+  //     }
+  //   }
+
+  //   if (fullyClear) {
+  //     setAudioProgress({ current: 0, total: 0 });
+  //     if (!isR4 || !r4IsActiveSession) {
+  //       setTimeLeft(undefined);
+  //     }
+  //   }
+  // }, [gameState.activeRoundId, r4IsActiveSession]);
 
 
   const {
@@ -1179,10 +1219,14 @@ const App: React.FC = () => {
     if (isSprintRound) {
       const pId = gameState.players[gameState.currentPlayerIndex].id;
       const playerProg = progress.r4PlayerProgress?.[pId];
+      
       if (!playerProg) return;
 
       const finalizeR4Player = (finalStatus: 'wrong' | 'all_correct' | 'time_out') => {
         stopSong(true);
+
+        setActiveResponder(null);
+
         const finalCorrectCount = playerProg.correctIndices.size + (status === 'correct' ? 1 : 0);
         const pointsAwarded = finalCorrectCount * 10 + (finalCorrectCount === 7 ? 300 : 0);
 
@@ -1223,6 +1267,7 @@ const App: React.FC = () => {
         showModal(t.wrong, t.confirmAction, () => {
           setModal(null);
           finalizeR4Player('wrong');
+          setActiveResponder(null);
           setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
         }, undefined, undefined, 'inline');
         return;
@@ -1231,6 +1276,7 @@ const App: React.FC = () => {
       if (status === 'correct') {
         showModal(t.correct || "Correct", t.confirmAction || "Mark this song as correct?", () => {
           setModal(null);
+          setActiveResponder(null);
           const newSet = new Set(playerProg.correctIndices);
           newSet.add(r4CurrentSongIdx);
           setPlayedButNotEvaluated(prev => prev.filter(id => id !== r4CurrentSongIdx));
