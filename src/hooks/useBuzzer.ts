@@ -84,12 +84,13 @@ export const useBuzzer = (stopSong: (fullyClear?: boolean) => void) => {
                 stopSong(false);
 
                 // 2. Identify the slot via mapping
-                const mappedSlot = buzzerMapping[winner.playerId];
-                if (mappedSlot) {
-                    setActiveResponder(`${winner.playerName} (Slot ${mappedSlot})`);
-                } else {
-                    setActiveResponder(winner.playerName);
-                }
+                setActiveResponder(winner.playerId);
+                // const mappedSlot = buzzerMapping[winner.playerId];
+                // if (mappedSlot) {
+                //     setActiveResponder(`${winner.playerName} (Slot ${mappedSlot})`);
+                // } else {
+                //     setActiveResponder(winner.playerName);
+                // }
 
                 // 3. Immediately lock the game to turn other phones gray
                 socket.emit('gameAction', { type: 'SET_STATE', data: { state: 'LOCKED' } });
