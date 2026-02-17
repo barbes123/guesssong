@@ -60,19 +60,19 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
 }) => {
 
   const roundId = gameState.activeRoundId!;
-  const isBuzzerRound = roundId === 1 || roundId === 2;
+  // const isBuzzerRound = roundId === 1 || roundId === 2;
 
-  // Find the index of the person who buzzed
-  const buzzerIndex = (players || []).findIndex(p => p?.hubId === activeResponder);
+  // // Find the index of the person who buzzed
+  // const buzzerIndex = (players || []).findIndex(p => p?.hubId === activeResponder);
 
-  // THE MASTER INDEX: 
-  // Use the buzzer if it's active and found; otherwise, use your manual appointment.
-  const visualActiveIndex = (isBuzzerRound && activeResponder && buzzerIndex !== -1)
-    ? buzzerIndex
-    : gameState.currentPlayerIndex;
+  // // THE MASTER INDEX: 
+  // // Use the buzzer if it's active and found; otherwise, use your manual appointment.
+  // const visualActiveIndex = (isBuzzerRound && activeResponder && buzzerIndex !== -1)
+  //   ? buzzerIndex
+  //   : gameState.currentPlayerIndex;
 
-  // Use this for any name/score displays in the sidebar
-  const displayPlayer = gameState.players[visualActiveIndex] || gameState.players[0];
+  // // Use this for any name/score displays in the sidebar
+  // const displayPlayer = gameState.players[visualActiveIndex] || gameState.players[0];
 
 
   // const roundId = gameState.activeRoundId!;
@@ -103,6 +103,16 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
   // const currentPlayer = buzzerWinner || gameState.players[gameState.currentPlayerIndex];
 
   console.log("🔍 DEBUG: activeResponder:", activeResponder, "Winner Found:", buzzerWinner?.name);
+
+
+  // //To send buzz resukta to PlayerDisplay
+  // const buzzerIdx = (players || []).findIndex(p => p?.hubId === activeResponder);
+  // const isBuzzerActive = activeResponder && buzzerIdx !== -1;
+  // // The "Visual Index" determines who gets the main highlight
+  // const visualActiveIndex = isBuzzerActive ? buzzerIdx : gameState.currentPlayerIndex;
+
+
+
 
   return (
     <div className="min-h-screen bg-slate-950 p-8 pt-24">

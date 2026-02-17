@@ -248,27 +248,42 @@ const PlayerScreen = () => {
     );
   };
 
+
   const renderPlayersFooter = () => {
+    // 1. Check if a buzzer is currently active in the synchronized state
+    const buzzerIdx = players.findIndex(p => p.hubId === state.activeResponder);
+    const hasBuzzer = state.activeResponder && buzzerIdx !== -1;
+    
+    // 2. The visual focus goes to the buzzer winner, otherwise the turn player
+    const visualActiveIndex = hasBuzzer ? buzzerIdx : state.currentPlayerIndex;
+
     return (
       <div className="mt-8 pb-8 w-full max-w-[1800px] mx-auto">
         <div className="flex justify-center gap-6">
           {players.map((p, idx) => {
-            const isCurrent = idx === state.currentPlayerIndex;
+            const isHighlighted = idx === visualActiveIndex;
+            const isWinner = hasBuzzer && idx === buzzerIdx;
+
             return (
               <div 
                 key={p.id} 
                 className={`
                   relative flex-1 bg-slate-900/90 backdrop-blur-md px-6 py-4 rounded-[2rem] border-2 flex items-center justify-between shadow-xl transition-all duration-500
-                  ${isCurrent ? 'border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.4)] scale-105 z-10 bg-slate-800' : 'border-slate-800 opacity-80'}
+                  ${isHighlighted 
+                    ? isWinner
+                      ? 'border-yellow-500 shadow-[0_0_40px_rgba(234,179,8,0.5)] scale-110 z-20 bg-slate-800' // BUZZER STATE
+                      : 'border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.4)] scale-105 z-10 bg-slate-800' // MANUAL STATE
+                    : 'border-slate-800 opacity-60 scale-95'
+                  }
                 `}
               >
-                {isCurrent && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
-                    Current Turn
+                {isHighlighted && (
+                  <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg ${isWinner ? 'bg-yellow-600' : 'bg-indigo-600'}`}>
+                    {isWinner ? (t.buzzer || "BUZZER!") : (t.currentTurn || "Current Turn")}
                   </div>
                 )}
                 <div className="flex flex-col">
-                  <div className={`text-xl font-black truncate max-w-[180px] ${isCurrent ? 'text-white' : 'text-slate-400'}`}>
+                  <div className={`text-xl font-black truncate max-w-[180px] ${isHighlighted ? 'text-white' : 'text-slate-400'}`}>
                     {p.name || `Player ${p.id + 1}`}
                   </div>
                   <div className="flex gap-1 mt-1">
@@ -281,7 +296,7 @@ const PlayerScreen = () => {
                     ))}
                   </div>
                 </div>
-                <div className={`text-4xl font-black tabular-nums ${isCurrent ? 'text-indigo-400' : 'text-slate-500'}`}>
+                <div className={`text-4xl font-black tabular-nums ${isHighlighted ? (isWinner ? 'text-yellow-400' : 'text-indigo-400') : 'text-slate-500'}`}>
                   {p.score}
                 </div>
               </div>
@@ -291,6 +306,50 @@ const PlayerScreen = () => {
       </div>
     );
   };
+
+  // const renderPlayersFooter = () => {
+  //   return (
+  //     <div className="mt-8 pb-8 w-full max-w-[1800px] mx-auto">
+  //       <div className="flex justify-center gap-6">
+  //         {players.map((p, idx) => {
+  //           const isCurrent = idx === state.currentPlayerIndex;
+  //           return (
+  //             <div 
+  //               key={p.id} 
+  //               className={`
+  //                 relative flex-1 bg-slate-900/90 backdrop-blur-md px-6 py-4 rounded-[2rem] border-2 flex items-center justify-between shadow-xl transition-all duration-500
+  //                 ${isCurrent ? 'border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.4)] scale-105 z-10 bg-slate-800' : 'border-slate-800 opacity-80'}
+  //               `}
+  //             >
+  //               {isCurrent && (
+  //                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg">
+  //                   Current Turn
+  //                 </div>
+  //               )}
+  //               <div className="flex flex-col">
+  //                 <div className={`text-xl font-black truncate max-w-[180px] ${isCurrent ? 'text-white' : 'text-slate-400'}`}>
+  //                   {p.name || `Player ${p.id + 1}`}
+  //                 </div>
+  //                 <div className="flex gap-1 mt-1">
+  //                   {[...Array(3)].map((_, i) => (
+  //                     <Star 
+  //                       key={i} 
+  //                       size={16} 
+  //                       className={`${i < (p.stars || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-slate-700 fill-slate-700'}`} 
+  //                     />
+  //                   ))}
+  //                 </div>
+  //               </div>
+  //               <div className={`text-4xl font-black tabular-nums ${isCurrent ? 'text-indigo-400' : 'text-slate-500'}`}>
+  //                 {p.score}
+  //               </div>
+  //             </div>
+  //           );
+  //         })}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   const renderRound3 = () => {
     const progress = roundProgress[3] || { activePlayerIds: [], currentTurnIndex: 0, usedNotes: [] };
@@ -619,12 +678,25 @@ const PlayerScreen = () => {
                     }
 
                     return (
+
                       <div 
-                        key={noteIdx} 
-                        className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
-                      >
-                        {progress.pointMap?.[cat.id]?.[noteIdx] || 0}
-                      </div>
+  key={noteIdx} 
+  className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
+>
+  {/* If the note is currently active (being played) or is already used, show points. 
+      Otherwise, show the music icon. */}
+  {isActive || isUsed ? (
+    progress.pointMap?.[cat.id]?.[noteIdx] || 0
+  ) : (
+    <Music size={48} className="text-slate-700/50" />
+  )}
+</div>
+                      // <div 
+                      //   key={noteIdx} 
+                      //   className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
+                      // >
+                      //   {progress.pointMap?.[cat.id]?.[noteIdx] || 0}
+                      // </div>
                     );
                   })}
                 </div>
