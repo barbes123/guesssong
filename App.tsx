@@ -16,105 +16,107 @@ import RoundSprint from './src/screens/RoundSprint'; // (Adjust path if needed)
 import MusicTimeline from './components/MusicTimeline'; // The file you just created
 
 import PlayerScreen from './src/displays/PlayerScreen'; // Adjust path if needed
+import { useBuzzer } from './src/hooks/useBuzzer';
 
 import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
 
 /////////// Buzz---------------------------
 import configBuzz from './configBuzz.json';
 import { io } from 'socket.io-client';
-const socket = io(configBuzz.SOCKET_URL);
+// const socket = io(configBuzz.SOCKET_URL);
 // ----------------------------------------
 
 
 const App: React.FC = () => {
   const isPlayerScreen = window.location.pathname === '/display';
-  // --- Connection to buzzer ---
-  const [isBuzzerConnected, setIsBuzzerConnected] = useState(false);
-  const [buzzerBuzzes, setBuzzerBuzzes] = useState<any[]>([]);
 
-  const [hubPlayers, setHubPlayers] = useState<any[]>([]);
-  const [buzzerMapping, setBuzzerMapping] = useState<Record<string, number>>({});
+  // // --- Connection to buzzer ---
+  // const [isBuzzerConnected, setIsBuzzerConnected] = useState(false);
+  // const [buzzerBuzzes, setBuzzerBuzzes] = useState<any[]>([]);
 
-
-  const handleConnect = () => {
-    if (socket) {
-      socket.connect();
-      socket.emit('register', { name: 'GameEngine', role: 'host', code: '' });
-      setIsBuzzerConnected(true);
-    }
-  };
-
-  const handleForceDisconnect = () => {
-    if (socket) {
-      socket.disconnect();
-    }
-    setIsBuzzerConnected(false);
-    setHubPlayers([]);
-  };
+  // const [hubPlayers, setHubPlayers] = useState<any[]>([]);
+  // const [buzzerMapping, setBuzzerMapping] = useState<Record<string, number>>({});
 
 
-  useEffect(() => {
-    socket.on('connect', () => {
-      console.log("✅ Game linked to Hub");
-      setIsBuzzerConnected(true);
+  // const handleConnect = () => {
+  //   if (socket) {
+  //     socket.connect();
+  //     socket.emit('register', { name: 'GameEngine', role: 'host', code: '' });
+  //     setIsBuzzerConnected(true);
+  //   }
+  // };
 
-      // FIX: Instead of a new command, we send a 'register' as a 'host' 
-      // This usually forces the Hub to broadcast the 'playerListUpdate' to everyone
-      socket.emit('register', {
-        name: 'GameEngine',
-        role: 'host',
-        code: ''
-      });
-    });
+  // const handleForceDisconnect = () => {
+  //   if (socket) {
+  //     socket.disconnect();
+  //   }
+  //   setIsBuzzerConnected(false);
+  //   setHubPlayers([]);
+  // };
 
-    socket.on('connect_error', (err) => {
-      console.error("❌ TASK 0: Link failed:", err.message);
-      setIsBuzzerConnected(false);
-    });
 
-    socket.on('disconnect', () => {
-      setIsBuzzerConnected(false);
-    });
+  // useEffect(() => {
+  //   socket.on('connect', () => {
+  //     console.log("✅ Game linked to Hub");
+  //     setIsBuzzerConnected(true);
 
-    const handleForceDisconnect = () => {
-      if (socket) {
-        socket.disconnect(); // Physically closes the socket
-        setIsBuzzerConnected(false); // Forces UI to "Disconnected" mode
-        setHubPlayers([]); // Clears the sliding list so it disappears
-        console.log("🛑 Buzzer System Forcefully Disconnected");
-      }
-    };
+  //     // FIX: Instead of a new command, we send a 'register' as a 'host' 
+  //     // This usually forces the Hub to broadcast the 'playerListUpdate' to everyone
+  //     socket.emit('register', {
+  //       name: 'GameEngine',
+  //       role: 'host',
+  //       code: ''
+  //     });
+  //   });
 
-    socket.on('playerListUpdate', (list) => {
-      console.log("📥 RECEIVED PLAYER LIST:", list);
-      setHubPlayers(list)
-      // Filter out the 'Host' or 'GameEngine' so they don't appear in your sliding list
-      // const onlyPlayers = list.filter((p: any) => p.role === 'player');
-      // setHubPlayers(onlyPlayers);
-    });
-    // --- ADDED THIS PART ---
-    socket.on('buzzer_pressed', (data: { playerId: string }) => {
-      // 1. Check if the device that buzzed is in our mapping (1, 2, or 3)
-      const mappedSlot = buzzerMapping[data.playerId];
+  //   socket.on('connect_error', (err) => {
+  //     console.error("❌ TASK 0: Link failed:", err.message);
+  //     setIsBuzzerConnected(false);
+  //   });
 
-      if (mappedSlot) {
-        console.log(`🎯 SLOT ${mappedSlot} BUZZED!`);
+  //   socket.on('disconnect', () => {
+  //     setIsBuzzerConnected(false);
+  //   });
 
-        // 2. Stop the music
-        if (songRef.current) {
-          songRef.current.pause();
-        }
-      }
-    });
+  //   const handleForceDisconnect = () => {
+  //     if (socket) {
+  //       socket.disconnect(); // Physically closes the socket
+  //       setIsBuzzerConnected(false); // Forces UI to "Disconnected" mode
+  //       setHubPlayers([]); // Clears the sliding list so it disappears
+  //       console.log("🛑 Buzzer System Forcefully Disconnected");
+  //     }
+  //   };
 
-    return () => {
-      socket.off('connect');
-      socket.off('connect_error');
-      socket.off('disconnect');
-      socket.off('playerListUpdate');
-      socket.off('buzzer_pressed'); // Clean up
-    };
-  }, []);
+  //   socket.on('playerListUpdate', (list) => {
+  //     console.log("📥 RECEIVED PLAYER LIST:", list);
+  //     setHubPlayers(list)
+  //     // Filter out the 'Host' or 'GameEngine' so they don't appear in your sliding list
+  //     // const onlyPlayers = list.filter((p: any) => p.role === 'player');
+  //     // setHubPlayers(onlyPlayers);
+  //   });
+  //   // --- ADDED THIS PART ---
+  //   socket.on('buzzer_pressed', (data: { playerId: string }) => {
+  //     // 1. Check if the device that buzzed is in our mapping (1, 2, or 3)
+  //     const mappedSlot = buzzerMapping[data.playerId];
+
+  //     if (mappedSlot) {
+  //       console.log(`🎯 SLOT ${mappedSlot} BUZZED!`);
+
+  //       // 2. Stop the music
+  //       if (songRef.current) {
+  //         songRef.current.pause();
+  //       }
+  //     }
+  //   });
+
+  //   return () => {
+  //     socket.off('connect');
+  //     socket.off('connect_error');
+  //     socket.off('disconnect');
+  //     socket.off('playerListUpdate');
+  //     socket.off('buzzer_pressed'); // Clean up
+  //   };
+  // }, []);
   // --------------------------------
   const [gameState, setGameState] = useState<GameState>({
     players: [{ id: 0, name: '', score: 0, stars: 0 }],
@@ -262,6 +264,21 @@ const App: React.FC = () => {
     }
   }, [gameState.activeRoundId, r4IsActiveSession]);
 
+
+  const {
+    activeResponder,
+    setActiveResponder,
+    isBuzzerConnected,
+    hubPlayers,
+    handleConnect,
+    handleForceDisconnect,
+    setBuzzerMapping,
+    armBuzzers,
+    socket: buzzerSocket,
+  } = useBuzzer(stopSong);
+
+
+
   const triggerBGM = useCallback((page: Page, roundId: number | null) => {
     if (!gameState.isMusicEnabled) return;
     stopBGM();
@@ -399,154 +416,6 @@ const App: React.FC = () => {
     }, 300);
     return () => clearInterval(interval);
   }, []);
-
-
-  // useEffect(() => {
-  //   // Share game state with player screen
-  //   const shareState = () => {
-  //     const stateToShare = {
-  //       currentPage: showVictory ? 'victory' : currentPage,
-  //       activeRoundId: gameState.activeRoundId,
-  //       players: gameState.players,
-  //       currentPlayerIndex: gameState.currentPlayerIndex,
-  //       roundProgress: gameState.roundProgress,
-  //       roundSets: gameState.roundSets,
-  //       // Add round-specific states
-  //       timeLeft: timeLeft,
-  //       audioProgress: audioProgress,
-  //       isPlaying: isPlaying,
-  //       activeNote: activeNote,
-  //       currentRoundPoints: currentRoundPoints,
-  //       // Round 3 specific
-  //       r3Selection: r3Selection,
-  //       isR3Finalized: isR3Finalized,
-  //       selectedDuration: selectedDuration,
-  //       // Round 4 specific
-  //       r4CurrentSongIdx: r4CurrentSongIdx,
-  //       r4IsActiveSession: r4IsActiveSession,
-  //       selectedRow: selectedRow,
-  //       timerDuration: timerDuration,
-  //       playedButNotEvaluated: playedButNotEvaluated,
-  //       // Victory
-  //       victoryContext: victoryContext,
-  //       showVictory: showVictory,
-  //       // Language
-  //       language: gameState.language
-  //     };
-
-  //     // DEBUG: Log round progress when it changes
-  //     if (gameState.activeRoundId && gameState.roundProgress[gameState.activeRoundId]) {
-  //       const currentRound = gameState.activeRoundId;
-  //       const roundProgress = gameState.roundProgress[currentRound];
-
-  //       // Check if this is round 1 or 2 (where notes have results)
-  //       // if (currentRound === 1 || currentRound === 2) {
-  //       //   // Log only when results exist
-  //       //   if (roundProgress.results && Object.keys(roundProgress.results).length > 0) {
-  //       //     console.log('📤 [App → Player] Sharing state for round', currentRound);
-  //       //     console.log('📤 Results:', roundProgress.results);
-  //       //     console.log('📤 Used notes:', Array.from(roundProgress.usedNotes || []));
-  //       //   }
-  //       // }
-  //     }
-
-  //     try {
-  //       localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShare));
-  //     } catch (error) {
-  //       console.log('Error sharing state:', error);
-  //     }
-  //   };
-
-  //   // Update every 300ms (fast enough for real-time updates)
-  //   const interval = setInterval(shareState, 300);
-  //   return () => clearInterval(interval);
-  // }, [
-  //   currentPage,
-  //   gameState,
-  //   timeLeft,
-  //   audioProgress,
-  //   isPlaying,
-  //   activeNote,
-  //   currentRoundPoints,
-  //   r3Selection,
-  //   isR3Finalized,
-  //   selectedDuration,
-  //   r4CurrentSongIdx,
-  //   r4IsActiveSession,
-  //   selectedRow,
-  //   timerDuration,
-  //   playedButNotEvaluated,
-  //   victoryContext,
-  //   showVictory
-  // ]);
-  //   // In App.js, add this useEffect after other useEffects
-  // useEffect(() => {
-  //   // Share game state with player screen
-  //   const shareState = () => {
-  //     const stateToShare = {
-  //       currentPage,
-  //       activeRoundId: gameState.activeRoundId,
-  //       players: gameState.players,
-  //       currentPlayerIndex: gameState.currentPlayerIndex,
-  //       roundProgress: gameState.roundProgress,
-  //       roundSets: gameState.roundSets,
-  //       // Add round-specific states
-  //       timeLeft: timeLeft,
-  //       audioProgress: audioProgress,
-  //       isPlaying: isPlaying,
-  //       activeNote: activeNote,
-  //       currentRoundPoints: currentRoundPoints,
-  //       // Round 3 specific
-  //       r3Selection: r3Selection,
-  //       isR3Finalized: isR3Finalized,
-  //       selectedDuration: selectedDuration,
-  //       // Round 4 specific
-  //       r4CurrentSongIdx: r4CurrentSongIdx,
-  //       r4IsActiveSession: r4IsActiveSession,
-  //       selectedRow: selectedRow,
-  //       timerDuration: timerDuration,
-  //       playedButNotEvaluated: playedButNotEvaluated,
-  //       // Victory
-  //       victoryContext: victoryContext,
-  //       showVictory: showVictory,
-  //       // Language
-  //       language: gameState.language
-  //     };
-
-  //     try {
-  //       localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShare));
-  //     } catch (error) {
-  //       console.log('Error sharing state:', error);
-  //     }
-  //   };
-
-  //   // Update state every 300ms
-  //   const interval = setInterval(shareState, 300);
-
-  //   return () => clearInterval(interval);
-  //   }, [
-  //     currentPage,
-  //     gameState,
-  //     timeLeft,
-  //     audioProgress,
-  //     isPlaying,
-  //     activeNote,
-  //     currentRoundPoints,
-  //     r3Selection,
-  //     isR3Finalized,
-  //     selectedDuration,
-  //     r4CurrentSongIdx,
-  //     r4IsActiveSession,
-  //     selectedRow,
-  //     timerDuration,
-  //     playedButNotEvaluated,
-  //     victoryContext,
-  //     showVictory
-  //   ]);
-
-
-  //also for playerscreen
-
   // Add this function to open/close player window
   const handleOpenPlayerWindow = () => {
     // Close existing window if open
@@ -685,26 +554,6 @@ const App: React.FC = () => {
           stars: 0,
           hubId: '',
         };
-
-
-
-        // const slots = [1, 2, 3];
-        // const updatedPlayers = slots.map(id => {
-        //   const existing = prev.players.find(p => p.id === id);
-
-        //   if (id === targetId) {
-        //     return {
-        //       id: id,
-        //       name: actualName || (existing ? existing.name : ''),
-        //       score: existing ? existing.score : 0,
-        //       stars: existing ? existing.stars : 0,
-        //       hubId: '',
-        //     };
-        //   }
-
-        //   // Return existing or empty
-        //   return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
-        // });
 
         return {
           ...prev,
@@ -1190,35 +1039,53 @@ const App: React.FC = () => {
     };
 
     if (action === 'start') {
-console.log("🔄 STARTING: isBuzzerConnected is:", isBuzzerConnected);
+      console.log("🔄 STARTING: isBuzzerConnected is:", isBuzzerConnected);
 
-const initiateSequence = () => {
-  if (isBuzzerConnected) {
-    // 1. "CLEAN SLATE": Tell the server to clear old buzzes and go to IDLE
-    console.log("🛠️ Sending DISARM (IDLE)");
-    socket.emit('gameAction', { 
-      type: 'SET_STATE', 
-      data: { state: 'IDLE' } 
-    });
+      const initiateSequence = () => {
+        // Clear the old winner so the yellow box disappears
+        setActiveResponder(null);
 
-    // 2. DELAY: Wait 150ms for the "Reset" signal to clear all phones
-    setTimeout(() => {
-      console.log("🛠️ Sending ARM (BATTLE)");
-      
-      // 3. ARM: Turn all phone buttons RED for the music
-      socket.emit('gameAction', { 
-        type: 'SET_STATE', 
-        data: { state: 'BATTLE' } 
-      });
+        let isRevealMode = false;
+        if (isBuzzerConnected) {
+          //CHeck to play minus or full
+          let songIndex = 0;
+          if (isMelodyRound) {
+            songIndex = activeNote.isReveal ? activeNote.noteIndex - 1 : (progress.activationCounts[activeNote.categoryId] || 0);
+          } else if (isFinalRound) {
+            songIndex = progress.currentTurnIndex || 0;
+          } else if (isSprintRound) {
+            songIndex = r4CurrentSongIdx;
+          } else {
+            songIndex = activeNote.noteIndex;
+          }
+          // Determine if we are in "Full/Reveal" mode or "Game" mode
+          // We use the same logic your startPlayback uses:
+          isRevealMode = activeNote.isReveal ||
+            (isSprintRound && !r4IsActiveSession) ||
+            (isFinalRound && progress.currentTurnIndex !== songIndex);
+        }
 
-      // 4. PLAY: Start the song exactly as the buttons turn red
-      startPlayback();
-    }, 150);
-  } else {
-    // Fallback: If buzzer server is down, just play the music
-    startPlayback();
-  }
-};
+
+        if (isBuzzerConnected && !isRevealMode ) {
+
+          // 1. "CLEAN SLATE": Tell the server to clear old buzzes and go to IDLE
+          console.log("🛠️ Sending DISARM (IDLE)");
+          buzzerSocket.emit('gameAction', {
+            type: 'SET_STATE',
+            data: { state: 'IDLE' }
+          });
+
+          // 2. DELAY: Wait 150ms for the "Reset" signal to clear all phones
+          setTimeout(() => {
+            console.log("🛠️ Sending ARM (BATTLE)");
+            armBuzzers();
+            startPlayback();
+          }, 150);
+        } else {
+          // Fallback: If buzzer server is down, just play the music
+          startPlayback();
+        }
+      };
 
       if (isFinalRound && !isPlaying && !isR3Finalized && selectedDuration === null) {
         showModal(t.currentTurn, t.confirmPlayerActive, () => {
@@ -1231,7 +1098,7 @@ const initiateSequence = () => {
     } else {
       // Start of your 'stop' leg - Added DISARM here
       if (isBuzzerConnected) {
-        socket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+        buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
       }
 
       if (isSprintRound && r4IsActiveSession) {
