@@ -1,0 +1,8 @@
+{
+  "SERVER_IP": "10.42.0.1",
+  "SERVER_PORT": 3000,  
+  "SOCKET_URL": "http://100.109.59.68:3001",
+  "MAX_PLAYERS": 10,
+  "leaderPassword": "leader123"
+}
+
