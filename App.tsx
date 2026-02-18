@@ -41,10 +41,10 @@ const App: React.FC = () => {
     } else {
       document.title = "GS Main";
     }
-  }, [isLeaderScreen, isPlayerScreen]); 
-  
+  }, [isLeaderScreen, isPlayerScreen]);
 
-  
+
+
   // --------------------------------
   const [gameState, setGameState] = useState<GameState>({
     players: [{ id: 0, name: '', score: 0, stars: 0 }],
@@ -223,12 +223,19 @@ const App: React.FC = () => {
       // This sends the data from your Laptop to the Server Bridge
       if (stateToShareRef.current && isBuzzerConnected) {
         // 'buzzerSocket' is the variable you got from your useBuzzer hook
-        buzzerSocket.emit('updateGameState', stateToShareRef.current);
+        const stateData = stateToShareRef.current;
+        console.log('🚀 [App.tsx] Emitting updateGameState:', {
+          hasSong: !!stateData.currentSong,
+          songTitle: stateData.currentSong?.title || 'none',
+          socketConnected: buzzerSocket?.connected,
+          eventName: 'updateGameState'
+        });
+        buzzerSocket.emit('updateGameState', stateData);
       }
     }, 500);
 
     return () => clearInterval(syncInterval);
-  }, [isBuzzerConnected]);
+  }, [isBuzzerConnected, buzzerSocket]);
 
 
 
@@ -316,7 +323,13 @@ const App: React.FC = () => {
       const roundData = getRoundData(activeId, selectedSetId) || [];
       const category = roundData.find(c => c.id === activeNote.categoryId);
       if (category) {
-        currentSong = category.songs[activeNote.noteIndex];
+        const songData = category.songs[activeNote.noteIndex];
+        currentSong = {
+          title: songData.title,
+          artist: songData.artist,
+          // Force the notes string into the object
+          notes: songData.notes || ""
+        };
       }
     }
 
@@ -349,6 +362,16 @@ const App: React.FC = () => {
       language: gameState.language,
       currentSong: currentSong
     };
+
+    // DEBUG: Log what we're about to emit
+    if (currentSong) {
+      console.log('📦 [App.tsx] Packing song data:', {
+        title: currentSong.title,
+        artist: currentSong.artist,
+        notes: currentSong.notes ? currentSong.notes.substring(0, 50) + '...' : '(none)',
+        timestamp: new Date().toISOString()
+      });
+    }
   }, [
     currentPage,
     gameState,
@@ -372,32 +395,70 @@ const App: React.FC = () => {
     activeResponder
   ]);
 
+
   useEffect(() => {
-    // Share game state with player screen and leader display
-    const interval = setInterval(() => {
-      if (stateToShareRef.current) {
-        try {
-          localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShareRef.current));
-          
-          // Send song state to server via HTTP for network access
-          if (stateToShareRef.current.currentSong) {
-            fetch('/api/current-song', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                currentSong: stateToShareRef.current.currentSong
-              })
-            }).catch(() => {
-              // Silently fail if server endpoint not available
-            });
-          }
-        } catch (error) {
-          console.log('Error sharing state:', error);
-        }
+    const syncInterval = setInterval(() => {
+      // 🔴 REMOVED: 'isBuzzerConnected' from the if-statement
+      // Now it only cares if the socket is physically connected to the server
+      if (stateToShareRef.current && buzzerSocket?.connected) {
+
+        // Optional: Add a log to see it working in your Laptop console
+        console.log("Manual Syncing to Phone...");
+
+        buzzerSocket.emit('updateGameState', stateToShareRef.current);
       }
-    }, 300);
-    return () => clearInterval(interval);
-  }, []);
+    }, 500);
+
+    return () => clearInterval(syncInterval);
+  }, [buzzerSocket]); // Removed isBuzzerConnected from dependency array
+  //   useEffect(() => {
+  //   const syncInterval = setInterval(() => {
+  //     if (stateToShareRef.current) {
+  //       // 1. Update the TV/Display window (Same device)
+  //       try {
+  //         localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShareRef.current));
+  //       } catch (e) {
+  //         console.error("Local storage error", e);
+  //       }
+
+  //       // 2. Update the Phone/Leader display (Network device)
+  //       // Note: I removed the "isBuzzerConnected" check so the phone works even 
+  //       // if you haven't clicked 'Connect' on the buzzer yet.
+  //       if (buzzerSocket?.connected) {
+  //         buzzerSocket.emit('updateGameState', stateToShareRef.current);
+  //       }
+  //     }
+  //   }, 500);
+
+  //   return () => clearInterval(syncInterval);
+  // }, [buzzerSocket]);
+
+  // useEffect(() => {
+  //   // Share game state with player screen and leader display
+  //   const interval = setInterval(() => {
+  //     if (stateToShareRef.current) {
+  //       try {
+  //         localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShareRef.current));
+
+  //         // Send song state to server via HTTP for network access
+  //         if (stateToShareRef.current.currentSong) {
+  //           fetch('/api/current-song', {
+  //             method: 'POST',
+  //             headers: { 'Content-Type': 'application/json' },
+  //             body: JSON.stringify({
+  //               currentSong: stateToShareRef.current.currentSong
+  //             })
+  //           }).catch(() => {
+  //             // Silently fail if server endpoint not available
+  //           });
+  //         }
+  //       } catch (error) {
+  //         console.log('Error sharing state:', error);
+  //       }
+  //     }
+  //   }, 300);
+  //   return () => clearInterval(interval);
+  // }, []);
   // Add this function to open/close player window
   const handleOpenPlayerWindow = () => {
     // Close existing window if open
@@ -2319,116 +2380,116 @@ const App: React.FC = () => {
 
   // console.log("PARENT HUB STATE:", hubPlayers);
   // Final return statement
-  
+
   return (
     <PasswordGuard>
 
-    
-    <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
-      {/* <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} /> */}
-      <SettingsOverlay
-        language={gameState.language}
-        onLanguageToggle={toggleLanguage}
-        isMusicEnabled={gameState.isMusicEnabled}
-        onMusicToggle={toggleMusic}
-        isFullscreen={isFullscreen}
-        onFullscreenToggle={toggleFullscreen}
-        onGoHome={() => navigateTo('setup')}
-        onGoStart={() => navigateTo('start')}
-        onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)}
-        volume={volume}
-        onVolumeChange={handleVolumeChange}
-        t={t}
-        isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4}
-        isBuzzerConnected={isBuzzerConnected} // <--- PLACE IT HERE
-      />
-      {currentPage === 'setup' && (
-        <SetupView
-          players={gameState.players}
-          t={t}
-          onUpdatePlayer={handleUpdatePlayer}
-          onAddPlayer={handleAddPlayer}
-          onRemovePlayer={handleRemovePlayer}
-          onStartGame={handleStartGameFromSetup}
-          isPlayerWindowOpen={playerWindow && !playerWindow.closed}
-          onTogglePlayerWindow={handleOpenPlayerWindow}
-          isBuzzerConnected={isBuzzerConnected}
-          // onCheckConnection={() => { socket.connect(); }}
-          onCheckConnection={handleConnect} // Whatever your connection function is named
-          onForceDisconnect={handleForceDisconnect} // Pass the new kill switch here
-          availableHubPlayers={hubPlayers}
-          activeResponder={activeResponder}
-        />
-      )}
 
-
-
-      {/* {currentPage === 'start' && <StartView />} */}
-
-      {currentPage === 'start' && (
-        <StartView
-          t={t}
+      <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
+        {/* <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} /> */}
+        <SettingsOverlay
           language={gameState.language}
-          roundSets={gameState.roundSets}
-          playersCount={gameState.players.length}
-          onNavigate={navigateTo}
-          onInitializeRound={initializeRound}
-          onShowScoreboard={() => setShowScoreboard(true)}
-          onShowVictory={() => setShowVictory(true)}
-          onSetRoundSetSelection={setRoundSetSelectionModal}
-          onStopSong={stopSong}
-          setPage={setCurrentPage}
+          onLanguageToggle={toggleLanguage}
+          isMusicEnabled={gameState.isMusicEnabled}
+          onMusicToggle={toggleMusic}
+          isFullscreen={isFullscreen}
+          onFullscreenToggle={toggleFullscreen}
+          onGoHome={() => navigateTo('setup')}
+          onGoStart={() => navigateTo('start')}
+          onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)}
+          volume={volume}
+          onVolumeChange={handleVolumeChange}
+          t={t}
+          isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4}
+          isBuzzerConnected={isBuzzerConnected} // <--- PLACE IT HERE
         />
-      )}
+        {currentPage === 'setup' && (
+          <SetupView
+            players={gameState.players}
+            t={t}
+            onUpdatePlayer={handleUpdatePlayer}
+            onAddPlayer={handleAddPlayer}
+            onRemovePlayer={handleRemovePlayer}
+            onStartGame={handleStartGameFromSetup}
+            isPlayerWindowOpen={playerWindow && !playerWindow.closed}
+            onTogglePlayerWindow={handleOpenPlayerWindow}
+            isBuzzerConnected={isBuzzerConnected}
+            // onCheckConnection={() => { socket.connect(); }}
+            onCheckConnection={handleConnect} // Whatever your connection function is named
+            onForceDisconnect={handleForceDisconnect} // Pass the new kill switch here
+            availableHubPlayers={hubPlayers}
+            activeResponder={activeResponder}
+          />
+        )}
 
-      {currentPage === 'round' && <RoundView />}
-      {currentPage === 'r3_select' && <R3SelectView />} {/* Changed from r6_select */}
-      {currentPage === 'r4_select' && <R4SelectView />}
-      {modal && modal.position === 'center' && <ConfirmationModal isOpen={modal.isOpen} title={modal.title} message={modal.message} onConfirm={modal.onConfirm} onCancel={() => setModal(null)} confirmLabel={modal.confirmLabel} cancelLabel={modal.cancelLabel} position={modal.position} />}
-      {showTimerSettings && <TimerSettings />}
-      {showScoreboard && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-3xl p-10 animate-in fade-in duration-500">
-          <div className="bg-slate-900 rounded-[4rem] p-16 max-w-2xl w-full border-2 border-slate-800 shadow-2xl">
-            <h3 className="text-6xl font-black text-white mb-14 flex items-center gap-6 tracking-tighter uppercase"><Trophy className="text-yellow-500" size={64} /> {t.scorePanel}</h3>
-            <div className="space-y-6">{sortedPlayersScoreboard.map((p, idx) => (<div key={p.id} className="flex items-center justify-between p-8 bg-slate-800/60 rounded-[2.5rem] border-2 border-slate-700/50 shadow-xl"><div className="flex items-center gap-8"><span className="text-slate-600 font-black text-4xl w-10">{idx + 1}.</span><div><div className="text-white font-black text-3xl">{p.name || `Player ${p.id + 1}`}</div><div className="text-yellow-500 text-sm font-black uppercase flex items-center gap-3 mt-2"><Star size={16} fill="currentColor" /> {p.stars || 0} {t.stars}</div></div></div><span className="text-5xl font-black text-indigo-400 tabular-nums">{p.score} <span className="text-xs opacity-40 uppercase ml-2">pts</span></span></div>))}</div>
-            {gameState.activeRoundId === 4 ? (
-              <div className="flex gap-6 mt-14">
-                <button onClick={() => setShowScoreboard(false)} className="flex-1 py-8 bg-slate-800 text-white font-black text-2xl rounded-[2rem] uppercase shadow-xl hover:bg-slate-700">{t.cancel || "Cancel"}</button>
-                <button onClick={() => { setShowScoreboard(false); navigateTo('start'); }} className="flex-1 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl hover:bg-indigo-500">{t.continue || "Continue"}</button>
-              </div>
-            ) : (
-              <button onClick={() => setShowScoreboard(false)} className="w-full mt-14 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl">{t.close}</button>
-            )}
+
+
+        {/* {currentPage === 'start' && <StartView />} */}
+
+        {currentPage === 'start' && (
+          <StartView
+            t={t}
+            language={gameState.language}
+            roundSets={gameState.roundSets}
+            playersCount={gameState.players.length}
+            onNavigate={navigateTo}
+            onInitializeRound={initializeRound}
+            onShowScoreboard={() => setShowScoreboard(true)}
+            onShowVictory={() => setShowVictory(true)}
+            onSetRoundSetSelection={setRoundSetSelectionModal}
+            onStopSong={stopSong}
+            setPage={setCurrentPage}
+          />
+        )}
+
+        {currentPage === 'round' && <RoundView />}
+        {currentPage === 'r3_select' && <R3SelectView />} {/* Changed from r6_select */}
+        {currentPage === 'r4_select' && <R4SelectView />}
+        {modal && modal.position === 'center' && <ConfirmationModal isOpen={modal.isOpen} title={modal.title} message={modal.message} onConfirm={modal.onConfirm} onCancel={() => setModal(null)} confirmLabel={modal.confirmLabel} cancelLabel={modal.cancelLabel} position={modal.position} />}
+        {showTimerSettings && <TimerSettings />}
+        {showScoreboard && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-3xl p-10 animate-in fade-in duration-500">
+            <div className="bg-slate-900 rounded-[4rem] p-16 max-w-2xl w-full border-2 border-slate-800 shadow-2xl">
+              <h3 className="text-6xl font-black text-white mb-14 flex items-center gap-6 tracking-tighter uppercase"><Trophy className="text-yellow-500" size={64} /> {t.scorePanel}</h3>
+              <div className="space-y-6">{sortedPlayersScoreboard.map((p, idx) => (<div key={p.id} className="flex items-center justify-between p-8 bg-slate-800/60 rounded-[2.5rem] border-2 border-slate-700/50 shadow-xl"><div className="flex items-center gap-8"><span className="text-slate-600 font-black text-4xl w-10">{idx + 1}.</span><div><div className="text-white font-black text-3xl">{p.name || `Player ${p.id + 1}`}</div><div className="text-yellow-500 text-sm font-black uppercase flex items-center gap-3 mt-2"><Star size={16} fill="currentColor" /> {p.stars || 0} {t.stars}</div></div></div><span className="text-5xl font-black text-indigo-400 tabular-nums">{p.score} <span className="text-xs opacity-40 uppercase ml-2">pts</span></span></div>))}</div>
+              {gameState.activeRoundId === 4 ? (
+                <div className="flex gap-6 mt-14">
+                  <button onClick={() => setShowScoreboard(false)} className="flex-1 py-8 bg-slate-800 text-white font-black text-2xl rounded-[2rem] uppercase shadow-xl hover:bg-slate-700">{t.cancel || "Cancel"}</button>
+                  <button onClick={() => { setShowScoreboard(false); navigateTo('start'); }} className="flex-1 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl hover:bg-indigo-500">{t.continue || "Continue"}</button>
+                </div>
+              ) : (
+                <button onClick={() => setShowScoreboard(false)} className="w-full mt-14 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl">{t.close}</button>
+              )}
+            </div>
           </div>
-        </div>
-      )}
-      {/* {showVictory && <VictoryView />} */}
+        )}
+        {/* {showVictory && <VictoryView />} */}
 
-      {showVictory && (
-        victoryContext.roundId === 3 ?
-          <Round3VictoryView /> :
-          <VictoryView />
-      )}
+        {showVictory && (
+          victoryContext.roundId === 3 ?
+            <Round3VictoryView /> :
+            <VictoryView />
+        )}
 
-      {roundSetSelectionModal !== null && (
-        <RoundSetSelector
-          roundId={roundSetSelectionModal}
-          availableSets={getAvailableSets(roundSetSelectionModal)}
-          selectedSetId={gameState.roundSets[roundSetSelectionModal] || 'default'}
-          onSelect={(setId) => {
-            if (setId) {
-              setGameState(prev => ({
-                ...prev,
-                roundSets: { ...prev.roundSets, [roundSetSelectionModal]: setId }
-              }));
-            }
-          }}
-          onConfirm={() => setRoundSetSelectionModal(null)}
-          language={gameState.language}
-          t={t}
-        />
-      )}
-    </div>
+        {roundSetSelectionModal !== null && (
+          <RoundSetSelector
+            roundId={roundSetSelectionModal}
+            availableSets={getAvailableSets(roundSetSelectionModal)}
+            selectedSetId={gameState.roundSets[roundSetSelectionModal] || 'default'}
+            onSelect={(setId) => {
+              if (setId) {
+                setGameState(prev => ({
+                  ...prev,
+                  roundSets: { ...prev.roundSets, [roundSetSelectionModal]: setId }
+                }));
+              }
+            }}
+            onConfirm={() => setRoundSetSelectionModal(null)}
+            language={gameState.language}
+            t={t}
+          />
+        )}
+      </div>
     </PasswordGuard>
   );
 };
