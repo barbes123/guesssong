@@ -1,8 +1,8 @@
 {
-  "SERVER_IP": "10.42.0.1",
-  "SERVER_PORT": 3000,  
-  "SOCKET_URL": "http://100.109.59.68:3001",
+  "SERVER_IP": "172.18.4.146",
+  "SERVER_PORT": 3001,  
+  "SOCKET_URL": "http://172.18.4.146:3001",
   "MAX_PLAYERS": 10,
-  "leaderPassword": "leader123"
+  "leaderPassword": "leader123",
+  "HOST_PASSWORD": "dumon"
 }
-
