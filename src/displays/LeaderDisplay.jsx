@@ -82,34 +82,34 @@ const LeaderDisplay = () => {
     }, []);
 
     // Poll the server for current song state (works on any network device)
-    useEffect(() => {
-        if (!isAuthenticated) return;
+    // useEffect(() => {
+    //     if (!isAuthenticated) return;
 
-        const pollInterval = setInterval(async () => {
-            try {
-                // Get the host from the current URL or use config server
-                const hostUrl = window.location.origin === 'http://localhost:5173' 
-                    ? 'http://localhost:5173'
-                    : `http://${window.location.hostname}:5173`;
+    //     const pollInterval = setInterval(async () => {
+    //         try {
+    //             // Get the host from the current URL or use config server
+    //             const hostUrl = window.location.origin === 'http://localhost:5173' 
+    //                 ? 'http://localhost:5173'
+    //                 : `http://${window.location.hostname}:5173`;
                 
-                const response = await fetch(`${hostUrl}/api/current-song`);
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.currentSong && data.currentSong.title) {
-                        setSongInfo({
-                            title: data.currentSong.title || '',
-                            artist: data.currentSong.artist || '',
-                            notes: data.currentSong.notes || ''
-                        });
-                    }
-                }
-            } catch (e) {
-                console.log('Could not fetch from HTTP endpoint:', e.message);
-            }
-        }, 300);
+    //             const response = await fetch(`${hostUrl}/api/current-song`);
+    //             if (response.ok) {
+    //                 const data = await response.json();
+    //                 if (data.currentSong && data.currentSong.title) {
+    //                     setSongInfo({
+    //                         title: data.currentSong.title || '',
+    //                         artist: data.currentSong.artist || '',
+    //                         notes: data.currentSong.notes || ''
+    //                     });
+    //                 }
+    //             }
+    //         } catch (e) {
+    //             console.log('Could not fetch from HTTP endpoint:', e.message);
+    //         }
+    //     }, 300);
 
-        return () => clearInterval(pollInterval);
-    }, [isAuthenticated]);
+    //     return () => clearInterval(pollInterval);
+    // }, [isAuthenticated]);
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();

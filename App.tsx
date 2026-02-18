@@ -218,24 +218,47 @@ const App: React.FC = () => {
   } = useBuzzer(stopSong);
 
 
-  useEffect(() => {
-    const syncInterval = setInterval(() => {
-      // This sends the data from your Laptop to the Server Bridge
-      if (stateToShareRef.current && isBuzzerConnected) {
-        // 'buzzerSocket' is the variable you got from your useBuzzer hook
-        const stateData = stateToShareRef.current;
-        console.log('🚀 [App.tsx] Emitting updateGameState:', {
-          hasSong: !!stateData.currentSong,
-          songTitle: stateData.currentSong?.title || 'none',
-          socketConnected: buzzerSocket?.connected,
-          eventName: 'updateGameState'
-        });
-        buzzerSocket.emit('updateGameState', stateData);
-      }
-    }, 500);
+  // useEffect(() => { //was this one
+  //   const syncInterval = setInterval(() => {
+  //     // This sends the data from your Laptop to the Server Bridge
+  //     if (stateToShareRef.current && isBuzzerConnected) {
+  //       // 'buzzerSocket' is the variable you got from your useBuzzer hook
+  //       const stateData = stateToShareRef.current;
+  //       console.log('🚀 [App.tsx] Emitting updateGameState:', {
+  //         hasSong: !!stateData.currentSong,
+  //         songTitle: stateData.currentSong?.title || 'none',
+  //         socketConnected: buzzerSocket?.connected,
+  //         eventName: 'updateGameState'
+  //       });
+  //       buzzerSocket.emit('updateGameState', stateData);
+  //     }
+  //   }, 500);
 
-    return () => clearInterval(syncInterval);
-  }, [isBuzzerConnected, buzzerSocket]);
+  //   return () => clearInterval(syncInterval);
+  // }, [isBuzzerConnected, buzzerSocket]);
+
+  useEffect(() => {
+  const syncInterval = setInterval(() => {
+    const stateData = stateToShareRef.current;
+    if (!stateData) return;
+
+    // 1. SYNC TO PLAYER DISPLAY (Same Laptop)
+    // This fixed the "Stuck on Starting Page" issue for /display
+    try {
+      localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateData));
+    } catch (e) {
+      console.error("Local storage sync error", e);
+    }
+
+    // 2. SYNC TO LEADER DISPLAY (Phone / Network)
+    // Removed isBuzzerConnected so it works in "Manual Mode"
+    if (buzzerSocket?.connected) {
+      buzzerSocket.emit('updateGameState', stateData);
+    }
+  }, 500);
+
+  return () => clearInterval(syncInterval);
+}, [buzzerSocket]);
 
 
 
@@ -396,21 +419,21 @@ const App: React.FC = () => {
   ]);
 
 
-  useEffect(() => {
-    const syncInterval = setInterval(() => {
-      // 🔴 REMOVED: 'isBuzzerConnected' from the if-statement
-      // Now it only cares if the socket is physically connected to the server
-      if (stateToShareRef.current && buzzerSocket?.connected) {
+  // useEffect(() => {
+  //   const syncInterval = setInterval(() => {
+  //     // 🔴 REMOVED: 'isBuzzerConnected' from the if-statement
+  //     // Now it only cares if the socket is physically connected to the server
+  //     if (stateToShareRef.current && buzzerSocket?.connected) {
 
-        // Optional: Add a log to see it working in your Laptop console
-        console.log("Manual Syncing to Phone...");
+  //       // Optional: Add a log to see it working in your Laptop console
+  //       console.log("Manual Syncing to Phone...");
 
-        buzzerSocket.emit('updateGameState', stateToShareRef.current);
-      }
-    }, 500);
+  //       buzzerSocket.emit('updateGameState', stateToShareRef.current);
+  //     }
+  //   }, 500);
 
-    return () => clearInterval(syncInterval);
-  }, [buzzerSocket]); // Removed isBuzzerConnected from dependency array
+  //   return () => clearInterval(syncInterval);
+  // }, [buzzerSocket]); // Removed isBuzzerConnected from dependency array
   //   useEffect(() => {
   //   const syncInterval = setInterval(() => {
   //     if (stateToShareRef.current) {
@@ -650,6 +673,16 @@ const App: React.FC = () => {
       activeRoundId: null,
       roundProgress: {}
     }));
+
+    if (buzzerSocket) {
+      buzzerSocket.emit('updateGameState', {
+        currentPage: 'setup',  // This forces Display back to start
+        currentSong: null,     // Clears the "Ёлочка" info
+        activeResponder: null, // Clears the "Buzzer" light
+        players: []            // Optional: clears player list on display
+      });
+    }
+
     setCurrentPage('setup');
     setModal(null);
     setShowVictory(false);
