@@ -20,7 +20,7 @@ import LeaderDisplay from './src/displays/LeaderDisplay'; // Leader display for 
 import { useBuzzer } from './src/hooks/useBuzzer';
 import { saveScoreSnapshot, downloadFinalLog } from './src/utils/logger';
 import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
-
+import PasswordGuard from './components/PasswordGuard';
 /////////// Buzz---------------------------
 import configBuzz from './configBuzz.json';
 import { io } from 'socket.io-client';
@@ -29,100 +29,22 @@ import { io } from 'socket.io-client';
 
 
 const App: React.FC = () => {
-  const isPlayerScreen = window.location.pathname === '/display';
+  const path = window.location.pathname.toLowerCase();
+  const isPlayerScreen = path.includes('display');
+  const isLeaderScreen = path.includes('leader');
+
+  useEffect(() => {
+    if (isLeaderScreen) {
+      document.title = "GS Leader";
+    } else if (isPlayerScreen) {
+      document.title = "GS Display";
+    } else {
+      document.title = "GS Main";
+    }
+  }, [isLeaderScreen, isPlayerScreen]); 
   
-  // Check for role query parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  const role = urlParams.get('role');
-  const isLeaderScreen = role === 'leader';
 
-  // // --- Connection to buzzer ---
-  // const [isBuzzerConnected, setIsBuzzerConnected] = useState(false);
-  // const [buzzerBuzzes, setBuzzerBuzzes] = useState<any[]>([]);
-
-  // const [hubPlayers, setHubPlayers] = useState<any[]>([]);
-  // const [buzzerMapping, setBuzzerMapping] = useState<Record<string, number>>({});
-
-
-  // const handleConnect = () => {
-  //   if (socket) {
-  //     socket.connect();
-  //     socket.emit('register', { name: 'GameEngine', role: 'host', code: '' });
-  //     setIsBuzzerConnected(true);
-  //   }
-  // };
-
-  // const handleForceDisconnect = () => {
-  //   if (socket) {
-  //     socket.disconnect();
-  //   }
-  //   setIsBuzzerConnected(false);
-  //   setHubPlayers([]);
-  // };
-
-
-  // useEffect(() => {
-  //   socket.on('connect', () => {
-  //     console.log("✅ Game linked to Hub");
-  //     setIsBuzzerConnected(true);
-
-  //     // FIX: Instead of a new command, we send a 'register' as a 'host' 
-  //     // This usually forces the Hub to broadcast the 'playerListUpdate' to everyone
-  //     socket.emit('register', {
-  //       name: 'GameEngine',
-  //       role: 'host',
-  //       code: ''
-  //     });
-  //   });
-
-  //   socket.on('connect_error', (err) => {
-  //     console.error("❌ TASK 0: Link failed:", err.message);
-  //     setIsBuzzerConnected(false);
-  //   });
-
-  //   socket.on('disconnect', () => {
-  //     setIsBuzzerConnected(false);
-  //   });
-
-  //   const handleForceDisconnect = () => {
-  //     if (socket) {
-  //       socket.disconnect(); // Physically closes the socket
-  //       setIsBuzzerConnected(false); // Forces UI to "Disconnected" mode
-  //       setHubPlayers([]); // Clears the sliding list so it disappears
-  //       console.log("🛑 Buzzer System Forcefully Disconnected");
-  //     }
-  //   };
-
-  //   socket.on('playerListUpdate', (list) => {
-  //     console.log("📥 RECEIVED PLAYER LIST:", list);
-  //     setHubPlayers(list)
-  //     // Filter out the 'Host' or 'GameEngine' so they don't appear in your sliding list
-  //     // const onlyPlayers = list.filter((p: any) => p.role === 'player');
-  //     // setHubPlayers(onlyPlayers);
-  //   });
-  //   // --- ADDED THIS PART ---
-  //   socket.on('buzzer_pressed', (data: { playerId: string }) => {
-  //     // 1. Check if the device that buzzed is in our mapping (1, 2, or 3)
-  //     const mappedSlot = buzzerMapping[data.playerId];
-
-  //     if (mappedSlot) {
-  //       console.log(`🎯 SLOT ${mappedSlot} BUZZED!`);
-
-  //       // 2. Stop the music
-  //       if (songRef.current) {
-  //         songRef.current.pause();
-  //       }
-  //     }
-  //   });
-
-  //   return () => {
-  //     socket.off('connect');
-  //     socket.off('connect_error');
-  //     socket.off('disconnect');
-  //     socket.off('playerListUpdate');
-  //     socket.off('buzzer_pressed'); // Clean up
-  //   };
-  // }, []);
+  
   // --------------------------------
   const [gameState, setGameState] = useState<GameState>({
     players: [{ id: 0, name: '', score: 0, stars: 0 }],
@@ -184,11 +106,11 @@ const App: React.FC = () => {
   const roundPointsTimerRef = useRef<number | null>(null);
   const autoStopTimerRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
-  
+
   if (isLeaderScreen) {
     return <LeaderDisplay />;
   }
-  
+
   if (isPlayerScreen) {
     return <PlayerScreen />;
   }
@@ -280,40 +202,7 @@ const App: React.FC = () => {
     }
   }, [gameState.activeRoundId, r4IsActiveSession]);
 
-  // const stopSong = useCallback((fullyClear = true) => {
-  //   if (songRef.current) {
-  //     songRef.current.pause();
-  //     if (fullyClear) {
-  //       songRef.current = null;
-  //     }
-  //   }
-  //   setIsPlaying(false);
 
-  //   const roundId = gameState.activeRoundId;
-  //   const isR4 = roundId === 4; // Changed from isR5
-
-  //   if (fullyClear || (!isR4 || !r4IsActiveSession)) {
-  //     // if (roundPointsTimerRef.current) {
-  //     //   window.clearInterval(roundPointsTimerRef.current);
-  //     //   roundPointsTimerRef.current = null;
-  //     // }
-  //     if (autoStopTimerRef.current) {
-  //       window.clearTimeout(autoStopTimerRef.current);
-  //       autoStopTimerRef.current = null;
-  //     }
-  //     if (countdownIntervalRef.current) {
-  //       window.clearInterval(countdownIntervalRef.current);
-  //       countdownIntervalRef.current = null;
-  //     }
-  //   }
-
-  //   if (fullyClear) {
-  //     setAudioProgress({ current: 0, total: 0 });
-  //     if (!isR4 || !r4IsActiveSession) {
-  //       setTimeLeft(undefined);
-  //     }
-  //   }
-  // }, [gameState.activeRoundId, r4IsActiveSession]);
 
 
   const {
@@ -327,6 +216,19 @@ const App: React.FC = () => {
     armBuzzers,
     socket: buzzerSocket,
   } = useBuzzer(stopSong);
+
+
+  useEffect(() => {
+    const syncInterval = setInterval(() => {
+      // This sends the data from your Laptop to the Server Bridge
+      if (stateToShareRef.current && isBuzzerConnected) {
+        // 'buzzerSocket' is the variable you got from your useBuzzer hook
+        buzzerSocket.emit('updateGameState', stateToShareRef.current);
+      }
+    }, 500);
+
+    return () => clearInterval(syncInterval);
+  }, [isBuzzerConnected]);
 
 
 
@@ -471,11 +373,24 @@ const App: React.FC = () => {
   ]);
 
   useEffect(() => {
-    // Share game state with player screen
+    // Share game state with player screen and leader display
     const interval = setInterval(() => {
       if (stateToShareRef.current) {
         try {
           localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShareRef.current));
+          
+          // Send song state to server via HTTP for network access
+          if (stateToShareRef.current.currentSong) {
+            fetch('/api/current-song', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                currentSong: stateToShareRef.current.currentSong
+              })
+            }).catch(() => {
+              // Silently fail if server endpoint not available
+            });
+          }
         } catch (error) {
           console.log('Error sharing state:', error);
         }
@@ -1215,7 +1130,7 @@ const App: React.FC = () => {
     if (isSprintRound) {
       const pId = gameState.players[gameState.currentPlayerIndex].id;
       const playerProg = progress.r4PlayerProgress?.[pId];
-      
+
       if (!playerProg) return;
 
       const finalizeR4Player = (finalStatus: 'wrong' | 'all_correct' | 'time_out') => {
@@ -1385,11 +1300,10 @@ const App: React.FC = () => {
 
     showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
       const addedPoints = status === 'correct' ? (currentRoundPoints || 0) : 0;
-      if (status === 'correct') 
-        {
-          playSFX(SFX.correct);
-          saveScoreSnapshot(gameState.players, roundId);
-        }
+      if (status === 'correct') {
+        playSFX(SFX.correct);
+        saveScoreSnapshot(gameState.players, roundId);
+      }
       else playSFX(SFX.wrong);
 
       setActiveResponder(null);//*** */
@@ -1439,8 +1353,8 @@ const App: React.FC = () => {
           players: newPlayers,
           //uncomment for auto-switch next player in rounds 1 & 2
           // currentPlayerIndex: (prev.currentPlayerIndex + 1) % prev.players.length,
-          currentPlayerIndex: targetPlayerIndex,roundProgress: {
-          // roundProgress: {
+          currentPlayerIndex: targetPlayerIndex, roundProgress: {
+            // roundProgress: {
             ...prev.roundProgress,
             [roundId]: {
               ...progress,
@@ -1540,24 +1454,24 @@ const App: React.FC = () => {
   };
 
   const TimerSettings = () => (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-8">
-      <div className="bg-slate-900 rounded-[3rem] p-12 max-w-lg w-full border-2 border-slate-700 shadow-2xl">
-        <h3 className="text-4xl font-black text-white mb-8 text-center uppercase tracking-tight">{t.timerSettings || "Timer Settings"}</h3>
-        <div className="space-y-6 mb-10">
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-6">
+      <div className="bg-slate-900 rounded-2xl p-6 max-w-md w-full border-2 border-slate-700 shadow-lg">
+        <h3 className="text-2xl font-black text-white mb-4 text-center uppercase tracking-tight">{t.timerSettings || "Timer Settings"}</h3>
+        <div className="space-y-4 mb-6">
           <div>
-            <label className="block text-lg font-bold text-slate-400 mb-4 uppercase tracking-widest">{t.timerDuration || "Timer Duration (seconds)"}</label>
-            <div className="flex items-center gap-4">
-              <button onClick={() => setTimerDuration(Math.max(10, timerDuration - 10))} className="w-16 h-16 rounded-2xl bg-slate-800 border-2 border-slate-600 flex items-center justify-center text-2xl font-black hover:bg-slate-700">-</button>
-              <div className="flex-1 bg-slate-800 border-2 border-slate-700 rounded-2xl px-4 py-4 text-white text-4xl font-black text-center tabular-nums">
+            <label className="block text-sm font-bold text-slate-400 mb-2 uppercase tracking-widest">{t.timerDuration || "Timer Duration (seconds)"}</label>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setTimerDuration(Math.max(10, timerDuration - 10))} className="w-12 h-12 rounded-lg bg-slate-800 border-2 border-slate-600 flex items-center justify-center text-xl font-black hover:bg-slate-700">-</button>
+              <div className="flex-1 bg-slate-800 border-2 border-slate-700 rounded-lg px-3 py-2 text-white text-2xl font-black text-center tabular-nums">
                 {timerDuration}
               </div>
-              <button onClick={() => setTimerDuration(Math.min(300, timerDuration + 10))} className="w-16 h-16 rounded-2xl bg-slate-800 border-2 border-slate-600 flex items-center justify-center text-2xl font-black hover:bg-slate-700">+</button>
+              <button onClick={() => setTimerDuration(Math.min(300, timerDuration + 10))} className="w-12 h-12 rounded-lg bg-slate-800 border-2 border-slate-600 flex items-center justify-center text-xl font-black hover:bg-slate-700">+</button>
             </div>
           </div>
         </div>
-        <div className="flex gap-6">
-          <button onClick={() => setShowTimerSettings(false)} className="flex-1 py-6 bg-slate-800 text-white font-black text-xl rounded-[2rem] hover:bg-slate-700 uppercase tracking-widest">{t.cancel}</button>
-          <button onClick={() => { setShowTimerSettings(false); resetTimer(); }} className="flex-1 py-6 bg-indigo-600 text-white font-black text-xl rounded-[2rem] hover:bg-indigo-500 uppercase tracking-widest shadow-lg">{t.save || "Save"}</button>
+        <div className="flex gap-4">
+          <button onClick={() => setShowTimerSettings(false)} className="flex-1 py-3 bg-slate-800 text-white font-black text-sm rounded-lg hover:bg-slate-700 uppercase tracking-widest">{t.cancel}</button>
+          <button onClick={() => { setShowTimerSettings(false); resetTimer(); }} className="flex-1 py-3 bg-indigo-600 text-white font-black text-sm rounded-lg hover:bg-indigo-500 uppercase tracking-widest shadow-lg">{t.save || "Save"}</button>
         </div>
       </div>
     </div>
@@ -1606,19 +1520,19 @@ const App: React.FC = () => {
       if (!playerProg) return null;
       const usedRowsSet = progress.usedRows || new Set();
       return (
-        <div className="min-h-screen bg-slate-950 p-8 pt-24">
-          <div className="max-w-[1600px] mx-auto flex gap-12">
-            <div className="flex-1 flex flex-col gap-12">
-              <div className="bg-slate-900/80 backdrop-blur-xl rounded-[5rem] p-16 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
-                <div className="flex items-center justify-between mb-10">
-                  <div className="flex items-center gap-6">
-                    <div className="bg-indigo-600 text-white w-20 h-20 rounded-2xl flex items-center justify-center text-5xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">4</div>
+        <div className="min-h-screen bg-slate-950 p-6 pt-20">
+          <div className="max-w-[1600px] mx-auto flex gap-8">
+            <div className="flex-1 flex flex-col gap-8">
+              <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-indigo-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">4</div>
                     <div>
-                      <h2 className="text-6xl font-black text-white tracking-tighter uppercase">SPRINT</h2>
-                      <div className="text-xl font-black text-slate-400 uppercase tracking-[0.3em] mt-2">{t.round} 4</div>
+                      <h2 className="text-4xl font-black text-white tracking-tighter uppercase">SPRINT</h2>
+                      <div className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mt-1">{t.round} 4</div>
                     </div>
                   </div>
-                  <div className="flex gap-4">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => {
                         if (isPlaying) return;
@@ -1626,58 +1540,57 @@ const App: React.FC = () => {
                         initializeRound(4); // Go to Round 3 (final)
                         navigateTo('round', 3);
                       }}
-                      className={`p-6 rounded-2xl transition-all ${isPlaying
+                      className={`p-3 rounded-lg transition-all ${isPlaying
                         ? 'opacity-20 cursor-not-allowed bg-slate-800'
                         : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:scale-105 active:scale-95 shadow-lg'
                         }`}
                       disabled={isPlaying}
                     >
-                      <ChevronLeft size={40} />
+                      <ChevronLeft size={24} />
                     </button>
 
                     <button
-                      className="p-6 bg-slate-800/20 text-slate-700 rounded-2xl cursor-not-allowed transition-all"
+                      className="p-3 bg-slate-800/20 text-slate-700 rounded-lg cursor-not-allowed transition-all"
                       disabled
                     >
-                      <ChevronRight size={40} />
+                      <ChevronRight size={24} />
                     </button>
                   </div>
                 </div>
 
                 {!r4IsActiveSession && (
-                  <div className="mb-10 flex justify-center">
-                    <button onClick={() => setShowTimerSettings(true)} className="px-8 py-4 bg-slate-800 text-white rounded-3xl font-bold border-2 border-slate-700 hover:bg-slate-700 transition-all flex items-center gap-3 shadow-lg">
-                      <Timer size={24} />
+                  <div className="mb-6 flex justify-center">
+                    <button onClick={() => setShowTimerSettings(true)} className="px-6 py-3 bg-slate-800 text-white rounded-2xl font-bold border-2 border-slate-700 hover:bg-slate-700 transition-all flex items-center gap-2 shadow-md">
+                      <Timer size={18} />
                       {t.timerSettings || "Timer Settings"}
                     </button>
                   </div>
                 )}
 
                 {r4IsActiveSession && (
-                  <div className="mb-10 flex items-center justify-center gap-6"><div className="bg-slate-800/50 px-10 py-6 rounded-3xl border-2 border-slate-700"><div className="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">{t.timeLeft || "Time Left"}</div><div className={`text-6xl font-black tabular-nums ${timeLeft && timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>{formatTime(timeLeft)}</div></div><button onClick={() => setShowTimerSettings(true)} className="px-8 py-6 bg-slate-800 text-white rounded-3xl font-bold border-2 border-slate-700">{t.settings || "Settings"}</button></div>
+                  <div className="mb-6 flex items-center justify-center gap-4"><div className="bg-slate-800/50 px-6 py-3 rounded-2xl border-2 border-slate-700"><div className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">{t.timeLeft || "Time Left"}</div><div className={`text-4xl font-black tabular-nums ${timeLeft && timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>{formatTime(timeLeft)}</div></div><button onClick={() => setShowTimerSettings(true)} className="px-6 py-3 bg-slate-800 text-white rounded-2xl font-bold border-2 border-slate-700">{t.settings || "Settings"}</button></div>
                 )}
-                <div className="mb-16">{[0].map(row => {
+                <div className="mb-10">{[0].map(row => {
                   const startIdx = row * 7; const isPlayerRow = selectedRow === row; const isRowUsed = usedRowsSet.has(row);
-                  return (<div key={row} className={`mb-8 p-8 rounded-[3rem] border-4 ${isPlayerRow && r4IsActiveSession ? 'bg-slate-800/50 border-slate-600' : isRowUsed ? 'opacity-50' : 'bg-slate-900/30'}`}><div className="text-xl font-black text-slate-400 mb-6 uppercase">Row {row + 1}</div><div className="grid grid-cols-7 gap-4">{Array.from({ length: 7 }, (_, i) => startIdx + i).map(songIdx => {
+                  return (<div key={row} className={`mb-5 p-5 rounded-2xl border-3 ${isPlayerRow && r4IsActiveSession ? 'bg-slate-800/50 border-slate-600' : isRowUsed ? 'opacity-50' : 'bg-slate-900/30'}`}><div className="text-sm font-black text-slate-400 mb-4 uppercase">Row {row + 1}</div><div className="grid grid-cols-7 gap-3">{Array.from({ length: 7 }, (_, i) => startIdx + i).map(songIdx => {
                     const isCorrect = playerProg?.correctIndices.has(songIdx); const isWrong = playerProg?.wrongIndex === songIdx; const isActive = r4CurrentSongIdx === songIdx; const isSelectable = !playerProg?.hasFinished && !isRowUsed && (!r4IsActiveSession || (isPlayerRow && r4IsActiveSession && !isCorrect));
-                    return (<button key={songIdx} onClick={() => { if (isSelectable || playerProg?.hasFinished || isCorrect || isWrong) handleNoteClick('r4_sprint', songIdx); }} className={`h-24 rounded-2xl border-3 transition-all flex flex-col items-center justify-center ${isActive && r4IsActiveSession ? 'bg-indigo-600 border-white scale-110 z-10' :
+                    return (<button key={songIdx} onClick={() => { if (isSelectable || playerProg?.hasFinished || isCorrect || isWrong) handleNoteClick('r4_sprint', songIdx); }} className={`h-16 rounded-lg border-2 transition-all flex flex-col items-center justify-center ${isActive && r4IsActiveSession ? 'bg-indigo-600 border-white scale-110 z-10' :
                       isCorrect ? 'bg-emerald-600 border-emerald-400' :
                         isWrong ? 'bg-rose-600 border-rose-400' :
                           playedButNotEvaluated.includes(songIdx) ? 'bg-yellow-600 border-yellow-400' :
                             isSelectable ? 'bg-slate-800 border-slate-600 hover:bg-slate-700' :
                               'bg-slate-900/50 opacity-60'
-                      }`}>{isCorrect ? <CheckCircle size={28} /> : isWrong ? <XCircle size={28} /> : <MusicIcon size={28} />}</button>);
+                      }`}>{isCorrect ? <CheckCircle size={18} /> : isWrong ? <XCircle size={18} /> : <MusicIcon size={18} />}</button>);
                   })}</div></div>);
                 })}</div>
-                {!r4IsActiveSession && playerProg?.hasFinished && (<div className="flex flex-col items-center animate-in fade-in duration-700"><div className="text-3xl font-black text-indigo-400 mb-4 uppercase">{playerProg.correctIndices.size === 7 ? t.perfectRound || "Perfect Round!" : `${playerProg.correctIndices.size} Correct`}</div><button onClick={() => { setR4IsActiveSession(false); setSelectedRow(null); setActiveNote(null); setTimeLeft(undefined); setPlayedButNotEvaluated([]); }} className="py-8 px-20 rounded-[2.5rem] bg-indigo-600 text-white font-black text-3xl uppercase">{t.continue || "Continue"}</button></div>)}
+                {!r4IsActiveSession && playerProg?.hasFinished && (<div className="flex flex-col items-center animate-in fade-in duration-700"><div className="text-2xl font-black text-indigo-400 mb-3 uppercase">{playerProg.correctIndices.size === 7 ? t.perfectRound || "Perfect Round!" : `${playerProg.correctIndices.size} Correct`}</div><button onClick={() => { setR4IsActiveSession(false); setSelectedRow(null); setActiveNote(null); setTimeLeft(undefined); setPlayedButNotEvaluated([]); }} className="py-4 px-12 rounded-2xl bg-indigo-600 text-white font-black text-xl uppercase">{t.continue || "Continue"}</button></div>)}
               </div>
-              <div className="bg-slate-900/50 p-12 rounded-[5rem] border-2 border-slate-800"><PlayerBoard players={gameState.players} currentPlayerIndex={gameState.currentPlayerIndex} onUpdatePlayer={handleUpdatePlayer} onSetCurrentPlayer={(idx) => { if (r4IsActiveSession) return; showModal(t.playerName, t.confirmPlayerActive, () => { setGameState(prev => ({ ...prev, currentPlayerIndex: idx })); setR4IsActiveSession(false); setModal(null); }); }} t={t} /></div>
+              <div className="bg-slate-900/50 p-6 rounded-3xl border-2 border-slate-800"><PlayerBoard players={gameState.players} currentPlayerIndex={gameState.currentPlayerIndex} onUpdatePlayer={handleUpdatePlayer} onSetCurrentPlayer={(idx) => { if (r4IsActiveSession) return; showModal(t.playerName, t.confirmPlayerActive, () => { setGameState(prev => ({ ...prev, currentPlayerIndex: idx })); setR4IsActiveSession(false); setModal(null); }); }} t={t} /></div>
             </div>
 
-            <div className="w-[450px] flex flex-col gap-10 relative">
-              <div className="bg-slate-800 rounded-[3rem] p-12 border-2 border-slate-700 shadow-2xl flex flex-col items-center gap-4">
-                <div className="text-4xl font-black text-white text-center truncate w-full">
-                  {currentPlayer.name || `Player ${gameState.currentPlayerIndex + 1}`}
+            <div className="w-[380px] flex flex-col gap-6 relative">
+              <div className="bg-slate-800 rounded-2xl p-6 border-2 border-slate-700 shadow-lg flex flex-col items-center gap-2">
+                <div className="text-2xl font-black text-white text-center truncate w-full">{currentPlayer.name || `Player ${gameState.currentPlayerIndex + 1}`}
                 </div>
                 <div className="bg-indigo-900/40 px-10 py-4 rounded-3xl border-2 border-indigo-500/30 shadow-inner">
                   <span className="text-4xl font-black text-indigo-400 tabular-nums">
@@ -1796,29 +1709,29 @@ const App: React.FC = () => {
       const leftPlayer = gameState.players.find(p => p.id === leftId) || gameState.players[0];
       const rightPlayer = rightId !== undefined ? (gameState.players.find(p => p.id === rightId) || null) : null;
       return (
-        <div className="min-h-screen bg-slate-950 p-8 pt-24">
-          <div className="max-w-[1600px] mx-auto flex gap-12">
-            <div className="flex-1 flex flex-col gap-12">
-              <div className="bg-slate-900/80 backdrop-blur-xl rounded-[5rem] p-16 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 left-0 w-full h-4 bg-indigo-600/10"><div className="bg-indigo-600 h-full transition-all duration-1000" style={{ width: `${((turnIdx + 1) / 5) * 100}%` }} /></div>
-                <div className="flex items-center justify-between mb-10">
-                  <div className="flex items-center gap-6">
-                    <div className="bg-indigo-600 text-white w-20 h-20 rounded-2xl flex items-center justify-center text-5xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">3</div>
-                    <h2 className="text-6xl font-black text-white tracking-tighter uppercase">{t.categories.superGame}</h2>
+        <div className="min-h-screen bg-slate-950 p-6 pt-20">
+          <div className="max-w-[1600px] mx-auto flex gap-8">
+            <div className="flex-1 flex flex-col gap-8">
+              <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 left-0 w-full h-3 bg-indigo-600/10"><div className="bg-indigo-600 h-full transition-all duration-1000" style={{ width: `${((turnIdx + 1) / 5) * 100}%` }} /></div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-indigo-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">3</div>
+                    <h2 className="text-4xl font-black text-white tracking-tighter uppercase">{t.categories.superGame}</h2>
                   </div>
-                  <div className="flex gap-4">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => {
                         if (isPlaying) return;
                         navigateTo('round', 2);
                       }}
-                      className={`p-6 rounded-2xl transition-all ${isPlaying
+                      className={`p-3 rounded-lg transition-all ${isPlaying
                         ? 'opacity-20 cursor-not-allowed bg-slate-800'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:scale-105 active:scale-95 shadow-lg'
+                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:scale-105 active:scale-95 shadow-md'
                         }`}
                       disabled={isPlaying}
                     >
-                      <ChevronLeft size={40} />
+                      <ChevronLeft size={24} />
                     </button>
 
                     <button
@@ -1845,13 +1758,13 @@ const App: React.FC = () => {
                         }`}
                       disabled={isPlaying}
                     >
-                      <ChevronRight size={40} />
+                      <ChevronRight size={24} />
                     </button>
                   </div>
                 </div>
-                <div className="bg-slate-800/40 rounded-[4rem] p-16 border-2 border-slate-700/50 mb-14 shadow-inner group"><HelpCircle size={80} className="text-indigo-500 mx-auto mb-8" /><p className="text-5xl font-black text-white italic">"{gameState.language === 'en' ? song?.hint?.en : song?.hint?.ru}"</p></div>
-                <div className="flex justify-center gap-8">
-                  {[1, 2, 3, 4, 5].map(s => (<button key={s} onClick={() => { setSelectedDuration(s); playSFX(SFX.button); }} className={`w-32 h-32 rounded-[2rem] border-4 transition-all ${selectedDuration === s ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-800 border-slate-700 text-slate-500'}`}><span className="text-5xl font-black">{s}</span></button>))}
+                <div className="bg-slate-800/40 rounded-2xl p-8 border-2 border-slate-700/50 mb-8 shadow-inner group"><HelpCircle size={48} className="text-indigo-500 mx-auto mb-4" /><p className="text-3xl font-black text-white italic">"{gameState.language === 'en' ? song?.hint?.en : song?.hint?.ru}"</p></div>
+                <div className="flex justify-center gap-5">
+                  {[1, 2, 3, 4, 5].map(s => (<button key={s} onClick={() => { setSelectedDuration(s); playSFX(SFX.button); }} className={`w-20 h-20 rounded-lg border-3 transition-all ${selectedDuration === s ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-800 border-slate-700 text-slate-500'}`}><span className="text-3xl font-black">{s}</span></button>))}
                   <div className="relative">
                     <button
                       onClick={() => {
@@ -1861,13 +1774,13 @@ const App: React.FC = () => {
                         setSelectedDuration(null);
                         playSFX(SFX.button);
                       }}
-                      className={`px-14 h-32 rounded-[2rem] border-4 transition-all ${selectedDuration === null ? 'bg-indigo-800 border-white text-white scale-110 shadow-2xl z-10' :
+                      className={`px-8 h-20 rounded-lg border-3 transition-all ${selectedDuration === null ? 'bg-indigo-800 border-white text-white scale-110 shadow-lg z-10' :
                         !isR3Finalized ? 'bg-slate-900/40 border-slate-800 text-slate-600 cursor-not-allowed' :
                           'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
                         }`}
                       disabled={!isR3Finalized}
                     >
-                      <span className="text-4xl font-black uppercase tracking-widest">
+                      <span className="text-2xl font-black uppercase tracking-widest">
                         {t.full}
                       </span>
                     </button>
@@ -1879,21 +1792,21 @@ const App: React.FC = () => {
                     )}
                   </div>
                 </div>
-                {isR3Finalized && (<button onClick={handleNextTurnNav} className="mt-16 py-8 px-20 rounded-[2.5rem] bg-emerald-600 text-white font-black text-3xl uppercase">Next Turn</button>)}
+                {isR3Finalized && (<button onClick={handleNextTurnNav} className="mt-8 py-4 px-12 rounded-xl bg-emerald-600 text-white font-black text-xl uppercase">Next Turn</button>)}
               </div>
-              <div className="bg-slate-900/50 p-12 rounded-[5rem] border-2 border-slate-800"><PlayerBoard players={gameState.players} currentPlayerIndex={gameState.currentPlayerIndex} onUpdatePlayer={handleUpdatePlayer} onSetCurrentPlayer={(idx) => { if (progress.activePlayerIds?.includes(gameState.players[idx].id)) showModal(t.playerName, t.confirmPlayerActive, () => { setGameState(prev => ({ ...prev, currentPlayerIndex: idx })); setModal(null); }); }} t={t} activePlayerIds={progress.activePlayerIds} /></div>
+              <div className="bg-slate-900/50 p-6 rounded-3xl border-2 border-slate-800"><PlayerBoard players={gameState.players} currentPlayerIndex={gameState.currentPlayerIndex} onUpdatePlayer={handleUpdatePlayer} onSetCurrentPlayer={(idx) => { if (progress.activePlayerIds?.includes(gameState.players[idx].id)) showModal(t.playerName, t.confirmPlayerActive, () => { setGameState(prev => ({ ...prev, currentPlayerIndex: idx })); setModal(null); }); }} t={t} activePlayerIds={progress.activePlayerIds} /></div>
             </div>
 
-            <div className="w-[450px] flex flex-col gap-10 relative">
-              <div className="bg-slate-800 rounded-[3rem] p-12 border-2 border-slate-700 shadow-2xl flex flex-col items-center gap-4">
-                <span className="text-lg font-black text-indigo-400 uppercase tracking-[0.2em] mb-2">
+            <div className="w-[380px] flex flex-col gap-6 relative">
+              <div className="bg-slate-800 rounded-2xl p-6 border-2 border-slate-700 shadow-lg flex flex-col items-center gap-2">
+                <span className="text-sm font-black text-indigo-400 uppercase tracking-[0.15em] mb-1">
                   {t.turn || "TURN"} {turnIdx + 1} / 5
                 </span>
 
-                <div className="grid grid-cols-2 gap-8 w-full">
+                <div className="grid grid-cols-2 gap-4 w-full">
 
                   <div className="flex flex-col items-center">
-                    <div className="text-2xl font-black text-indigo-300 mb-3 text-center break-words whitespace-normal w-full px-2 min-h-[4rem] flex items-center justify-center">
+                    <div className="text-lg font-black text-indigo-300 mb-2 text-center break-words whitespace-normal w-full px-1 min-h-[3rem] flex items-center justify-center">
                       <div className="leading-tight">
                         {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
                       </div>
@@ -2406,7 +2319,11 @@ const App: React.FC = () => {
 
   // console.log("PARENT HUB STATE:", hubPlayers);
   // Final return statement
+  
   return (
+    <PasswordGuard>
+
+    
     <div className="font-sans text-slate-100 select-none bg-slate-950 min-h-screen selection:bg-indigo-500 selection:text-white">
       {/* <SettingsOverlay language={gameState.language} onLanguageToggle={toggleLanguage} isMusicEnabled={gameState.isMusicEnabled} onMusicToggle={toggleMusic} isFullscreen={isFullscreen} onFullscreenToggle={toggleFullscreen} onGoHome={() => navigateTo('setup')} onGoStart={() => navigateTo('start')} onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)} volume={volume} onVolumeChange={handleVolumeChange} t={t} isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4} /> */}
       <SettingsOverlay
@@ -2512,6 +2429,7 @@ const App: React.FC = () => {
         />
       )}
     </div>
+    </PasswordGuard>
   );
 };
 
