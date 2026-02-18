@@ -43,7 +43,8 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   };
 
   return (
-    <div className="fixed top-6 right-6 flex items-center gap-3 z-50">
+    // <div className="fixed top-6 right-6 flex items-center gap-3 z-50">
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50">
       <div className="bg-slate-800/95 backdrop-blur-xl rounded-full shadow-2xl border border-slate-700/50 p-2 flex items-center gap-2">
 
       {/* --- BUZZER CONNECTION STATUS --- */}

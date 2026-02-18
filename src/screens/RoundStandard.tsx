@@ -115,35 +115,35 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
 
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 pt-24">
-      <div className="max-w-[1600px] mx-auto flex gap-12">
-        <div className="flex-1 flex flex-col gap-12">
+    <div className="min-h-screen bg-slate-950 p-6 pt-20">
+      <div className="max-w-[1600px] mx-auto flex gap-8">
+        <div className="flex-1 flex flex-col gap-8">
           {/* HEADER */}
-          <div className="bg-slate-900/80 backdrop-blur-xl rounded-[5rem] p-16 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between mb-10">
-              <div className="flex items-center gap-6">
-                <div className="bg-indigo-600 text-white w-20 h-20 rounded-2xl flex items-center justify-center text-5xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">
+          <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-indigo-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">
                   {roundId}
                 </div>
                 <div>
-                  <h2 className="text-6xl font-black text-white tracking-tighter uppercase">
+                  <h2 className="text-4xl font-black text-white tracking-tighter uppercase">
                     {t.round} {roundId}
                   </h2>
-                  <div className="text-xl font-black text-slate-400 uppercase tracking-[0.3em] mt-2">
+                  <div className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
                     {isMelodyRound ? t.melodyGuess : t.songChallenge}
                   </div>
                 </div>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-2">
                 <button
                   onClick={() => {
                     const pr = Math.max(1, roundId - 1);
                     onInitializeRound(pr);
                     onNavigate('round', pr);
                   }}
-                  className="p-6 bg-slate-800 text-slate-300 rounded-2xl hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all shadow-lg"
+                  className="p-3 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all shadow-md"
                 >
-                  <ChevronLeft size={40} />
+                  <ChevronLeft size={24} />
                 </button>
                 <button
                   onClick={() => {
@@ -153,15 +153,15 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                       onNavigate('round', nxt);
                     }
                   }}
-                  className="p-6 bg-slate-800 text-slate-300 rounded-2xl hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all shadow-lg"
+                  className="p-3 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all shadow-md"
                 >
-                  <ChevronRight size={40} />
+                  <ChevronRight size={24} />
                 </button>
               </div>
             </div>
 
             {/* GRID */}
-            <div className="grid grid-cols-1 gap-8">
+            <div className="grid grid-cols-1 gap-5">
               {roundData.map(cat => {
                 const activatedCount = progress.activationCounts[cat.id] || 0;
                 const isCategoryFinished = progress.activatedCategories.has(cat.id);
@@ -170,33 +170,33 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                 return (
                   <div
                     key={cat.id}
-                    className={`flex items-center gap-8 p-8 rounded-[3rem] border-4 transition-all ${activeNote?.categoryId === cat.id ? 'bg-indigo-900/20 border-indigo-500/50' : 'bg-slate-800/20 border-slate-700'
+                    className={`flex items-center gap-5 p-5 rounded-2xl border-3 transition-all ${activeNote?.categoryId === cat.id ? 'bg-indigo-900/20 border-indigo-500/50' : 'bg-slate-800/20 border-slate-700'
                       } ${isCategoryFinished ? 'opacity-40' : ''}`}
                   >
-                    <div className={`w-64 h-36 flex items-center justify-center rounded-3xl border-3 font-black text-2xl text-center px-8 leading-tight ${isCategoryFinished ? 'bg-slate-800 text-slate-600 border-slate-700' : 'bg-slate-800 text-slate-200 border-slate-700'
+                    <div className={`w-48 h-28 flex items-center justify-center rounded-2xl border-3 font-black text-lg text-center px-6 leading-tight ${isCategoryFinished ? 'bg-slate-800 text-slate-600 border-slate-700' : 'bg-slate-800 text-slate-200 border-slate-700'
                       }`}>
                       {gameState.language === 'en' ? cat.name.en : cat.name.ru}
                     </div>
 
-                    <div className={`flex-1 grid ${isMelodyRound ? 'grid-cols-5' : 'grid-cols-4'} gap-6`}>
+                    <div className={`flex-1 grid ${isMelodyRound ? 'grid-cols-5' : 'grid-cols-4'} gap-4`}>
                       {isMelodyRound ? (
                         <>
                           <button
                             onClick={() => onNoteClick(cat.id, 0)}
-                            className={`h-36 rounded-3xl transition-all flex flex-col items-center justify-center border-4 relative overflow-hidden ${isPointsActiveInTurn ? 'bg-indigo-600 text-white scale-110 shadow-[0_0_40px_rgba(99,102,241,0.6)] border-indigo-400 z-10' :
+                            className={`h-24 rounded-2xl transition-all flex flex-col items-center justify-center border-3 relative overflow-hidden ${isPointsActiveInTurn ? 'bg-indigo-600 text-white scale-110 shadow-[0_0_40px_rgba(99,102,241,0.6)] border-indigo-400 z-10' :
                               'bg-slate-800 border-slate-700 text-indigo-400 hover:border-indigo-500/50 hover:bg-slate-700'
                               }`}
                             disabled={isCategoryFinished}
                           >
                             {isPointsActiveInTurn && isPlaying && <div className="absolute inset-0 bg-white/20 animate-pulse" />}
                             {(activatedCount === 0 && !isPointsActiveInTurn) ? (
-                              <MusicIcon size={48} className="opacity-40" />
+                              <MusicIcon size={32} className="opacity-40" />
                             ) : (
-                              <span className="text-6xl font-black tracking-tighter">
+                              <span className="text-4xl font-black tracking-tighter">
                                 {isPointsActiveInTurn ? currentRoundPoints : (progress.persistentPoints?.[`${cat.id}-0`] || 0)}
                               </span>
                             )}
-                            <div className="absolute top-3 right-3 text-xs font-black uppercase opacity-50 bg-slate-900/50 px-2 rounded-md">
+                            <div className="absolute top-2 right-2 text-[9px] font-black uppercase opacity-50 bg-slate-900/50 px-1 rounded text-center">
                               {4 - activatedCount} L
                             </div>
                           </button>
@@ -209,7 +209,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                             const isUsed = progress.usedNotes.has(noteId);
                             const result = progress.results?.[noteId];
 
-                            let btnCls = `h-36 rounded-3xl border-4 flex items-center justify-center transition-all `;
+                            let btnCls = `h-24 rounded-2xl border-3 flex items-center justify-center transition-all `;
 
                             if (!isUnlocked) {
                               btnCls += `bg-slate-900/50 border-dashed border-slate-700 text-slate-800 cursor-not-allowed `;
@@ -235,14 +235,14 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                                 disabled={!isUnlocked}
                               >
                                 {isSelectedReveal && isPlaying ? (
-                                  <PlayCircle size={48} className="animate-spin" />
+                                  <PlayCircle size={28} className="animate-spin" />
                                 ) : (
-                                  <MusicIcon size={isUnlocked ? 48 : 40} />
+                                  <MusicIcon size={isUnlocked ? 28 : 24} />
                                 )}
 
                                 {isUsed && !isSelectedReveal && (
-                                  <div className="absolute bottom-3 right-3">
-                                    <PlayCircle size={24} className="text-slate-400" />
+                                  <div className="absolute bottom-2 right-2">
+                                    <PlayCircle size={16} className="text-slate-400" />
                                   </div>
                                 )}
                               </button>
@@ -262,7 +262,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                             pts = isSelected ? currentRoundPoints : progress.pointMap?.[cat.id]?.[idx];
                           }
 
-                          let btnCls = `h-36 rounded-3xl transition-all flex flex-col items-center justify-center group relative overflow-hidden border-4 `;
+let btnCls = `h-24 rounded-2xl transition-all flex flex-col items-center justify-center group relative overflow-hidden border-3 `;
 
                           if (isSelected) {
                             btnCls += `bg-indigo-600 text-white shadow-[0_0_40px_rgba(99,102,241,0.6)] scale-110 border-indigo-400 z-10 `;
@@ -289,14 +289,14 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                             >
                               {isCurrentlyPlayingThis && <div className="absolute inset-0 bg-white/20 animate-pulse" />}
                               {!pts ? (
-                                <MusicIcon size={48} className={`${isSelected ? 'animate-bounce' : 'group-hover:rotate-12 transition-transform opacity-60'}`} />
+                                <MusicIcon size={28} className={`${isSelected ? 'animate-bounce' : 'group-hover:rotate-12 transition-transform opacity-60'}`} />
                               ) : (
-                                <span className="text-6xl font-black tracking-tighter">{pts}</span>
+                                <span className="text-4xl font-black tracking-tighter">{pts}</span>
                               )}
 
                               {isRevealActive && (
-                                <div className="absolute bottom-3 right-3">
-                                  <PlayCircle size={28} className="text-white opacity-80" />
+                                <div className="absolute bottom-2 right-2">
+                                  <PlayCircle size={16} className="text-white opacity-80" />
                                 </div>
                               )}
                             </button>
@@ -311,40 +311,13 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
           </div>
 
           {/* PLAYER BOARD */}
-          {/* <div className="bg-slate-900/50 p-12 rounded-[5rem] border-2 border-slate-800">
+          <div className="bg-slate-900/50 p-6 rounded-3xl border-2 border-slate-800">
             <PlayerBoard
               players={gameState.players}
-              currentPlayerIndex={gameState.currentPlayerIndex}
-              onUpdatePlayer={onUpdatePlayer}
-              onSetCurrentPlayer={onSetCurrentPlayer}
-              activeResponder={activeResponder}
-              t={t}
-            />
-          </div> */}
-          {/* PLAYER BOARD */}
-          {/* <div className="bg-slate-900/50 p-12 rounded-[5rem] border-2 border-slate-800">
-            <PlayerBoard
-              players={gameState.players}
-              // Switch the highlight to the buzzer winner's index if they exist
               currentPlayerIndex={buzzerWinner
                 ? gameState.players.findIndex(p => p.hubId === activeResponder)
                 : gameState.currentPlayerIndex
               }
-              onUpdatePlayer={onUpdatePlayer}
-              onSetCurrentPlayer={onSetCurrentPlayer}
-              activeResponder={activeResponder}
-              t={t}
-            />
-          </div> */}
-          <div className="bg-slate-900/50 p-12 rounded-[5rem] border-2 border-slate-800">
-            <PlayerBoard
-              players={gameState.players}
-              // currentPlayerIndex={gameState.currentPlayerIndex}
-              currentPlayerIndex={buzzerWinner
-                ? gameState.players.findIndex(p => p.hubId === activeResponder)
-                : gameState.currentPlayerIndex
-              }
-
               onUpdatePlayer={onUpdatePlayer}
               onSetCurrentPlayer={onSetCurrentPlayer}
               activeResponder={activeResponder}
@@ -354,14 +327,14 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
         </div>
 
         {/* SIDEBAR */}
-        <div className="w-[450px] flex flex-col gap-10 relative">
-          <div className="bg-slate-800 rounded-[3rem] p-12 border-2 border-slate-700 shadow-2xl flex flex-col items-center gap-4 overflow-hidden">
-            <span className="text-sm font-black text-slate-500 uppercase tracking-[0.4em] mb-2">{t.currentTurn}</span>
-            <div className="text-4xl font-black text-white truncate text-center w-full mb-2 tracking-tight">
+        <div className="w-[380px] flex flex-col gap-6 relative">
+          <div className="bg-slate-800 rounded-2xl p-6 border-2 border-slate-700 shadow-lg flex flex-col items-center gap-2 overflow-hidden">
+            <span className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mb-1">{t.currentTurn}</span>
+            <div className="text-2xl font-black text-white truncate text-center w-full mb-1 tracking-tight">
               {currentPlayer.name || `Player ${gameState.currentPlayerIndex + 1}`}
             </div>
-            <div className="bg-indigo-900/40 px-10 py-4 rounded-3xl border-2 border-indigo-500/30 shadow-inner">
-              <span className="text-4xl font-black text-indigo-400 tabular-nums">
+            <div className="bg-indigo-900/40 px-6 py-2 rounded-2xl border-2 border-indigo-500/30 shadow-inner">
+              <span className="text-2xl font-black text-indigo-400 tabular-nums">
                 {currentPlayer.score} <span className="text-xs uppercase opacity-60 ml-2 tracking-widest">{t.points}</span>
               </span>
             </div>
@@ -391,19 +364,19 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
           />
 
           {modal?.isOpen && modal.position === 'inline' && (
-            <div className="w-full bg-slate-800 rounded-3xl p-8 border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.3)] animate-in fade-in slide-in-from-top duration-300">
-              <h3 className="text-sm font-black text-white mb-3 leading-tight uppercase tracking-widest text-center">{modal.title}</h3>
-              <p className="text-slate-300 text-xs mb-6 font-medium text-center leading-relaxed">{modal.message}</p>
-              <div className="flex flex-col gap-3">
+            <div className="w-full bg-slate-800 rounded-2xl p-5 border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.3)] animate-in fade-in slide-in-from-top duration-300">
+              <h3 className="text-xs font-black text-white mb-2 leading-tight uppercase tracking-widest text-center">{modal.title}</h3>
+              <p className="text-slate-300 text-[11px] mb-4 font-medium text-center leading-relaxed">{modal.message}</p>
+              <div className="flex flex-col gap-2">
                 <button
                   onClick={modal.onConfirm}
-                  className="w-full py-4 rounded-2xl bg-indigo-600 text-white font-black hover:bg-indigo-700 transition-all uppercase tracking-widest text-sm shadow-lg shadow-indigo-900/40"
+                  className="w-full py-2 rounded-lg bg-indigo-600 text-white font-black hover:bg-indigo-700 transition-all uppercase tracking-widest text-xs shadow-lg shadow-indigo-900/40"
                 >
                   {modal.confirmLabel}
                 </button>
                 <button
                   onClick={() => onSetModal(null)}
-                  className="w-full py-4 rounded-2xl bg-slate-700 text-slate-300 font-bold hover:bg-slate-600 transition-colors uppercase tracking-widest text-sm"
+                  className="w-full py-2 rounded-lg bg-slate-700 text-slate-300 font-bold hover:bg-slate-600 transition-colors uppercase tracking-widest text-xs"
                 >
                   {modal.cancelLabel}
                 </button>
