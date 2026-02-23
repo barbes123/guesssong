@@ -121,7 +121,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
           {/* HEADER */}
           <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4">
                 <div className="bg-indigo-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">
                   {roundId}
                 </div>
@@ -136,10 +136,20 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
               </div>
               <div className="flex gap-2">
                 <button
+                  // onClick={() => {
+                  //   const pr = Math.max(1, roundId - 1);
+                  //   onInitializeRound(pr);
+                  //   onNavigate('round', pr);
+                  // }}
+
                   onClick={() => {
-                    const pr = Math.max(1, roundId - 1);
-                    onInitializeRound(pr);
-                    onNavigate('round', pr);
+                    const pr = roundId - 1; // 🟢 Calculate the previous ID
+                    if (pr >= 0) { // 🟢 If it's 0 or higher, go to that round
+                      onInitializeRound(pr);
+                      onNavigate('round', pr);
+                    } else {
+                      onNavigate('start', null); // 🟢 If we are at 0, go back to the Start page
+                    }
                   }}
                   className="p-3 bg-slate-800 text-slate-300 rounded-lg hover:bg-slate-700 hover:scale-105 active:scale-95 transition-all shadow-md"
                 >
@@ -262,7 +272,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                             pts = isSelected ? currentRoundPoints : progress.pointMap?.[cat.id]?.[idx];
                           }
 
-let btnCls = `h-24 rounded-2xl transition-all flex flex-col items-center justify-center group relative overflow-hidden border-3 `;
+                          let btnCls = `h-24 rounded-2xl transition-all flex flex-col items-center justify-center group relative overflow-hidden border-3 `;
 
                           if (isSelected) {
                             btnCls += `bg-indigo-600 text-white shadow-[0_0_40px_rgba(99,102,241,0.6)] scale-110 border-indigo-400 z-10 `;

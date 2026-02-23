@@ -3,7 +3,7 @@ import { round1Sets } from '../round1_index';
 import { round2Sets } from '../round2_index';
 import { round3Sets } from '../round3_index';
 import { round4Sets } from '../round4_index';
-import { ROUND_DATA } from '../constants_main';	
+import { ROUND_DATA } from '../index_data';	
 // import { round5Sets } from '../round5_index';
 // import { round6Sets } from '../round6_index';
 
