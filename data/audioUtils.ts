@@ -9,7 +9,18 @@ const cloudinaryUrl = (publicId: string, version = 'v1768571922') => {
   return `${CLOUDINARY_BASE}/${OPTIMIZATIONS}/${version}/${publicId}.mp3`;
 };
 
-// Helper to choose between Cloudinary or local file
+// // Helper to choose between Cloudinary or local file
+// export const audioUrl = (cloudinaryId: string, localPath: string, version = 'v1768571922') => {
+//   return cloudinaryId ? cloudinaryUrl(cloudinaryId, version) : localPath;
+// };
+
+
 export const audioUrl = (cloudinaryId: string, localPath: string, version = 'v1768571922') => {
-  return cloudinaryId ? cloudinaryUrl(cloudinaryId, version) : localPath;
+  // 🟢 Priority 1: If a local path is provided, use it.
+  if (localPath) {
+    return localPath;
+  }
+  
+  // 🟢 Priority 2: Fallback to Cloudinary only if localPath is missing
+  return cloudinaryId ? cloudinaryUrl(cloudinaryId, version) : '';
 };
