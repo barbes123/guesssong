@@ -1196,7 +1196,7 @@ const App: React.FC = () => {
         setActiveResponder(null);
 
         let isRevealMode = false;
-        if (isBuzzerConnected) {
+        if (isBuzzerConnected && !isRevealMode) {
           //CHeck to play minus or full
           let songIndex = 0;
           if (isMelodyRound) {
