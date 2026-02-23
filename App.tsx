@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { translations } from './translations';
 import { Player, GameState, Page, Language } from './types';
-import { ROUND_DATA, SCREEN_BGM, SFX, INITIAL_POINTS, shuffle, getRoundData, getAvailableSets } from './data/index_data';
+import { ROUND_DATA, getRoundData, getAvailableSets } from './data/index_data';
+import { SCREEN_BGM, SFX, INITIAL_POINTS, shuffle } from './data/constants_main';
 import SettingsOverlay from './components/SettingsOverlay';
 import PlayerBoard from './components/PlayerBoard';
 import ConfirmationModal from './components/ConfirmationModal';
@@ -753,7 +754,7 @@ const App: React.FC = () => {
       activeRoundId: null,
     }));
     // When starting from Setup, include the Warm-up (Round 0) before normal rounds
-    setIncludeWarmupStart(true);
+    // setIncludeWarmupStart(true);
     setCurrentPage('start');
     stopSong();
   };
@@ -837,9 +838,13 @@ const App: React.FC = () => {
     // ROUND 0: Warm-up - structurally identical to Round 1 but practice (no points awarded)
     if (roundId === 0) {
       const pointMap0: { [categoryId: string]: number[] } = {};
-      const selectedSetId0 = gameState.roundSets[1] || 'default';
-      const roundData0 = getRoundData(1, selectedSetId0) || [];
+      
+      // 🟢 CHANGE: Use index 0 instead of 1 to target your new round0_default.ts
+      const selectedSetId0 = gameState.roundSets[0] || 'default';
+      const roundData0 = getRoundData(0, selectedSetId0) || [];
+      
       roundData0.forEach((cat) => {
+        // Shuffling points is fine, even for warmup!
         pointMap0[cat.id] = shuffle(INITIAL_POINTS);
       });
 
@@ -859,11 +864,40 @@ const App: React.FC = () => {
         currentPlayerIndex: 0,
         activeRoundId: 0
       }));
-      // Clear the warmup flag once initialized
+      
       setIncludeWarmupStart(false);
       setCurrentPage('round');
       return;
     }
+    // if (roundId === 0) {
+    //   const pointMap0: { [categoryId: string]: number[] } = {};
+    //   const selectedSetId0 = gameState.roundSets[1] || 'default';
+    //   const roundData0 = getRoundData(1, selectedSetId0) || [];
+    //   roundData0.forEach((cat) => {
+    //     pointMap0[cat.id] = shuffle(INITIAL_POINTS);
+    //   });
+
+    //   setGameState(prev => ({
+    //     ...prev,
+    //     roundProgress: {
+    //       ...prev.roundProgress,
+    //       [0]: {
+    //         usedNotes: new Set(),
+    //         activatedCategories: new Set(),
+    //         pointMap: pointMap0,
+    //         activationCounts: {},
+    //         persistentPoints: {},
+    //         results: {}
+    //       }
+    //     },
+    //     currentPlayerIndex: 0,
+    //     activeRoundId: 0
+    //   }));
+    //   // Clear the warmup flag once initialized
+    //   setIncludeWarmupStart(false);
+    //   setCurrentPage('round');
+    //   return;
+    // }
 
     // ROUNDS 1 & 2 (regular rounds)
     const pointPool = [];

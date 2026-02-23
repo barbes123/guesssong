@@ -612,19 +612,38 @@ const PlayerScreen = () => {
     </div>
   );
 
-  const renderRound1 = () => {
-    const progress = roundProgress[1] || { 
-      usedNotes: [], 
-      results: {}, 
-      pointMap: {} 
-    };
+  // const renderRound1 = () => {
+  //   const progress = roundProgress[1] || { 
+  //     usedNotes: [], 
+  //     results: {}, 
+  //     pointMap: {} 
+  //   };
     
-    const selectedSetId = roundSets[1] || 'default';
-    const categories = getRoundData(1, selectedSetId) || [];
+  //   const selectedSetId = roundSets[1] || 'default';
+  //   const categories = getRoundData(1, selectedSetId) || [];
+  const renderRound1 = () => {
+  // 1. Get the actual ID (0, 1, etc.)
+  const currentId = activeRoundId; 
+
+  // 2. Get the progress for THIS specific round
+  const progress = roundProgress[currentId] || { 
+    usedNotes: [], 
+    results: {}, 
+    pointMap: {} 
+  };
+  
+  // 3. Get the correct data file (round0_default vs round1_default)
+  const selectedSetId = roundSets[currentId] || 'default';
+  const categories = getRoundData(currentId, selectedSetId) || [];
+
+  // 4. Set the title based on the round
+  const title = currentId === 0 
+    ? (language === 'en' ? "Warm-up" : "Разминка") 
+    : (t.songChallenge || "SONG CHALLENGE");
 
     return (
-      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
-        {renderHeader(1, t.songChallenge || "SONG CHALLENGE")}
+     <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
+      {renderHeader(currentId, title)}
         <div className="max-w-[1800px] mx-auto w-full">
           <div className="flex flex-col gap-6">
             {categories.slice(0, 4).map((cat) => (
@@ -857,6 +876,9 @@ const PlayerScreen = () => {
   }
 
   if (currentPage === 'round') {
+    if (activeRoundId === 0) {
+      return renderRound1();
+    }
     if (activeRoundId === 1) {
       return renderRound1();
     }
