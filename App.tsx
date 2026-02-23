@@ -102,6 +102,7 @@ const App: React.FC = () => {
   const [playedButNotEvaluated, setPlayedButNotEvaluated] = useState<number[]>([]);
   const [playerWindow, setPlayerWindow] = useState<Window | null>(null);
   const [r4SelectedPlayerId, setR4SelectedPlayerId] = useState<number | null>(null);
+  const [includeWarmupStart, setIncludeWarmupStart] = useState(false);
 
   const roundPointsTimerRef = useRef<number | null>(null);
   const autoStopTimerRef = useRef<number | null>(null);
@@ -304,7 +305,8 @@ const App: React.FC = () => {
     // We create a "Serialized" version of progress to fix the Set -> Array issue
     const serializedRoundProgress = { ...gameState.roundProgress };
 
-    if (activeId && serializedRoundProgress[activeId]) {
+    // NOTE: activeId may be 0 (warm-up). Use explicit null check.
+    if (activeId !== null && Object.prototype.hasOwnProperty.call(serializedRoundProgress, activeId)) {
       const currentProg = serializedRoundProgress[activeId];
 
       serializedRoundProgress[activeId] = {
@@ -341,7 +343,7 @@ const App: React.FC = () => {
     // CHANGE: Only update song info when activeNote changes (new song selected with PLAY)
     // Song info persists even if music is stopped (STOP) or buzzer is pressed
     let currentSong: any = null;
-    if (activeNote && activeId) {
+    if (activeNote && activeId !== null) {
       const selectedSetId = gameState.roundSets[activeId] || 'default';
       const roundData = getRoundData(activeId, selectedSetId) || [];
       const category = roundData.find(c => c.id === activeNote.categoryId);
@@ -750,6 +752,8 @@ const App: React.FC = () => {
       roundProgress: {},
       activeRoundId: null,
     }));
+    // When starting from Setup, include the Warm-up (Round 0) before normal rounds
+    setIncludeWarmupStart(true);
     setCurrentPage('start');
     stopSong();
   };
@@ -826,6 +830,37 @@ const App: React.FC = () => {
         currentPlayerIndex: 0,
         activeRoundId: 4
       }));
+      setCurrentPage('round');
+      return;
+    }
+
+    // ROUND 0: Warm-up - structurally identical to Round 1 but practice (no points awarded)
+    if (roundId === 0) {
+      const pointMap0: { [categoryId: string]: number[] } = {};
+      const selectedSetId0 = gameState.roundSets[1] || 'default';
+      const roundData0 = getRoundData(1, selectedSetId0) || [];
+      roundData0.forEach((cat) => {
+        pointMap0[cat.id] = shuffle(INITIAL_POINTS);
+      });
+
+      setGameState(prev => ({
+        ...prev,
+        roundProgress: {
+          ...prev.roundProgress,
+          [0]: {
+            usedNotes: new Set(),
+            activatedCategories: new Set(),
+            pointMap: pointMap0,
+            activationCounts: {},
+            persistentPoints: {},
+            results: {}
+          }
+        },
+        currentPlayerIndex: 0,
+        activeRoundId: 0
+      }));
+      // Clear the warmup flag once initialized
+      setIncludeWarmupStart(false);
       setCurrentPage('round');
       return;
     }
@@ -1393,7 +1428,8 @@ const App: React.FC = () => {
 
 
     showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
-      const addedPoints = status === 'correct' ? (currentRoundPoints || 0) : 0;
+      // If this is the Warm-up (Round 0), do not award points regardless of correctness
+      const addedPoints = status === 'correct' ? ((roundId === 0) ? 0 : (currentRoundPoints || 0)) : 0;
       if (status === 'correct') {
         playSFX(SFX.correct);
         saveScoreSnapshot(gameState.players, roundId);
@@ -2472,6 +2508,7 @@ const App: React.FC = () => {
             onSetRoundSetSelection={setRoundSetSelectionModal}
             onStopSong={stopSong}
             setPage={setCurrentPage}
+            includeWarmup={includeWarmupStart}
           />
         )}
 

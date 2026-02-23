@@ -15,6 +15,7 @@ interface StartViewProps {
   onSetRoundSetSelection: (roundId: number) => void;
   onStopSong: () => void;
   setPage: (page: any) => void;
+  includeWarmup?: boolean;
 }
 
 const StartView: React.FC<StartViewProps> = ({
@@ -29,6 +30,8 @@ const StartView: React.FC<StartViewProps> = ({
   onSetRoundSetSelection,
   onStopSong,
   setPage
+  ,
+  includeWarmup
 }) => {
   return (
     <div className="min-h-screen bg-slate-950 p-6 pt-20">
@@ -37,7 +40,16 @@ const StartView: React.FC<StartViewProps> = ({
         <p className="text-xl text-slate-400 mb-10 font-bold uppercase tracking-[0.4em]">{t.chooseRound}</p>
         
         <button 
-          onClick={() => { onInitializeRound(1); onNavigate('round', 1); }} 
+          onClick={() => {
+            // If the app requested an initial warm-up (started from Setup), start at Round 0
+            if (includeWarmup) {
+              onInitializeRound(0);
+              onNavigate('round', 0);
+            } else {
+              onInitializeRound(1);
+              onNavigate('round', 1);
+            }
+          }}
           className="mb-12 py-8 px-20 bg-indigo-600 text-white rounded-[2.5rem] font-black text-3xl shadow-xl flex items-center gap-6 mx-auto"
         >
           <PlayCircle size={48} /> {t.startOrder}
@@ -100,3 +112,4 @@ const StartView: React.FC<StartViewProps> = ({
 };
 
 export default StartView;
+ 

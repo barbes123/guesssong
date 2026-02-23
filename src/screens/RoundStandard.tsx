@@ -121,16 +121,16 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
           {/* HEADER */}
           <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
             <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4">
                 <div className="bg-indigo-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">
                   {roundId}
                 </div>
                 <div>
                   <h2 className="text-4xl font-black text-white tracking-tighter uppercase">
-                    {t.round} {roundId}
+                    {roundId === 0 ? 'Warm-up' : `${t.round} ${roundId}`}
                   </h2>
                   <div className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
-                    {isMelodyRound ? t.melodyGuess : t.songChallenge}
+                    {roundId === 0 ? 'WARM-UP / PRACTICE' : (isMelodyRound ? t.melodyGuess : t.songChallenge)}
                   </div>
                 </div>
               </div>

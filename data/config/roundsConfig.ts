@@ -9,6 +9,11 @@ import { ROUND_DATA } from '../constants_main';
 
 // Temporary config with just Round 1
 export const roundsConfig: Record<number, RoundConfig> = {
+  0: {
+    roundNumber: 0,
+    defaultSet: 'default',
+    availableSets: round1Sets
+  },
   1: {
     roundNumber: 1,
     defaultSet: 'default',
