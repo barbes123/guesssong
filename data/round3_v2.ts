@@ -3,20 +3,20 @@ import { audioUrl } from './audioUtils';
 
 // ==================== ROUND 3 (DUEL) - SET 2 (Q6–Q10) ====================
 
-const R66 = audioUrl('dva_kusocheka_kolbaski-minus_cut_ufsdnx', '/music/round6/dva_kusocheka_kolbaski-minus_cut.mp3');
-const R66f = audioUrl('dva_kusocheka_kolbaski_murtq8', '/music/round6/dva_kusocheka_kolbaski.mp3');
+const R66 = audioUrl('dva_kusocheka_kolbaski-minus_cut_ufsdnx', '/music/round3/dva_kusocheka_kolbaski-minus_cut_ufsdnx.mp3');
+const R66f = audioUrl('dva_kusocheka_kolbaski_murtq8', '/music/round3/dva_kusocheka_kolbaski_murtq8.mp3');
 
-const R67 = audioUrl('dolche_gabanna-minus_cut_g8ncuk', '/music/round6/dolche_gabanna-minus_cut.mp3');
-const R67f = audioUrl('dolche_gabanna_pj56fm', '/music/round6/dolche_gabanna.mp3');
+const R67 = audioUrl('dolche_gabanna-minus_cut_g8ncuk', '/music/round3/dolche_gabanna-minus_cut_g8ncuk.mp3');
+const R67f = audioUrl('dolche_gabanna_pj56fm', '/music/round3/dolche_gabanna_pj56fm.mp3');
 
-const R68 = audioUrl('katjusha-minus_cut_y2erml', '/music/round6/katjusha-minus_cut.mp3');
-const R68f = audioUrl('katjusha_bvwmml', '/music/round6/katjusha.mp3');
+const R68 = audioUrl('katjusha-minus_cut_y2erml', '/music/round3/katjusha-minus_cut_y2erml.mp3');
+const R68f = audioUrl('katjusha_bvwmml', '/music/round3/katjusha_bvwmml.mp3');
 
-const R69 = audioUrl('nadezhda-kadysheva-techet-ruchey-minus_cut_gqo3pd', '/music/round6/nadezhda-kadysheva-techet-ruchey-minus_cut.mp3');
-const R69f = audioUrl('nadezhda-kadysheva-techet-ruchey_fawp80', '/music/round6/nadezhda-kadysheva-techet-ruchey.mp3');
+const R69 = audioUrl('nadezhda-kadysheva-techet-ruchey-minus_cut_gqo3pd', '/music/round3/nadezhda-kadysheva-techet-ruchey-minus_cut_gqo3pd.mp3');
+const R69f = audioUrl('nadezhda-kadysheva-techet-ruchey_fawp80', '/music/round3/nadezhda-kadysheva-techet-ruchey_fawp80.mp3');
 
-const R610 = audioUrl('topolinii_puh_minus_k2p4ks', '/music/round6/topolinii_puh_minus.mp3');
-const R610f = audioUrl('topolinii_puh_u8pn0f', '/music/round6/topolinii_puh.mp3');
+const R610 = audioUrl('topolinii_puh_minus_k2p4ks', '/music/round3/topolinii_puh_minus_k2p4ks.mp3');
+const R610f = audioUrl('topolinii_puh_u8pn0f', '/music/round3/topolinii_puh_u8pn0f.mp3');
 
 export const round3v2Set: RoundSet = {
   id: 'round3_v2',

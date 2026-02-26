@@ -4,20 +4,20 @@ import { audioUrl } from './audioUtils';
 // ==================== ROUND 3 (DUEL) - DEFAULT SET (Q1–Q5) ====================
 // Uses Round 6 audio assets (legacy) but is presented as Round 3 in the app.
 
-const R61 = audioUrl('pesenka-krokodila-geny-minus_ebmqsh', '/music/round6/pesenka-krokodila-geny-minus.mp3');
-const R61f = audioUrl('pesenka-krokodila-geny_ggehic', '/music/round6/pesenka-krokodila-geny.mp3');
+const R61 = audioUrl('pesenka-krokodila-geny-minus_ebmqsh', '/music/round3/pesenka-krokodila-geny-minus_ebmqsh.mp3');
+const R61f = audioUrl('pesenka-krokodila-geny_ggehic', '/music/round3/pesenka-krokodila-geny_ggehic.mp3');
 
-const R62 = audioUrl('kukushka-minus_cut_ncxht2', '/music/round6/kukushka-minus_cut.mp3');
-const R62f = audioUrl('kukushka_ff7ce8', '/music/round6/kukushka.mp3');
+const R62 = audioUrl('kukushka-minus_cut_ncxht2', '/music/round3/kukushka-minus_cut_ncxht2.mp3');
+const R62f = audioUrl('kukushka_ff7ce8', '/music/round3/kukushka_ff7ce8.mp3');
 
-const R63 = audioUrl('veter_peremen_minus_cut_powyye', '/music/round6/veter_peremen_minus_cut.mp3');
-const R63f = audioUrl('veter_peremen_qgqsck', '/music/round6/veter_peremen.mp3');
+const R63 = audioUrl('veter_peremen_minus_cut_powyye', '/music/round3/veter_peremen_minus_cut_powyye.mp3');
+const R63f = audioUrl('veter_peremen_qgqsck', '/music/round3/veter_peremen_qgqsck.mp3');
 
-const R64 = audioUrl('vyydu-noch-yu-v-pole-s-konem-minus_cut_mdphjn', '/music/round6/vyydu-noch-yu-v-pole-s-konem-minus_cut.mp3');
-const R64f = audioUrl('vyydu-noch-yu-v-pole-s-konem_x004md', '/music/round6/vyydu-noch-yu-v-pole-s-konem-minus.mp3');
+const R64 = audioUrl('vyydu-noch-yu-v-pole-s-konem-minus_cut_mdphjn', '/music/round3/vyydu-noch-yu-v-pole-s-konem-minus_cut_mdphjn.mp3');
+const R64f = audioUrl('vyydu-noch-yu-v-pole-s-konem_x004md', '/music/round3/vyydu-noch-yu-v-pole-s-konem_x004md.mp3');
 
-const R65 = audioUrl('antoshka_minus_ttcnms', '/music/round6/antoshka_minus.mp3');
-const R65f = audioUrl('antoshka_fpdxti', '/music/round6/antoshka.mp3');
+const R65 = audioUrl('antoshka_minus_ttcnms', '/music/round3/antoshka_minus_ttcnms.mp3');
+const R65f = audioUrl('antoshka_fpdxti', '/music/round3/antoshka_fpdxti.mp3');
 
 export const defaultSet: RoundSet = {
   id: 'default',

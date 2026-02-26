@@ -3,36 +3,36 @@ import { audioUrl } from './audioUtils';
 
 // ==================== ROUND 4 SPRINT - SET 3 (Songs 15–21) ====================
 
-// Source: Round 5, player 3, tracks 1–7
-const R5R31minus = audioUrl('nastoyashiy_drug_minus_hf79gf', '/music/round5/3/nastoyashiy_drug_minus.mp3');
-const R5R31full  = audioUrl('nastoyashiy_drug_rgxpe8', '/music/round5/3/nastoyashiy_drug.mp3');
+const R5R31minus = audioUrl('nastoyashiy_drug_minus_hf79gf', '/music/round4/nastoyashiy_drug_minus_hf79gf.mp3');
+const R5R31full  = audioUrl('nastoyashiy_drug_rgxpe8', '/music/round4/nastoyashiy_drug_rgxpe8.mp3');
 
-const R5R32minus = audioUrl('my_malenkie_deti_minus_cut_igpiue', '/music/round5/3/my_malenkie_deti_minus_cut.mp3');
-const R5R32full  = audioUrl('my_malenkie_deti_bidbr8', '/music/round5/3/my_malenkie_deti.mp3');
+const R5R32minus = audioUrl('my_malenkie_deti_minus_cut_igpiue', '/music/round4/my_malenkie_deti_minus_cut_igpiue.mp3');
+const R5R32full  = audioUrl('my_malenkie_deti_bidbr8', '/music/round4/my_malenkie_deti_bidbr8.mp3');
 
-const R5R33minus = audioUrl('lesnoy-olen-minus_cut_slxeg7', '/music/round5/3/lesnoy-olen-minus_cut.mp3');
-const R5R33full  = audioUrl('lesnoy-olen_alsf9y', '/music/round5/3/lesnoy-olen.mp3');
+const R5R33minus = audioUrl('lesnoy-olen-minus_cut_slxeg7', '/music/round4/lesnoy-olen-minus_cut_slxeg7.mp3');
+const R5R33full  = audioUrl('lesnoy-olen_alsf9y', '/music/round4/lesnoy-olen_alsf9y.mp3');
 
-const R5R34minus = audioUrl('kuda-uhodit-detstvo_minus_ont8wl', '/music/round5/3/kuda-uhodit-detstvo_minus.mp3');
-const R5R34full  = audioUrl('kuda-uhodit-detstvo_bgbpo7', '/music/round5/3/kuda-uhodit-detstvo.mp3');
+const R5R34minus = audioUrl('kuda-uhodit-detstvo_minus_ont8wl', '/music/round4/kuda-uhodit-detstvo_minus_ont8wl.mp3');
+const R5R34full  = audioUrl('kuda-uhodit-detstvo_bgbpo7', '/music/round4/kuda-uhodit-detstvo_bgbpo7.mp3');
 
 const R5R35minus = audioUrl(
   'yuriy-nikulin-esli-b-ya-byil-sultan-minus_yn2jry',
-  '/music/round5/3/yuriy-nikulin-esli-b-ya-byil-sultan-minus.mp3'
+  '/music/round4/YUrij_Nikulin_-_Esli_b_ya_byl_sulta_minus_cut.mp3'
 );
 const R5R35full  = audioUrl(
   'yuriy-nikulin-esli-b-ya-byil-sultan_dxwjw2',
-  '/music/round5/3/yuriy-nikulin-esli-b-ya-byil-sultan.mp3'
+  '/music/round4/YUrij_Nikulin_-_Esli_b_ya_byl_sultan.mp3'
 );
 
 const R5R36minus = audioUrl(
-  'razgovor-so-schast-em-minus-koroche_rhzrco',
-  '/music/round5/3/razgovor-so-schast-em-minus-koroche.mp3'
+  'razgovor-so-schast-em-minus-koroche_rhzrco', '/music/round4/razgovor-so-schast-em-minus-koroche_rhzrco.mp3'
 );
-const R5R36full  = audioUrl('razgovor-so-schast-em_pvnq1z', '/music/round5/3/razgovor-so-schast-em.mp3');
+const R5R36full  = audioUrl(
+  'razgovor-so-schast-em_pvnq1z', '/music/round4/razgovor-so-schast-em_pvnq1z.mp3'
+);
 
-const R5R37minus = audioUrl('Landyshi-GelenaVelikanova-minus_xbaf0v', '/music/round5/3/Landyshi-GelenaVelikanova-minus.mp3');
-const R5R37full  = audioUrl('Landyshi-GelenaVelikanova_k1vxod', '/music/round5/3/Landyshi-GelenaVelikanova.mp3');
+const R5R37minus = audioUrl('Landyshi-GelenaVelikanova-minus_xbaf0v', '/music/round4/Landyshi-GelenaVelikanova-minus_xbaf0v.mp3');
+const R5R37full  = audioUrl('Landyshi-GelenaVelikanova_k1vxod', '/music/round4/Landyshi-GelenaVelikanova_k1vxod.mp3');
 
 export const round4v3Set: RoundSet = {
   id: 'round4_v3',
