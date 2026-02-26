@@ -5,7 +5,8 @@ import ControlPanel from '../../components/ControlPanel'; // Adjust path
 import MusicTimeline from '../../components/MusicTimeline'; // Adjust path
 import { getRoundData } from '../../data/index_data'; // Adjust path
 import { GameState } from '../../types';
-import { SFX } from '../../data/index_data';
+// import { SFX } from '../../data/index_data';
+import { SFX } from '../../data/constants_main';
 
 
 interface RoundDuelProps {
@@ -269,7 +270,8 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
           <MusicTimeline 
             isPlaying={isPlaying}
             progress={audioProgress}
-            isReveal={false} // Round 3 typically reveals via logic, not manual Seek in reveal mode
+            // isReveal={false} // Round 3 typically reveals via logic, not manual Seek in reveal mode
+            isReveal={isR3Finalized || selectedDuration === null}
             onSeek={onSeek}
             formatTime={formatTime}
             t={t}

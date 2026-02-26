@@ -240,27 +240,27 @@ const App: React.FC = () => {
   // }, [isBuzzerConnected, buzzerSocket]);
 
   useEffect(() => {
-  const syncInterval = setInterval(() => {
-    const stateData = stateToShareRef.current;
-    if (!stateData) return;
+    const syncInterval = setInterval(() => {
+      const stateData = stateToShareRef.current;
+      if (!stateData) return;
 
-    // 1. SYNC TO PLAYER DISPLAY (Same Laptop)
-    // This fixed the "Stuck on Starting Page" issue for /display
-    try {
-      localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateData));
-    } catch (e) {
-      console.error("Local storage sync error", e);
-    }
+      // 1. SYNC TO PLAYER DISPLAY (Same Laptop)
+      // This fixed the "Stuck on Starting Page" issue for /display
+      try {
+        localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateData));
+      } catch (e) {
+        console.error("Local storage sync error", e);
+      }
 
-    // 2. SYNC TO LEADER DISPLAY (Phone / Network)
-    // Removed isBuzzerConnected so it works in "Manual Mode"
-    if (buzzerSocket?.connected) {
-      buzzerSocket.emit('updateGameState', stateData);
-    }
-  }, 500);
+      // 2. SYNC TO LEADER DISPLAY (Phone / Network)
+      // Removed isBuzzerConnected so it works in "Manual Mode"
+      if (buzzerSocket?.connected) {
+        buzzerSocket.emit('updateGameState', stateData);
+      }
+    }, 500);
 
-  return () => clearInterval(syncInterval);
-}, [buzzerSocket]);
+    return () => clearInterval(syncInterval);
+  }, [buzzerSocket]);
 
 
 
@@ -838,11 +838,11 @@ const App: React.FC = () => {
     // ROUND 0: Warm-up - structurally identical to Round 1 but practice (no points awarded)
     if (roundId === 0) {
       const pointMap0: { [categoryId: string]: number[] } = {};
-      
+
       // 🟢 CHANGE: Use index 0 instead of 1 to target your new round0_default.ts
       const selectedSetId0 = gameState.roundSets[0] || 'default';
       const roundData0 = getRoundData(0, selectedSetId0) || [];
-      
+
       roundData0.forEach((cat) => {
         // Shuffling points is fine, even for warmup!
         pointMap0[cat.id] = shuffle(INITIAL_POINTS);
@@ -864,7 +864,7 @@ const App: React.FC = () => {
         currentPlayerIndex: 0,
         activeRoundId: 0
       }));
-      
+
       setIncludeWarmupStart(false);
       setCurrentPage('round');
       return;
@@ -1196,7 +1196,7 @@ const App: React.FC = () => {
         setActiveResponder(null);
 
         let isRevealMode = false;
-        if (isBuzzerConnected && !isRevealMode) {
+        if (isBuzzerConnected) {
           //CHeck to play minus or full
           let songIndex = 0;
           if (isMelodyRound) {
@@ -2052,7 +2052,15 @@ const App: React.FC = () => {
 
               </div>
               <ControlPanel isPlaying={isPlaying} onStart={() => handleAudioControl('start')} onStop={() => handleAudioControl('stop')} onCorrect={() => handleFinalizeTurn('correct')} onWrong={() => handleFinalizeTurn('wrong')} timeLeft={timeLeft} t={t} disabledActions={isR3Finalized || isSongUsed} isStartDisabled={!isR3Finalized && selectedDuration === null} />
-              <MusicTimeline />
+              {/* <MusicTimeline /> */}
+              <MusicTimeline
+                isPlaying={isPlaying}
+                progress={audioProgress}
+                isReveal={isR3Finalized || selectedDuration === null}
+                onSeek={handleSeek}
+                formatTime={formatTime}
+                t={t}
+              />
               {modal?.isOpen && modal.position === 'inline' && (
                 <div className="w-full bg-slate-800 rounded-3xl p-6 border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.3)] animate-in fade-in slide-in-from-top duration-300">
                   <h3 className="text-xs font-black text-white mb-2 leading-tight uppercase tracking-widest text-center">{modal.title}</h3>
