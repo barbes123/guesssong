@@ -46,7 +46,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             {currentPoints ?? '--'}
           </div>
         </div>
-        
+
         <div className="w-px h-10 bg-slate-800 mx-1" />
 
         {/* Timer section - conditionally rendered based on showTimer prop */}
@@ -75,22 +75,25 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         <button
           onClick={onStart}
           disabled={startButtonDisabled}
-          className={`flex items-center justify-center gap-1.5 py-2 rounded-lg font-black text-xs transition-all ${
-            startButtonDisabled ? 'bg-slate-800 text-slate-700 cursor-not-allowed opacity-50' : 'bg-emerald-600 text-white shadow-md shadow-emerald-900/20 hover:scale-105 active:scale-95 hover:bg-emerald-500'
-          }`}
+          className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all ${startButtonDisabled
+              ? 'bg-slate-800 text-slate-700 border border-transparent opacity-50 cursor-not-allowed'
+              : 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white hover:scale-105 active:scale-95'
+            }`}
         >
-          <Play size={14} fill="currentColor" />
-          {t.start.toUpperCase()}
+          <Play size={16} fill="currentColor" />
+          <span className="text-[8px] font-black uppercase tracking-widest">{t.start}</span>
         </button>
+
         <button
           onClick={onStop}
           disabled={!isPlaying}
-          className={`flex items-center justify-center gap-1.5 py-2 rounded-lg font-black text-xs transition-all ${
-            !isPlaying ? 'bg-slate-800 text-slate-700 cursor-not-allowed' : 'bg-rose-600 text-white shadow-md shadow-rose-900/20 hover:scale-105 active:scale-95 hover:bg-rose-500'
-          }`}
+          className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all ${!isPlaying
+              ? 'bg-slate-800 text-slate-700 border border-transparent cursor-not-allowed'
+              : 'bg-rose-600/20 text-rose-400 border border-rose-500/30 hover:bg-rose-600 hover:text-white hover:scale-105 active:scale-95'
+            }`}
         >
-          <Square size={14} fill="currentColor" />
-          {t.stop.toUpperCase()}
+          <Square size={16} fill="currentColor" />
+          <span className="text-[8px] font-black uppercase tracking-widest">{t.stop}</span>
         </button>
       </div>
 
@@ -100,9 +103,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         <button
           onClick={onCorrect}
           disabled={disabledActions}
-          className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all ${
-            disabledActions ? 'bg-slate-800 text-slate-700 border border-transparent opacity-50' : 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white hover:scale-105 active:scale-95'
-          }`}
+          className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all ${disabledActions ? 'bg-slate-800 text-slate-700 border border-transparent opacity-50' : 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-600 hover:text-white hover:scale-105 active:scale-95'
+            }`}
         >
           <CheckCircle size={16} />
           <span className="text-[8px] font-black uppercase tracking-widest">{t.correct}</span>
@@ -110,9 +112,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         <button
           onClick={onWrong}
           disabled={disabledActions}
-          className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all ${
-            disabledActions ? 'bg-slate-800 text-slate-700 border border-transparent opacity-50' : 'bg-orange-600/20 text-orange-400 border border-orange-500/30 hover:bg-orange-600 hover:text-white hover:scale-105 active:scale-95'
-          }`}
+          className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all ${disabledActions ? 'bg-slate-800 text-slate-700 border border-transparent opacity-50' : 'bg-orange-600/20 text-orange-400 border border-orange-500/30 hover:bg-orange-600 hover:text-white hover:scale-105 active:scale-95'
+            }`}
         >
           <XCircle size={16} />
           <span className="text-[8px] font-black uppercase tracking-widest">{t.wrong}</span>
