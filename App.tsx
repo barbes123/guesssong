@@ -1859,231 +1859,43 @@ const App: React.FC = () => {
       );
     }
 
+    // Inside App.tsx -> RoundView function
     if (isFinalRound) {
-      const selectedSetId = gameState.roundSets[roundId] || 'default';
-      const roundData = getRoundData(roundId, selectedSetId) || [];
-      const turnIdx = progress.currentTurnIndex || 0;
-      const song = roundData[0]?.songs[turnIdx];
-      const isSongUsed = progress.usedNotes?.has(`r3_final-${turnIdx}`);
-
-      // Keep player panels fixed (left/right) regardless of whose turn it is.
-      const duelIds = progress.activePlayerIds || [];
-      const leftId = duelIds[0];
-      const rightId = duelIds[1];
-      const leftPlayer = gameState.players.find(p => p.id === leftId) || gameState.players[0];
-      const rightPlayer = rightId !== undefined ? (gameState.players.find(p => p.id === rightId) || null) : null;
       return (
-        <div className="min-h-screen bg-slate-950 p-6 pt-20">
-          <div className="max-w-[1600px] mx-auto flex gap-8">
-            <div className="flex-1 flex flex-col gap-8">
-              <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
-                <div className="absolute top-0 left-0 w-full h-3 bg-indigo-600/10"><div className="bg-indigo-600 h-full transition-all duration-1000" style={{ width: `${((turnIdx + 1) / 5) * 100}%` }} /></div>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-indigo-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">3</div>
-                    <h2 className="text-4xl font-black text-white tracking-tighter uppercase">{t.categories.superGame}</h2>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        if (isPlaying) return;
-                        navigateTo('round', 2);
-                      }}
-                      className={`p-3 rounded-lg transition-all ${isPlaying
-                        ? 'opacity-20 cursor-not-allowed bg-slate-800'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:scale-105 active:scale-95 shadow-md'
-                        }`}
-                      disabled={isPlaying}
-                    >
-                      <ChevronLeft size={24} />
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        if (isPlaying) return;
-                        showModal(
-                          t.mainMenu,
-                          "Go to Round 4 (Sprint)?",
-                          () => {
-                            stopSong();
-                            if (gameState.players.length > 1) {
-                              setCurrentPage('r4_select');
-                            } else {
-                              initializeRound(4);
-                              navigateTo('round', 4);
-                            }
-                            setModal(null);
-                          }
-                        );
-                      }}
-                      className={`p-6 rounded-2xl transition-all ${isPlaying
-                        ? 'opacity-20 cursor-not-allowed bg-slate-800'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:scale-105 active:scale-95 shadow-lg'
-                        }`}
-                      disabled={isPlaying}
-                    >
-                      <ChevronRight size={24} />
-                    </button>
-                  </div>
-                </div>
-                <div className="bg-slate-800/40 rounded-2xl p-8 border-2 border-slate-700/50 mb-8 shadow-inner group"><HelpCircle size={48} className="text-indigo-500 mx-auto mb-4" /><p className="text-3xl font-black text-white italic">"{gameState.language === 'en' ? song?.hint?.en : song?.hint?.ru}"</p></div>
-                <div className="flex justify-center gap-5">
-                  {[1, 2, 3, 4, 5].map(s => (<button key={s} onClick={() => { setSelectedDuration(s); playSFX(SFX.button); }} className={`w-20 h-20 rounded-lg border-3 transition-all ${selectedDuration === s ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-800 border-slate-700 text-slate-500'}`}><span className="text-3xl font-black">{s}</span></button>))}
-                  <div className="relative">
-                    <button
-                      onClick={() => {
-                        if (!isR3Finalized) {
-                          return;
-                        }
-                        setSelectedDuration(null);
-                        playSFX(SFX.button);
-                      }}
-                      className={`px-8 h-20 rounded-lg border-3 transition-all ${selectedDuration === null ? 'bg-indigo-800 border-white text-white scale-110 shadow-lg z-10' :
-                        !isR3Finalized ? 'bg-slate-900/40 border-slate-800 text-slate-600 cursor-not-allowed' :
-                          'bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-500'
-                        }`}
-                      disabled={!isR3Finalized}
-                    >
-                      <span className="text-2xl font-black uppercase tracking-widest">
-                        {t.full}
-                      </span>
-                    </button>
-
-                    {!isR3Finalized && (
-                      <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white text-sm font-bold px-4 py-2 rounded-xl border border-slate-700 whitespace-nowrap z-20 animate-pulse">
-                        ← First press CORRECT or WRONG
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {isR3Finalized && (<button onClick={handleNextTurnNav} className="mt-8 py-4 px-12 rounded-xl bg-emerald-600 text-white font-black text-xl uppercase">Next Turn</button>)}
-              </div>
-              <div className="bg-slate-900/50 p-6 rounded-3xl border-2 border-slate-800"><PlayerBoard players={gameState.players} currentPlayerIndex={gameState.currentPlayerIndex} onUpdatePlayer={handleUpdatePlayer} onSetCurrentPlayer={(idx) => { if (progress.activePlayerIds?.includes(gameState.players[idx].id)) showModal(t.playerName, t.confirmPlayerActive, () => { setGameState(prev => ({ ...prev, currentPlayerIndex: idx })); setModal(null); }); }} t={t} activePlayerIds={progress.activePlayerIds} /></div>
-            </div>
-
-            <div className="w-[380px] flex flex-col gap-6 relative">
-              <div className="bg-slate-800 rounded-2xl p-6 border-2 border-slate-700 shadow-lg flex flex-col items-center gap-2">
-                <span className="text-sm font-black text-indigo-400 uppercase tracking-[0.15em] mb-1">
-                  {t.turn || "TURN"} {turnIdx + 1} / 5
-                </span>
-
-                <div className="grid grid-cols-2 gap-4 w-full">
-
-                  <div className="flex flex-col items-center">
-                    <div className="text-lg font-black text-indigo-300 mb-2 text-center break-words whitespace-normal w-full px-1 min-h-[3rem] flex items-center justify-center">
-                      <div className="leading-tight">
-                        {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
-                      </div>
-                    </div>
-
-                    <div className="bg-indigo-900/40 px-6 py-4 rounded-3xl border-2 border-indigo-500/30 shadow-inner flex flex-col items-center">
-
-
-                      <div className="flex justify-center gap-2">
-                        {[1, 2, 3].map((starNum) => {
-                          const isFilled = (leftPlayer.stars || 0) >= starNum;
-                          return (
-                            <Star
-                              key={starNum}
-                              size={28}
-                              className={`${isFilled ? 'text-yellow-400 fill-yellow-400' : 'text-indigo-900/40 fill-indigo-900/40'}`}
-                            />
-                          );
-                        })}
-                      </div>
-
-                      {/* <div className="flex flex-wrap justify-center gap-2">
-                        {(() => {
-                          const stars = leftPlayer.stars || 0;
-                          const elements = [];
-                          for (let i = 0; i < Math.min(stars, 3); i++) {
-                            elements.push(<Star key={i} size={28} className="text-yellow-400 fill-yellow-400" />);
-                          }
-                          for (let i = Math.min(stars, 3); i < 3; i++) {
-                            elements.push(<Star key={`empty-${i}`} size={28} className="text-indigo-900/40 fill-indigo-900/40" />);
-                          }
-                          return elements;
-                        })()}
-                      </div> */}
-
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-center">
-                    <div className="text-2xl font-black text-rose-300 mb-3 text-center break-words whitespace-normal w-full px-2 min-h-[4rem] flex items-center justify-center">
-                      <div className="leading-tight">
-                        {rightPlayer ? (rightPlayer.name || `Player ${rightPlayer.id + 1}`) : '--'}
-                      </div>
-                    </div>
-                    <div className="bg-rose-900/40 px-6 py-4 rounded-3xl border-2 border-rose-500/30 shadow-inner flex flex-col items-center">
-                      {/* <div className="flex flex-wrap justify-center gap-2">
-                        {(() => {
-                          const opponentStars = rightPlayer?.stars || 0;
-                          
-                          const yellowStars = Array.from({ length: Math.min(opponentStars, 3) }).map((_, i) => (
-                            <Star key={i} size={28} className="text-yellow-400 fill-yellow-400" />
-                          ));
-                          
-                          const grayStars = Array.from({ length: Math.max(0, 3 - opponentStars) }).map((_, i) => (
-                            <Star key={`empty-${i}`} size={28} className="text-rose-900/40 fill-rose-900/40" />
-                          ));
-                          
-                          return [...yellowStars, ...grayStars];
-                        })()} */}
-                      <div className="flex justify-center gap-2">
-                        {[1, 2, 3].map((starNum) => {
-                          const opponentStars = rightPlayer?.stars || 0;
-                          const isFilled = opponentStars >= starNum;
-                          return (
-                            <Star
-                              key={starNum}
-                              size={28}
-                              className={`${isFilled ? 'text-yellow-400 fill-yellow-400' : 'text-rose-900/40 fill-rose-900/40'}`}
-                            />
-                          );
-                        })}
-
-
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-              <ControlPanel isPlaying={isPlaying} onStart={() => handleAudioControl('start')} onStop={() => handleAudioControl('stop')} onCorrect={() => handleFinalizeTurn('correct')} onWrong={() => handleFinalizeTurn('wrong')} timeLeft={timeLeft} t={t} disabledActions={isR3Finalized || isSongUsed} isStartDisabled={!isR3Finalized && selectedDuration === null} />
-              {/* <MusicTimeline /> */}
-              <MusicTimeline
-                isPlaying={isPlaying}
-                progress={audioProgress}
-                isReveal={isR3Finalized || selectedDuration === null}
-                onSeek={handleSeek}
-                formatTime={formatTime}
-                t={t}
-              />
-              {modal?.isOpen && modal.position === 'inline' && (
-                <div className="w-full bg-slate-800 rounded-3xl p-6 border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.3)] animate-in fade-in slide-in-from-top duration-300">
-                  <h3 className="text-xs font-black text-white mb-2 leading-tight uppercase tracking-widest text-center">{modal.title}</h3>
-                  <p className="text-slate-400 text-[10px] mb-4 font-medium text-center">{modal.message}</p>
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={modal.onConfirm}
-                      className="w-full py-3 rounded-xl bg-indigo-600 text-white font-black hover:bg-indigo-700 transition-all uppercase tracking-widest text-[10px] shadow-lg shadow-indigo-900/40"
-                    >
-                      {modal.confirmLabel}
-                    </button>
-                    <button
-                      onClick={() => setModal(null)}
-                      className="w-full py-3 rounded-xl bg-slate-700 text-slate-300 font-bold hover:bg-slate-600 transition-colors uppercase tracking-widest text-[10px]"
-                    >
-                      {modal.cancelLabel}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <RoundDuel
+          gameState={gameState}
+          isPlaying={isPlaying}
+          timeLeft={timeLeft}
+          audioProgress={audioProgress}
+          modal={modal}
+          t={t}
+          selectedDuration={selectedDuration}
+          isR3Finalized={isR3Finalized}
+          // Pass all the functions
+          onNavigate={navigateTo}
+          onInitializeRound={initializeRound}
+          onUpdatePlayer={handleUpdatePlayer}
+          onShowModal={showModal}
+          onSetModal={setModal}
+          onSetCurrentPlayer={(idx) => {
+            // Custom logic for duel selection
+            const duelIds = gameState.roundProgress[3]?.activePlayerIds || [];
+            if (duelIds.includes(gameState.players[idx].id)) {
+              showModal(t.playerName, t.confirmPlayerActive, () => {
+                setGameState(prev => ({ ...prev, currentPlayerIndex: idx }));
+                setModal(null);
+              });
+            }
+          }}
+          onAudioControl={handleAudioControl}
+          onFinalizeTurn={handleFinalizeTurn}
+          onSeek={handleSeek}
+          formatTime={formatTime}
+          onSetSelectedDuration={setSelectedDuration}
+          onPlaySFX={playSFX}
+          onNextTurnNav={handleNextTurnNav}
+          onStopSong={stopSong}
+        />
       );
     }
     return (
