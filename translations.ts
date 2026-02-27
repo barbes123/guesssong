@@ -1,6 +1,10 @@
+import { Timer } from "lucide-react";
+import RoundSprint from "./src/screens/RoundSprint";
 
 export const translations = {
   en: {
+    RoundSprint: "Sprint",
+    TimeSettings: "Timer Settings",
     title: "Guess the Song",
     playerSetup: "Player Setup",
     numPlayers: "Number of Players",
@@ -82,6 +86,8 @@ export const translations = {
     duelChampion: "DUEL CHAMPION",
     totalPoints: "TOTAL POINTS",
     superGame: "SUPER GAME",
+    finishRound: "Finish Round",
+    confirmFinish: "Are you sure you want to finish this round and show the scoreboard?",
     categories: {
       pop: "Pop Hits",
       rock: "Rock Classics",
@@ -94,7 +100,9 @@ export const translations = {
   },
   ru: {
     title: "Угадай мелодию",
+    RoundSprint: "Спринт",
     playerSetup: "Настройка игроков",
+    TimerSettings: "Настройки таймера",
     numPlayers: "Количество игроков",
     playerName: "Имя игрока",
     initialScore: "Начальный счёт",
@@ -174,6 +182,8 @@ export const translations = {
     duelChampion: "ЧЕМПИОН ДУЭЛИ",
     totalPoints: "ВСЕГО ОЧКОВ",
     superGame: "СУПЕР ИГРА",
+    finishRound: "Завершить раунд",
+    confirmFinish: "Вы уверены, что хотите завершить раунд и показать таблицу счётов?",
     categories: {
       pop: "Поп-хиты",
       rock: "Рок-классика",

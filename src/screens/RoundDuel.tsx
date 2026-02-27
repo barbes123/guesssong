@@ -30,6 +30,7 @@ interface RoundDuelProps {
   onPlaySFX: (url: string) => void;
   onNextTurnNav: () => void;
   onStopSong: () => void;
+  onFinishRound: () => void;
 }
 
 const RoundDuel: React.FC<RoundDuelProps> = ({
@@ -54,7 +55,8 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
   onSetSelectedDuration,
   onPlaySFX,
   onNextTurnNav,
-  onStopSong
+  onFinishRound,
+  onStopSong,
 }) => {
   const roundId = 3;
   const progress = gameState.roundProgress[roundId];
@@ -221,6 +223,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
             onCorrect={() => onFinalizeTurn('correct')} 
             onWrong={() => onFinalizeTurn('wrong')} 
             timeLeft={timeLeft} 
+            onFinishRound={onFinishRound}
             t={t} 
             disabledActions={isR3Finalized || !!isSongUsed} 
             isStartDisabled={!isR3Finalized && selectedDuration === null} 
