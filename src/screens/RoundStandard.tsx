@@ -20,6 +20,7 @@ interface RoundStandardProps {
   t: any;
   activeResponder: string | null;
   players: any[];
+  onFinishRound: () => void;
   // Actions
   onNavigate: (page: any, roundId: number | null) => void;
   onInitializeRound: (roundId: number) => void;
@@ -55,8 +56,9 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
   onSeek,
   formatTime,
   activeResponder,
-  players = []
-  // players
+  players = [],
+  onFinishRound,
+  onShowRoundSummary  // players
 }) => {
 
   const roundId = gameState.activeRoundId!;
@@ -358,6 +360,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
             onWrong={() => onFinalizeTurn('wrong')}
             currentPoints={currentRoundPoints}
             timeLeft={timeLeft}
+            onFinishRound={onFinishRound}
             t={t}
             disabledActions={!activeNote || activeNote.isReveal || progress.usedNotes.has(`${activeNote.categoryId}-${activeNote.noteIndex}`)}
             isStartDisabled={!activeNote}

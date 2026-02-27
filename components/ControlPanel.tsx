@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Square, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Play, Square, CheckCircle, XCircle, Clock, Trophy } from 'lucide-react';
 
 interface ControlPanelProps {
   isPlaying: boolean;
@@ -7,6 +7,7 @@ interface ControlPanelProps {
   onStop: () => void;
   onCorrect: () => void;
   onWrong: () => void;
+  onFinishRound: () => void;
   currentPoints?: number;
   timeLeft?: number;
   t: any;
@@ -22,6 +23,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   onCorrect,
   onWrong,
   currentPoints,
+  onFinishRound,
   timeLeft,
   t,
   disabledActions = false,
@@ -76,8 +78,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           onClick={onStart}
           disabled={startButtonDisabled}
           className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all ${startButtonDisabled
-              ? 'bg-slate-800 text-slate-700 border border-transparent opacity-50 cursor-not-allowed'
-              : 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white hover:scale-105 active:scale-95'
+            ? 'bg-slate-800 text-slate-700 border border-transparent opacity-50 cursor-not-allowed'
+            : 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white hover:scale-105 active:scale-95'
             }`}
         >
           <Play size={16} fill="currentColor" />
@@ -88,14 +90,16 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           onClick={onStop}
           disabled={!isPlaying}
           className={`flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all ${!isPlaying
-              ? 'bg-slate-800 text-slate-700 border border-transparent cursor-not-allowed'
-              : 'bg-rose-600/20 text-rose-400 border border-rose-500/30 hover:bg-rose-600 hover:text-white hover:scale-105 active:scale-95'
+            ? 'bg-slate-800 text-slate-700 border border-transparent cursor-not-allowed'
+            : 'bg-rose-600/20 text-rose-400 border border-rose-500/30 hover:bg-rose-600 hover:text-white hover:scale-105 active:scale-95'
             }`}
         >
           <Square size={16} fill="currentColor" />
           <span className="text-[8px] font-black uppercase tracking-widest">{t.stop}</span>
         </button>
       </div>
+
+
 
       <div className="w-full h-px bg-slate-800" />
 
@@ -119,6 +123,24 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           <span className="text-[8px] font-black uppercase tracking-widest">{t.wrong}</span>
         </button>
       </div>
+
+      <div className="w-full h-px bg-slate-800" />
+
+      {/* 🟢 NEW ROW: FINISH ROUND (Full Width) */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onFinishRound?.();
+        }}
+        className="w-full mt-2 flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-900 hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-900/10 group"
+      >
+        <Trophy size={16} className="group-hover:animate-bounce" />
+        <span className="text-[8px] font-black uppercase tracking-widest">
+          {t.finishRound || "Finish Round"}
+        </span>
+      </button>
+
     </div>
   );
 };
