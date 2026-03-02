@@ -81,4 +81,12 @@ export interface GameState {
   roundSets: Record<number, string>; // roundId -> setId
 }
 
+export interface BuzzerPopupProps {
+  show: boolean;
+  playerName: string;
+  points: number;
+  isWarmup: boolean;
+  onClose?: () => void;
+}
+
 export type Page = 'setup' | 'start' | 'round' | 'r3_select' | 'r4_select';
