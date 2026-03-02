@@ -44,8 +44,6 @@ const App: React.FC = () => {
     }
   }, [isLeaderScreen, isPlayerScreen]);
 
-
-
   // --------------------------------
   const [gameState, setGameState] = useState<GameState>({
     players: [{ id: 0, name: '', score: 0, stars: 0 }],
@@ -108,6 +106,12 @@ const App: React.FC = () => {
   const roundPointsTimerRef = useRef<number | null>(null);
   const autoStopTimerRef = useRef<number | null>(null);
   const countdownIntervalRef = useRef<number | null>(null);
+
+  //To show pop pup window  with player who pressed
+  const [showBuzzerPopup, setShowBuzzerPopup] = useState(false);
+  const [buzzerPlayerName, setBuzzerPlayerName] = useState('');
+  const [buzzerPoints, setBuzzerPoints] = useState(0);
+  const [isWarmup, setIsWarmup] = useState(false);
 
   if (isLeaderScreen) {
     return <LeaderDisplay />;
@@ -204,9 +208,6 @@ const App: React.FC = () => {
     }
   }, [gameState.activeRoundId, r4IsActiveSession]);
 
-
-
-
   const {
     activeResponder,
     setActiveResponder,
@@ -218,7 +219,6 @@ const App: React.FC = () => {
     armBuzzers,
     socket: buzzerSocket,
   } = useBuzzer(stopSong);
-
 
   // useEffect(() => { //was this one
   //   const syncInterval = setInterval(() => {
@@ -244,6 +244,17 @@ const App: React.FC = () => {
       const stateData = stateToShareRef.current;
       if (!stateData) return;
 
+      // DEBUG: Log if popup is being synced
+      if (stateData.showBuzzerPopup) {
+        console.log('📤 [App.tsx] Syncing buzzer popup to localStorage:', {
+          showBuzzerPopup: stateData.showBuzzerPopup,
+          playerName: stateData.buzzerPlayerName,
+          points: stateData.buzzerPoints,
+          isWarmup: stateData.isWarmup,
+          timestamp: new Date().toISOString()
+        });
+      }
+
       // 1. SYNC TO PLAYER DISPLAY (Same Laptop)
       // This fixed the "Stuck on Starting Page" issue for /display
       try {
@@ -261,6 +272,54 @@ const App: React.FC = () => {
 
     return () => clearInterval(syncInterval);
   }, [buzzerSocket]);
+
+
+  // Show popup on PlayerScreen when buzzer is pressed in rounds 0,1,2
+  useEffect(() => {
+    const validRounds = [0, 1, 2];
+    const currentRoundId = gameState.activeRoundId;
+
+    if (!activeResponder || currentRoundId === null || currentRoundId === undefined || !validRounds.includes(currentRoundId) || !activeNote) {
+      return;
+    }
+
+    const buzzingPlayer = gameState.players.find(p => p.hubId === activeResponder);
+    if (!buzzingPlayer) return;
+
+    // Calculate points
+    let points = 0;
+    const progress = gameState.roundProgress[currentRoundId];
+
+    if (currentRoundId === 1 && progress?.pointMap) {
+      points = progress.pointMap[activeNote.categoryId]?.[activeNote.noteIndex] || 0;
+    } else if (currentRoundId === 2 && progress?.persistentPoints) {
+      points = progress.persistentPoints[`${activeNote.categoryId}-0`] || 20;
+    } else if (currentRoundId === 0 && progress?.pointMap) {
+      points = progress.pointMap[activeNote.categoryId]?.[activeNote.noteIndex] || 0;
+    }
+
+    setBuzzerPlayerName(buzzingPlayer.name || `Player ${buzzingPlayer.id}`);
+    setBuzzerPoints(points);
+    setIsWarmup(currentRoundId === 0);
+
+    console.log('🔔 [App.tsx] ABOUT TO SET showBuzzerPopup = true', {
+      activeResponder,
+      playerName: buzzingPlayer.name,
+      timestamp: new Date().toISOString()
+    });
+    setShowBuzzerPopup(true);
+
+    // DEBUG: Log buzzer popup state
+    console.log('🔔 [App.tsx] Buzzer pressed! Setting popup state:', {
+      playerName: buzzingPlayer.name || `Player ${buzzingPlayer.id}`,
+      points: points,
+      roundId: currentRoundId,
+      isWarmup: currentRoundId === 0,
+      activeResponder: activeResponder,
+      timestamp: new Date().toISOString()
+    });
+
+  }, [activeResponder, gameState.activeRoundId, activeNote, gameState.players]);
 
 
 
@@ -386,7 +445,11 @@ const App: React.FC = () => {
       showScoreboard: showScoreboard,
       r4SelectedPlayerId: r4SelectedPlayerId,
       language: gameState.language,
-      currentSong: currentSong
+      currentSong: currentSong,
+      showBuzzerPopup: showBuzzerPopup,
+      buzzerPlayerName: buzzerPlayerName,
+      buzzerPoints: buzzerPoints,
+      isWarmup: isWarmup
     };
 
     // DEBUG: Log what we're about to emit
@@ -418,7 +481,11 @@ const App: React.FC = () => {
     showVictory,
     showScoreboard,
     r4SelectedPlayerId,
-    activeResponder
+    activeResponder,
+    showBuzzerPopup,
+    buzzerPlayerName,
+    buzzerPoints,
+    isWarmup
   ]);
 
 
@@ -667,6 +734,9 @@ const App: React.FC = () => {
   };
 
   const handleFinishRoundManual = () => {
+    if (showBuzzerPopup) {
+      setShowBuzzerPopup(false);
+    }
     showModal(
       t.finishRound,
       t.confirmFinish,
@@ -1068,6 +1138,11 @@ const App: React.FC = () => {
   // UPDATED handleAudioControl function
   const handleAudioControl = (action: 'start' | 'stop') => {
     if (!activeNote) return;
+
+    if (showBuzzerPopup) {
+      setShowBuzzerPopup(false);
+    }
+
     const roundId = gameState.activeRoundId!;
     const progress = gameState.roundProgress[roundId];
     const selectedSetId = gameState.roundSets[roundId] || 'default';
@@ -1423,6 +1498,7 @@ const App: React.FC = () => {
       else playSFX(SFX.wrong);
 
       setActiveResponder(null);//*** */
+      setShowBuzzerPopup(false);
 
       setGameState(prev => {
         // const newPlayers = prev.players.map((p, idx) => idx === prev.currentPlayerIndex ? { ...p, score: p.score + addedPoints } : p);

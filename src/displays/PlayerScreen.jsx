@@ -2,6 +2,65 @@ import React, { useState, useEffect } from 'react';
 import { Music, CheckCircle, XCircle, Trophy, Star } from 'lucide-react';
 import { ROUND_DATA, getRoundData } from '../../data/index_data';
 import { translations } from '../../translations';
+// import { BuzzerPopupProps } from '../../types';
+
+// const BuzzerPopup = ({ show, playerName, points, isWarmup, onClose }) => {
+
+//   // DEBUG: Log popup props and render decisions
+//   useEffect(() => {
+//     console.log('👑 [BuzzerPopup] Props received:', {
+//       show,
+//       playerName,
+//       points,
+//       isWarmup,
+//       timestamp: new Date().toISOString()
+//     });
+
+//     if (show) {
+//       console.log('✅ [BuzzerPopup] RENDERING POPUP');
+//     } else {
+//       console.log('❌ [BuzzerPopup] NOT rendering - show is false or undefined');
+//     }
+//   }, [show, playerName, points, isWarmup]);
+
+//   if (!show) return null;
+
+//   return (
+//     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+//       <div className="relative max-w-2xl w-full mx-4">
+//         {/* Golden glow */}
+//         <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-3xl blur-2xl opacity-90 animate-pulse"></div>
+
+//         {/* Main window */}
+//         <div className="relative bg-gradient-to-br from-yellow-400 to-amber-500 rounded-3xl p-8 border-4 border-yellow-300 shadow-2xl">
+//           <div className="text-center">
+//             <div className="text-7xl mb-4">👑</div>
+//             {/* <h2 className="text-5xl font-black text-amber-900 mb-6">BUZZER PRESSED!</h2> */}
+//             <h2 className="text-5xl font-black text-amber-900 mb-6">{t.buzzerPressed}</h2>
+
+//             <div className="bg-amber-900/20 rounded-2xl p-6 mb-4">
+//               <div className="text-2xl text-amber-900 mb-2">Player</div>
+//               <div className="text-6xl font-black text-white mb-4">{playerName}</div>
+
+//               <div className="text-2xl text-amber-900 mb-2">Points to Gain</div>
+//               <div className="text-7xl font-black text-white">{points} PTS</div>
+
+//               {isWarmup && (
+//                 <div className="mt-4 text-xl bg-amber-200 text-amber-800 py-2 px-4 rounded-full">
+//                   ⚡ WARM-UP - PRACTICE ⚡
+//                 </div>
+//               )}
+//             </div>
+
+//             <div className="text-lg text-amber-800">
+//               Waiting for host...
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 const PlayerScreen = () => {
   const [state, setState] = useState(null);
@@ -11,7 +70,19 @@ const PlayerScreen = () => {
       const stored = localStorage.getItem('musicQuizPlayerState');
       if (stored) {
         try {
-          setState(JSON.parse(stored));
+          const parsedState = JSON.parse(stored);
+          setState(parsedState);
+
+          // DEBUG: Log if popup state is being received
+          if (parsedState.showBuzzerPopup) {
+            console.log('📥 [PlayerScreen] Received buzzer popup state:', {
+              show: parsedState.showBuzzerPopup,
+              playerName: parsedState.buzzerPlayerName,
+              points: parsedState.buzzerPoints,
+              isWarmup: parsedState.isWarmup,
+              timestamp: new Date().toISOString()
+            });
+          }
         } catch (e) {
           console.error("Failed to parse game state", e);
         }
@@ -23,6 +94,66 @@ const PlayerScreen = () => {
     return () => clearInterval(interval);
   }, []);
 
+
+  const BuzzerPopup = ({ show, playerName, points, isWarmup, onClose }) => {
+
+    // DEBUG: Log popup props and render decisions
+    useEffect(() => {
+      console.log('👑 [BuzzerPopup] Props received:', {
+        show,
+        playerName,
+        points,
+        isWarmup,
+        timestamp: new Date().toISOString()
+      });
+
+      if (show) {
+        console.log('✅ [BuzzerPopup] RENDERING POPUP');
+      } else {
+        console.log('❌ [BuzzerPopup] NOT rendering - show is false or undefined');
+      }
+    }, [show, playerName, points, isWarmup]);
+
+    if (!show) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+        <div className="relative max-w-2xl w-full mx-4">
+          {/* Golden glow */}
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-3xl blur-2xl opacity-90 animate-pulse"></div>
+
+          {/* Main window */}
+          <div className="relative bg-gradient-to-br from-yellow-400 to-amber-500 rounded-3xl p-8 border-4 border-yellow-300 shadow-2xl">
+            <div className="text-center">
+              <div className="text-7xl mb-4">👑</div>
+              {/* <h2 className="text-5xl font-black text-amber-900 mb-6">BUZZER PRESSED!</h2> */}
+              <h2 className="text-5xl font-black text-amber-900 mb-6">{t.buzzerPressed || "BUZZER PRESSED!"}</h2>
+
+              <div className="bg-amber-900/20 rounded-2xl p-6 mb-4">
+                <div className="text-2xl text-amber-900 mb-2">{t.playerName || "Player"}</div>
+                <div className="text-6xl font-black text-white mb-4">{playerName}</div>
+
+                <div className="text-2xl text-amber-900 mb-2">{t.pointsToGain || "Points to Gain"} </div>
+                <div className="text-7xl font-black text-white">{points} {t.points || "PTS"} </div>
+
+                {/* {isWarmup && (
+                  <div className="mt-4 text-xl bg-amber-200 text-amber-800 py-2 px-4 rounded-full">
+                    {isWarmup ? (language === 'en' ? "Settings" : "Настройка") : `${t.round} ${roundId}`}
+                  </div>
+                )
+                } */}
+              </div>
+
+              <div className="text-lg text-amber-800">
+                {t.waitingForAnswer || "Waiting for answer..."}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (!state) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -31,12 +162,12 @@ const PlayerScreen = () => {
     );
   }
 
-  const { 
-    currentPage, 
-    activeRoundId, 
-    roundProgress, 
-    roundSets, 
-    players, 
+  const {
+    currentPage,
+    activeRoundId,
+    roundProgress,
+    roundSets,
+    players,
     language,
     currentRoundPoints,
     activeNote,
@@ -253,7 +384,7 @@ const PlayerScreen = () => {
     // 1. Check if a buzzer is currently active in the synchronized state
     const buzzerIdx = players.findIndex(p => p.hubId === state.activeResponder);
     const hasBuzzer = state.activeResponder && buzzerIdx !== -1;
-    
+
     // 2. The visual focus goes to the buzzer winner, otherwise the turn player
     const visualActiveIndex = hasBuzzer ? buzzerIdx : state.currentPlayerIndex;
 
@@ -265,11 +396,11 @@ const PlayerScreen = () => {
             const isWinner = hasBuzzer && idx === buzzerIdx;
 
             return (
-              <div 
-                key={p.id} 
+              <div
+                key={p.id}
                 className={`
                   relative flex-1 bg-slate-900/90 backdrop-blur-md px-6 py-4 rounded-[2rem] border-2 flex items-center justify-between shadow-xl transition-all duration-500
-                  ${isHighlighted 
+                  ${isHighlighted
                     ? isWinner
                       ? 'border-yellow-500 shadow-[0_0_40px_rgba(234,179,8,0.5)] scale-110 z-20 bg-slate-800' // BUZZER STATE
                       : 'border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.4)] scale-105 z-10 bg-slate-800' // MANUAL STATE
@@ -288,10 +419,10 @@ const PlayerScreen = () => {
                   </div>
                   <div className="flex gap-1 mt-1">
                     {[...Array(3)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        size={16} 
-                        className={`${i < (p.stars || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-slate-700 fill-slate-700'}`} 
+                      <Star
+                        key={i}
+                        size={16}
+                        className={`${i < (p.stars || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-slate-700 fill-slate-700'}`}
                       />
                     ))}
                   </div>
@@ -369,7 +500,7 @@ const PlayerScreen = () => {
         </div>
       );
     }
-    
+
     const isFinalized = state.isR3Finalized;
 
     return (
@@ -403,7 +534,7 @@ const PlayerScreen = () => {
                 <span className="text-2xl font-black uppercase">{t.full || 'FULL'}</span>
               </div>
             </div>
-             {isFinalized && (
+            {isFinalized && (
               <div className="mt-8 text-2xl font-black text-emerald-400 uppercase animate-pulse tracking-widest">
                 {t.nextTurn || "Next Turn Pending..."}
               </div>
@@ -434,7 +565,7 @@ const PlayerScreen = () => {
 
     const playerProg = progress.r4PlayerProgress?.[currentPlayer.id] || { correctIndices: [], hasFinished: false };
     const correctIndices = new Set(playerProg.correctIndices);
-    
+
     const formatTime = (seconds) => {
       if (seconds === undefined) return "0:00";
       const m = Math.floor(Math.abs(seconds) / 60);
@@ -529,7 +660,7 @@ const PlayerScreen = () => {
                 {correctIndices.size} / 7
               </div>
               <div className="flex gap-1 mt-4">
-                {Array.from({length: 7}).map((_, i) => (
+                {Array.from({ length: 7 }).map((_, i) => (
                   <div key={i} className={`h-2 flex-1 rounded-full ${i < correctIndices.size ? 'bg-emerald-500' : 'bg-slate-700'}`} />
                 ))}
               </div>
@@ -542,36 +673,36 @@ const PlayerScreen = () => {
 
   const renderR3Select = () => {
     const selectedIds = r3Selection || [];
-    
+
     return (
       <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center items-center">
         {renderHeader(3, t.categories.superGame || "SUPER GAME")}
         <div className="w-full max-w-[1400px]">
-           <h3 className="text-4xl text-slate-400 font-bold text-center mb-12 uppercase tracking-widest">{t.selectTeams || "SELECT PLAYERS"}</h3>
-           <div className="flex justify-center gap-12">
-             {[0, 1].map(idx => {
-               const playerId = selectedIds[idx];
-               const player = playerId !== undefined ? players.find(p => p.id === playerId) : null;
-               
-               return (
-                 <div key={idx} className={`w-96 h-96 rounded-[3rem] border-4 flex flex-col items-center justify-center p-8 transition-all duration-500 ${player ? 'bg-indigo-900/40 border-indigo-500 shadow-[0_0_60px_rgba(99,102,241,0.3)]' : 'bg-slate-900/50 border-slate-800 border-dashed'}`}>
-                   {player ? (
-                     <>
-                       <div className="text-5xl font-black text-white mb-6 text-center leading-tight">{player.name || `Player ${player.id + 1}`}</div>
-                       <div className="flex gap-2">
-                         {[...Array(player.stars || 0)].map((_, i) => <Star key={i} size={32} className="text-yellow-500 fill-yellow-500" />)}
-                       </div>
-                       <div className="mt-6 text-3xl font-bold text-indigo-400">{player.score} pts</div>
-                     </>
-                   ) : (
-                     <div className="text-slate-700 font-black text-3xl uppercase tracking-widest">
-                       {idx === 0 ? "Player 1" : "Player 2"}
-                     </div>
-                   )}
-                 </div>
-               );
-             })}
-           </div>
+          <h3 className="text-4xl text-slate-400 font-bold text-center mb-12 uppercase tracking-widest">{t.selectTeams || "SELECT PLAYERS"}</h3>
+          <div className="flex justify-center gap-12">
+            {[0, 1].map(idx => {
+              const playerId = selectedIds[idx];
+              const player = playerId !== undefined ? players.find(p => p.id === playerId) : null;
+
+              return (
+                <div key={idx} className={`w-96 h-96 rounded-[3rem] border-4 flex flex-col items-center justify-center p-8 transition-all duration-500 ${player ? 'bg-indigo-900/40 border-indigo-500 shadow-[0_0_60px_rgba(99,102,241,0.3)]' : 'bg-slate-900/50 border-slate-800 border-dashed'}`}>
+                  {player ? (
+                    <>
+                      <div className="text-5xl font-black text-white mb-6 text-center leading-tight">{player.name || `Player ${player.id + 1}`}</div>
+                      <div className="flex gap-2">
+                        {[...Array(player.stars || 0)].map((_, i) => <Star key={i} size={32} className="text-yellow-500 fill-yellow-500" />)}
+                      </div>
+                      <div className="mt-6 text-3xl font-bold text-indigo-400">{player.score} pts</div>
+                    </>
+                  ) : (
+                    <div className="text-slate-700 font-black text-3xl uppercase tracking-widest">
+                      {idx === 0 ? "Player 1" : "Player 2"}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
@@ -582,18 +713,18 @@ const PlayerScreen = () => {
       <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center items-center">
         {renderHeader(4, "SPRINT")}
         <div className="w-full max-w-[1400px]">
-           <h3 className="text-4xl text-slate-400 font-bold text-center mb-12 uppercase tracking-widest">{t.playerName || "SELECT PLAYER"}</h3>
-           <div className="grid grid-cols-3 gap-8">
-             {players.map((p, idx) => (
-               <div key={p.id} className={`p-10 rounded-[3rem] border-4 flex flex-col items-center justify-center gap-6 shadow-xl transition-all duration-500 ${r4SelectedPlayerId === p.id ? 'bg-indigo-900/60 border-indigo-500 scale-105 opacity-100' : 'bg-slate-900/80 border-slate-800 opacity-60'}`}>
-                 <div className="text-4xl font-black text-white text-center leading-tight">{p.name || `Player ${p.id + 1}`}</div>
-                 <div className="flex gap-2">
-                    {[...Array(p.stars || 0)].map((_, i) => <Star key={i} size={32} className="text-yellow-500 fill-yellow-500" />)}
-                 </div>
-                 <div className="text-3xl font-bold text-indigo-400">{p.score} pts</div>
-               </div>
-             ))}
-           </div>
+          <h3 className="text-4xl text-slate-400 font-bold text-center mb-12 uppercase tracking-widest">{t.playerName || "SELECT PLAYER"}</h3>
+          <div className="grid grid-cols-3 gap-8">
+            {players.map((p, idx) => (
+              <div key={p.id} className={`p-10 rounded-[3rem] border-4 flex flex-col items-center justify-center gap-6 shadow-xl transition-all duration-500 ${r4SelectedPlayerId === p.id ? 'bg-indigo-900/60 border-indigo-500 scale-105 opacity-100' : 'bg-slate-900/80 border-slate-800 opacity-60'}`}>
+                <div className="text-4xl font-black text-white text-center leading-tight">{p.name || `Player ${p.id + 1}`}</div>
+                <div className="flex gap-2">
+                  {[...Array(p.stars || 0)].map((_, i) => <Star key={i} size={32} className="text-yellow-500 fill-yellow-500" />)}
+                </div>
+                <div className="text-3xl font-bold text-indigo-400">{p.score} pts</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -618,128 +749,150 @@ const PlayerScreen = () => {
   //     results: {}, 
   //     pointMap: {} 
   //   };
-    
+
   //   const selectedSetId = roundSets[1] || 'default';
   //   const categories = getRoundData(1, selectedSetId) || [];
   const renderRound1 = () => {
-  // 1. Get the actual ID (0, 1, etc.)
-  const currentId = activeRoundId; 
+    // 1. Get the actual ID (0, 1, etc.)
+    const currentId = activeRoundId;
 
-  // 2. Get the progress for THIS specific round
-  const progress = roundProgress[currentId] || { 
-    usedNotes: [], 
-    results: {}, 
-    pointMap: {} 
-  };
-  
-  // 3. Get the correct data file (round0_default vs round1_default)
-  const selectedSetId = roundSets[currentId] || 'default';
-  const categories = getRoundData(currentId, selectedSetId) || [];
+    // 2. Get the progress for THIS specific round
+    const progress = roundProgress[currentId] || {
+      usedNotes: [],
+      results: {},
+      pointMap: {}
+    };
 
-  // 4. Set the title based on the round
-  const title = currentId === 0 
-    ? (language === 'en' ? "Warm-up" : "Разминка") 
-    : (t.songChallenge || "SONG CHALLENGE");
+    // 3. Get the correct data file (round0_default vs round1_default)
+    const selectedSetId = roundSets[currentId] || 'default';
+    const categories = getRoundData(currentId, selectedSetId) || [];
+
+    // 4. Set the title based on the round
+    const title = currentId === 0
+      ? (language === 'en' ? "Warm-up" : "Разминка")
+      : (t.songChallenge || "SONG CHALLENGE");
 
     return (
-     <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
-      {renderHeader(currentId, title)}
-        <div className="max-w-[1800px] mx-auto w-full">
-          <div className="flex flex-col gap-6">
-            {categories.slice(0, 4).map((cat) => (
-              <div key={cat.id} className="flex gap-6 h-32">
-                {/* Category Label */}
-                <div className="w-80 bg-slate-800 rounded-3xl flex items-center justify-center p-6 border-2 border-slate-700 shadow-lg relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10">
-                    {language === 'ru' ? cat.name.ru : cat.name.en}
-                  </span>
-                </div>
+      <>
+        <BuzzerPopup
+          show={state?.showBuzzerPopup}
+          playerName={state?.buzzerPlayerName}
+          points={state?.buzzerPoints}
+          isWarmup={state?.isWarmup}
+        />
 
-                {/* Notes Grid */}
-                <div className="flex-1 grid grid-cols-4 gap-4">
-                  {[0, 1, 2, 3].map((noteIdx) => {
-                    const noteId = `${cat.id}-${noteIdx}`;
-                    // Handle both Set and Array for usedNotes
-                    const isUsed = Array.isArray(progress.usedNotes) 
-                      ? progress.usedNotes.includes(noteId) 
-                      : progress.usedNotes?.has?.(noteId);
-                    
-                    const result = progress.results?.[noteId];
-                    const isActive = activeNote?.categoryId === cat.id && activeNote?.noteIndex === noteIdx;
-                    
-                    let bgColor = 'bg-slate-900';
-                    let borderColor = 'border-slate-800';
-                    let textColor = 'text-indigo-400';
-                    let shadow = '';
-                    let scale = 'scale-100';
 
-                    if (isActive) {
-                      bgColor = 'bg-indigo-600';
-                      borderColor = 'border-white';
-                      textColor = 'text-white';
-                      shadow = 'shadow-[0_0_30px_rgba(79,70,229,0.5)]';
-                      scale = 'scale-105 z-10';
-                    } else if (isUsed) {
-                      if (result === 'correct') {
-                        bgColor = 'bg-emerald-600';
-                        borderColor = 'border-emerald-400';
+
+        <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
+          {renderHeader(currentId, title)}
+          <div className="max-w-[1800px] mx-auto w-full">
+            <div className="flex flex-col gap-6">
+              {categories.slice(0, 4).map((cat) => (
+                <div key={cat.id} className="flex gap-6 h-32">
+                  {/* Category Label */}
+                  <div className="w-80 bg-slate-800 rounded-3xl flex items-center justify-center p-6 border-2 border-slate-700 shadow-lg relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10">
+                      {language === 'ru' ? cat.name.ru : cat.name.en}
+                    </span>
+                  </div>
+
+                  {/* Notes Grid */}
+                  <div className="flex-1 grid grid-cols-4 gap-4">
+                    {[0, 1, 2, 3].map((noteIdx) => {
+                      const noteId = `${cat.id}-${noteIdx}`;
+                      // Handle both Set and Array for usedNotes
+                      const isUsed = Array.isArray(progress.usedNotes)
+                        ? progress.usedNotes.includes(noteId)
+                        : progress.usedNotes?.has?.(noteId);
+
+                      const result = progress.results?.[noteId];
+                      const isActive = activeNote?.categoryId === cat.id && activeNote?.noteIndex === noteIdx;
+
+                      let bgColor = 'bg-slate-900';
+                      let borderColor = 'border-slate-800';
+                      let textColor = 'text-indigo-400';
+                      let shadow = '';
+                      let scale = 'scale-100';
+
+                      if (isActive) {
+                        bgColor = 'bg-indigo-600';
+                        borderColor = 'border-white';
                         textColor = 'text-white';
-                      } else if (result === 'wrong') {
-                        bgColor = 'bg-rose-600';
-                        borderColor = 'border-rose-400';
-                        textColor = 'text-white';
-                      } else {
-                        bgColor = 'bg-slate-800';
-                        borderColor = 'border-slate-700';
-                        textColor = 'text-slate-600';
+                        shadow = 'shadow-[0_0_30px_rgba(79,70,229,0.5)]';
+                        scale = 'scale-105 z-10';
+                      } else if (isUsed) {
+                        if (result === 'correct') {
+                          bgColor = 'bg-emerald-600';
+                          borderColor = 'border-emerald-400';
+                          textColor = 'text-white';
+                        } else if (result === 'wrong') {
+                          bgColor = 'bg-rose-600';
+                          borderColor = 'border-rose-400';
+                          textColor = 'text-white';
+                        } else {
+                          bgColor = 'bg-slate-800';
+                          borderColor = 'border-slate-700';
+                          textColor = 'text-slate-600';
+                        }
                       }
-                    }
 
-                    return (
+                      return (
 
-                      <div 
-  key={noteIdx} 
-  className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
->
-  {/* If the note is currently active (being played) or is already used, show points. 
+                        <div
+                          key={noteIdx}
+                          className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
+                        >
+                          {/* If the note is currently active (being played) or is already used, show points. 
       Otherwise, show the music icon. */}
-  {isActive || isUsed ? (
-    progress.pointMap?.[cat.id]?.[noteIdx] || 0
-  ) : (
-    <Music size={48} className="text-slate-700/50" />
-  )}
-</div>
-                      // <div 
-                      //   key={noteIdx} 
-                      //   className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
-                      // >
-                      //   {progress.pointMap?.[cat.id]?.[noteIdx] || 0}
-                      // </div>
-                    );
-                  })}
+                          {isActive || isUsed ? (
+                            progress.pointMap?.[cat.id]?.[noteIdx] || 0
+                          ) : (
+                            <Music size={48} className="text-slate-700/50" />
+                          )}
+                        </div>
+                        // <div 
+                        //   key={noteIdx} 
+                        //   className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
+                        // >
+                        //   {progress.pointMap?.[cat.id]?.[noteIdx] || 0}
+                        // </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+          {renderPlayersFooter()}
         </div>
-        {renderPlayersFooter()}
-      </div>
+      </>
     );
   };
 
   const renderRound2 = () => {
-    const progress = roundProgress[2] || { 
-      usedNotes: [], 
-      activationCounts: {}, 
+    const progress = roundProgress[2] || {
+      usedNotes: [],
+      activationCounts: {},
       persistentPoints: {},
       results: {}
     };
-    
+
     const selectedSetId = roundSets[2] || 'default';
     const categories = getRoundData(2, selectedSetId) || [];
 
     return (
+          <>
+        <BuzzerPopup
+          show={state?.showBuzzerPopup}
+          playerName={state?.buzzerPlayerName}
+          // points={activeNote?.categoryId ? currentRoundPoints || state?.buzzerPoints : state?.buzzerPoints}
+          points={currentRoundPoints || state?.buzzerPoints}
+          // points={state?.buzzerPoints}
+          isWarmup={state?.isWarmup}
+        />
+
+
       <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
         {renderHeader(2, t.melodyGuess || "MELODY GUESS")}
         <div className="max-w-[1800px] mx-auto w-full">
@@ -749,13 +902,13 @@ const PlayerScreen = () => {
               const isCategoryActive = activeNote?.categoryId === cat.id;
               // Check if category is completed (all 4 songs done)
               const isCompleted = progress.results?.[`${cat.id}-0`] !== undefined || (progress.usedNotes && (Array.isArray(progress.usedNotes) ? progress.usedNotes.includes(`${cat.id}-0`) : progress.usedNotes.has(`${cat.id}-0`)));
-              
+
               let displayScore = null;
-              
+
               if (activationCount > 0 || isCategoryActive) {
-                 displayScore = progress.persistentPoints?.[`${cat.id}-0`];
+                displayScore = progress.persistentPoints?.[`${cat.id}-0`];
               }
-              
+
               if (isCategoryActive && activeNote?.noteIndex === 0 && currentRoundPoints !== undefined) {
                 displayScore = currentRoundPoints;
               }
@@ -773,13 +926,13 @@ const PlayerScreen = () => {
                   {/* Notes Grid - 5 columns (1 Price + 4 Songs) */}
                   <div className="flex-1 grid grid-cols-5 gap-4">
                     {/* Note 0: Price/Activator */}
-                    <div 
+                    <div
                       className={`
                         rounded-3xl border-4 flex items-center justify-center text-4xl font-black transition-all duration-500 relative overflow-hidden
-                        ${isCompleted 
-                          ? 'bg-slate-800 border-slate-700 text-slate-600' 
+                        ${isCompleted
+                          ? 'bg-slate-800 border-slate-700 text-slate-600'
                           : isCategoryActive && activeNote?.noteIndex === 0
-                            ? 'bg-indigo-600 border-white text-white shadow-[0_0_30px_rgba(79,70,229,0.5)] scale-105 z-10' 
+                            ? 'bg-indigo-600 border-white text-white shadow-[0_0_30px_rgba(79,70,229,0.5)] scale-105 z-10'
                             : 'bg-slate-900 border-slate-800 text-indigo-400/50'
                         }
                       `}
@@ -792,7 +945,7 @@ const PlayerScreen = () => {
                       const resultKey = `${cat.id}-${noteIdx}`;
                       const result = progress.results?.[resultKey];
                       const isNoteActive = isCategoryActive && activeNote?.noteIndex === noteIdx;
-                      
+
                       let bgColor = 'bg-slate-900/50';
                       let borderColor = 'border-slate-800';
                       let icon = <Music size={32} className="text-slate-700" />;
@@ -812,7 +965,7 @@ const PlayerScreen = () => {
                       }
 
                       return (
-                        <div 
+                        <div
                           key={noteIdx}
                           className={`
                             rounded-3xl border-2 flex items-center justify-center transition-all duration-300
@@ -832,6 +985,7 @@ const PlayerScreen = () => {
         </div>
         {renderPlayersFooter()}
       </div>
+      </>
     );
   };
 
@@ -856,11 +1010,11 @@ const PlayerScreen = () => {
             <div className="absolute inset-0 bg-indigo-500 blur-[60px] opacity-30 rounded-full" />
             <Music size={120} className="text-indigo-400 relative z-10 animate-bounce" />
           </div>
-          
+
           <h1 className="text-8xl font-black text-white mb-6 tracking-tighter uppercase drop-shadow-2xl">
             {t.gameTitle || "GUESS THE SONG"}
           </h1>
-          
+
           <div className="flex flex-wrap justify-center gap-8 mt-16">
             {players.map((p) => (
               <div key={p.id} className="bg-slate-900/80 backdrop-blur-md px-10 py-6 rounded-[2.5rem] border-2 border-slate-800 flex items-center gap-6 shadow-xl">
@@ -891,7 +1045,7 @@ const PlayerScreen = () => {
     if (activeRoundId === 4) {
       return renderRound4();
     }
-    
+
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
@@ -918,7 +1072,7 @@ const PlayerScreen = () => {
   if (currentPage === 'r4_select') {
     return renderR4Select();
   }
-    
+
 
   return null;
 };

@@ -49,7 +49,7 @@ const PlayerRoundDisplay = ({ gameState, t }) => {
           </div>
           <div>
             <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
-              {isWarmup ? (language === 'en' ? "Practice Warm-up" : "Разминка") : `${t.round} ${roundId}`}
+              {isWarmup ? (language === 'en' ? "Settings" : "Настройка") : `${t.round} ${roundId}`}
             </h1>
             <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">
               {isWarmup 
