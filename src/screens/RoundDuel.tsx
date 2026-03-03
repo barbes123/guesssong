@@ -102,20 +102,17 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
                 >
                   <ChevronLeft size={24} />
                 </button>
-                <button 
-                  onClick={() => {
-                    if (isPlaying) return;
-                    onShowModal(t.mainMenu, "Go to Round 4 (Sprint)?", () => {
-                      onStopSong();
-                      onInitializeRound(4);
-                      onNavigate('round', 4);
-                    }, t.yes, t.no, 'center');
-                  }} 
-                  className={`p-3 rounded-lg transition-all ${isPlaying ? 'opacity-20 cursor-not-allowed bg-slate-800' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:scale-105 shadow-md'}`}
-                  disabled={isPlaying}
-                >
-                  <ChevronRight size={24} />
-                </button>
+            <button 
+  onClick={() => {
+    if (isPlaying) return;
+    onInitializeRound(4);
+    onNavigate('round', 4);
+  }} 
+  className={`p-3 rounded-lg transition-all ${isPlaying ? 'opacity-20 cursor-not-allowed bg-slate-800' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:scale-105 shadow-md'}`}
+  disabled={isPlaying}
+>
+  <ChevronRight size={24} />
+</button>
               </div>
             </div>
 

@@ -279,6 +279,17 @@ const App: React.FC = () => {
     const validRounds = [0, 1, 2];
     const currentRoundId = gameState.activeRoundId;
 
+
+    //     if (currentRoundId === 4 && activeResponder) {
+    //   const activePlayer = gameState.players[gameState.currentPlayerIndex];
+    //   if (activePlayer.hubId !== activeResponder) {
+    //     // Wrong player buzzed – ignore
+    //     console.log("Ignoring buzz from non‑active player in Round 4");
+    //     setActiveResponder(null);
+    //     return;
+    //   }
+    // }
+
     if (!activeResponder || currentRoundId === null || currentRoundId === undefined || !validRounds.includes(currentRoundId) || !activeNote) {
       return;
     }
@@ -1054,141 +1065,208 @@ const App: React.FC = () => {
 
   // UPDATED handleNoteClick function
   const handleNoteClick = (categoryId: string, noteIndex: number) => {
-//     const roundId = gameState.activeRoundId!;
-//     const selectedSetId = gameState.roundSets[roundId] || 'default';
-//     const roundData = getRoundData(roundId, selectedSetId) || [];
+    //     const roundId = gameState.activeRoundId!;
+    //     const selectedSetId = gameState.roundSets[roundId] || 'default';
+    //     const roundData = getRoundData(roundId, selectedSetId) || [];
 
-//     const category = roundData.find((c: any) => c.id === categoryId);
+    //     const category = roundData.find((c: any) => c.id === categoryId);
 
-//     // const dataIndex = (gameState.activeRoundId === 2) ? noteIndex - 1 : noteIndex;
-
-
-//     // console.log(`Current Category songs length: ${category?.songs?.length}`);
-//     // console.log(` Note index ${noteIndex} `);
-
-//     // if (!category || !category.songs || !category.songs[noteIndex]) {
-//     //   console.warn(`Blocked a crash! Note index ${noteIndex} doesn't exist in category ${categoryId}`);
-//     //   // console.log(`Current Category songs length: ${category?.songs?.length}`);
-//     //   return;
-//     // }
-//     // const songData = category.songs[dataIndex];
-
-// const dataIndex = (gameState.activeRoundId === 2) ? noteIndex - 1 : noteIndex;
-
-// console.log(`Current Category songs length: ${category?.songs?.length}`);
-// console.log(` Note index ${noteIndex}, data index ${dataIndex}`);
-
-// if (!category || !category.songs || !category.songs[dataIndex]) {
-//   console.warn(`Blocked a crash! Data index ${dataIndex} doesn't exist in category ${categoryId}`);
-//   return;
-// }
-// const songData = category.songs[dataIndex];
+    //     // const dataIndex = (gameState.activeRoundId === 2) ? noteIndex - 1 : noteIndex;
 
 
+    //     // console.log(`Current Category songs length: ${category?.songs?.length}`);
+    //     // console.log(` Note index ${noteIndex} `);
 
-//     // const roundId = gameState.activeRoundId;
+    //     // if (!category || !category.songs || !category.songs[noteIndex]) {
+    //     //   console.warn(`Blocked a crash! Note index ${noteIndex} doesn't exist in category ${categoryId}`);
+    //     //   // console.log(`Current Category songs length: ${category?.songs?.length}`);
+    //     //   return;
+    //     // }
+    //     // const songData = category.songs[dataIndex];
 
-//     if (roundId === null) return;
-//     const progress = gameState.roundProgress[roundId];
-//     if (!progress) return;
+    // const dataIndex = (gameState.activeRoundId === 2) ? noteIndex - 1 : noteIndex;
 
-//     const isMelodyRound = roundId === 2;
-//     const isSprintRound = roundId === 4;
-//     const isFinalRound = roundId === 3;
+    // console.log(`Current Category songs length: ${category?.songs?.length}`);
+    // console.log(` Note index ${noteIndex}, data index ${dataIndex}`);
 
-  const roundId = gameState.activeRoundId!;
-  const selectedSetId = gameState.roundSets[roundId] || 'default';
-  const roundData = getRoundData(roundId, selectedSetId) || [];
+    // if (!category || !category.songs || !category.songs[dataIndex]) {
+    //   console.warn(`Blocked a crash! Data index ${dataIndex} doesn't exist in category ${categoryId}`);
+    //   return;
+    // }
+    // const songData = category.songs[dataIndex];
 
-  const category = roundData.find((c: any) => c.id === categoryId);
-  if (!category) return;
 
-  const progress = gameState.roundProgress[roundId];
-  if (!progress) return;
 
-  const isMelodyRound = roundId === 2;
-  const isSprintRound = roundId === 4;
-  const isFinalRound = roundId === 3;
+    //     // const roundId = gameState.activeRoundId;
 
-  // --- Determine the actual song index for existence check ---
-  let effectiveIndex = noteIndex; // default for non-melody rounds
+    //     if (roundId === null) return;
+    //     const progress = gameState.roundProgress[roundId];
+    //     if (!progress) return;
 
-  if (isMelodyRound) {
-    if (noteIndex === 0) {
-      // Points button: use the next unrevealed song (activation count)
-      effectiveIndex = progress.activationCounts?.[categoryId] || 0;
-    } else {
-      // Reveal buttons: noteIndex maps to songIndex = noteIndex - 1
-      effectiveIndex = noteIndex - 1;
+    //     const isMelodyRound = roundId === 2;
+    //     const isSprintRound = roundId === 4;
+    //     const isFinalRound = roundId === 3;
+
+    const roundId = gameState.activeRoundId!;
+    const selectedSetId = gameState.roundSets[roundId] || 'default';
+    const roundData = getRoundData(roundId, selectedSetId) || [];
+
+    const category = roundData.find((c: any) => c.id === categoryId);
+    if (!category) return;
+
+    const progress = gameState.roundProgress[roundId];
+    if (!progress) return;
+
+    const isMelodyRound = roundId === 2;
+    const isSprintRound = roundId === 4;
+    const isFinalRound = roundId === 3;
+
+    // --- Determine the actual song index for existence check ---
+    let effectiveIndex = noteIndex; // default for non-melody rounds
+
+    if (isMelodyRound) {
+      if (noteIndex === 0) {
+        // Points button: use the next unrevealed song (activation count)
+        effectiveIndex = progress.activationCounts?.[categoryId] || 0;
+      } else {
+        // Reveal buttons: noteIndex maps to songIndex = noteIndex - 1
+        effectiveIndex = noteIndex - 1;
+      }
     }
-  }
 
-  // Safety check: ensure the song exists
-  if (!category.songs || !category.songs[effectiveIndex]) {
-    console.warn(`Blocked a crash! Effective index ${effectiveIndex} doesn't exist in category ${categoryId}`);
-    return;
-  }
+    // Safety check: ensure the song exists
+    if (!category.songs || !category.songs[effectiveIndex]) {
+      console.warn(`Blocked a crash! Effective index ${effectiveIndex} doesn't exist in category ${categoryId}`);
+      return;
+    }
 
-  // (Optional) log for debugging
-  console.log(`Category: ${categoryId}, noteIndex: ${noteIndex}, effectiveIndex: ${effectiveIndex}`);
-
+    // (Optional) log for debugging
+    console.log(`Category: ${categoryId}, noteIndex: ${noteIndex}, effectiveIndex: ${effectiveIndex}`);
 
     if (isSprintRound) {
       const pId = gameState.players[gameState.currentPlayerIndex].id;
       const playerProg = progress.r4PlayerProgress?.[pId];
       if (playerProg?.hasFinished) {
         stopSong();
+
         setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
         setR4CurrentSongIdx(noteIndex);
         playSFX(SFX.select);
         return;
       }
+
+      const isCorrect = playerProg?.correctIndices.has(noteIndex);
+
       if (!r4IsActiveSession) {
         const row = Math.floor(noteIndex / 7);
         const usedRowsSet = progress.usedRows || new Set();
+
+        // If row is used, only allow playing already‑correct songs (as reveals)
         if (usedRowsSet.has(row)) {
-          showModal(t.round, t.rowAlreadyUsed || "This row has already been used. Please select a different row.", () => setModal(null), t.close, "");
+          if (isCorrect) {
+            stopSong();
+            setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+            setR4CurrentSongIdx(noteIndex);
+            playSFX(SFX.select);
+          }
           return;
         }
 
-        showModal(
-          t.round,
-          `Choose row ${row + 1}?`,
-          () => {
-            const firstNoteInRow = row * 7;
-            setSelectedRow(row);
-            setR4CurrentSongIdx(firstNoteInRow);
-            setActiveNote({ categoryId: 'r4_sprint', noteIndex: firstNoteInRow });
-            setR4IsActiveSession(true);
-            setTimeLeft(timerDuration);
-            stopBGM();
-            playSFX(SFX.select);
-            setModal(null);
-          },
-          t.confirmLabel || "Choose",
-          t.cancelLabel || "Cancel",
-          'inline'
-        );
-
+        // Start a new session on an unused row
+        const firstNoteInRow = row * 7;
+        setSelectedRow(row);
+        setR4CurrentSongIdx(firstNoteInRow);
+        setActiveNote({ categoryId: 'r4_sprint', noteIndex: firstNoteInRow });
+        setR4IsActiveSession(true);
+        setTimeLeft(timerDuration);
+        stopBGM();
+        playSFX(SFX.select);
         return;
       }
+
       if (selectedRow !== null) {
         const startIdx = selectedRow * 7;
         const endIdx = startIdx + 7;
         if (noteIndex >= startIdx && noteIndex < endIdx) {
-          if (playerProg?.correctIndices.has(noteIndex)) return;
-
-          if (isPlaying) {
-            return;
-          }
+          if (isPlaying) return;
           stopSong();
           setR4CurrentSongIdx(noteIndex);
-          setActiveNote({ categoryId: 'r4_sprint', noteIndex });
+
+          // Explicitly set isReveal based on whether song is correct
+          if (isCorrect) {
+            console.log("🎵 Playing correct song as FULL version");
+            setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+          } else {
+            setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: false });
+          }
+
           playSFX(SFX.select);
         }
       }
-      return;
+
+      // Active session – allow replaying correct songs as reveals
+      // if (selectedRow !== null) {
+      //   const startIdx = selectedRow * 7;
+      //   const endIdx = startIdx + 7;
+      //   if (noteIndex >= startIdx && noteIndex < endIdx) {
+      //     if (isPlaying) return;
+      //     stopSong();
+      //     setR4CurrentSongIdx(noteIndex);
+      //     // If the song is already correct, play as reveal (full version, no timer)
+      //     setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: isCorrect ? true : false });
+      //     playSFX(SFX.select);
+      //   }
+      // }
     }
+
+
+    // if (isSprintRound) {
+    //   const pId = gameState.players[gameState.currentPlayerIndex].id;
+    //   const playerProg = progress.r4PlayerProgress?.[pId];
+    //   if (playerProg?.hasFinished) {
+    //     stopSong();
+    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+    //     setR4CurrentSongIdx(noteIndex);
+    //     playSFX(SFX.select);
+    //     return;
+    //   }
+    //   if (!r4IsActiveSession) {
+    //     const row = Math.floor(noteIndex / 7);
+    //     const usedRowsSet = progress.usedRows || new Set();
+
+    //     // (Optional) silently ignore clicks on already used rows
+    //     if (usedRowsSet.has(row)) {
+    //       return; // no modal, just do nothing
+    //     }
+
+    //     const firstNoteInRow = row * 7;
+    //     setSelectedRow(row);
+    //     setR4CurrentSongIdx(firstNoteInRow);
+    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex: firstNoteInRow });
+    //     setR4IsActiveSession(true);
+    //     setTimeLeft(timerDuration);
+    //     stopBGM();
+    //     playSFX(SFX.select);
+
+    //     return; // exit after starting session
+    //   }
+    //   if (selectedRow !== null) {
+    //     const startIdx = selectedRow * 7;
+    //     const endIdx = startIdx + 7;
+    //     if (noteIndex >= startIdx && noteIndex < endIdx) {
+    //       if (playerProg?.correctIndices.has(noteIndex)) return;
+
+    //       if (isPlaying) {
+    //         return;
+    //       }
+    //       stopSong();
+    //       setR4CurrentSongIdx(noteIndex);
+    //       setActiveNote({ categoryId: 'r4_sprint', noteIndex });
+    //       playSFX(SFX.select);
+    //     }
+    //   }
+    //   return;
+    // }
 
     if (isFinalRound) {
       stopSong();
@@ -1224,20 +1302,32 @@ const App: React.FC = () => {
       return;
     }
 
-    if (activeNote) return;
+    // if (activeNote) return;
 
-    showModal(t.round, t.confirmNote, () => {
-      playSFX(SFX.select);
-      stopBGM();
-      setActiveNote({ categoryId, noteIndex });
-      setTimeLeft(60);
-      setModal(null);
-      if (roundId === 1) {
-        setCurrentRoundPoints(progress.pointMap[categoryId][noteIndex]);
-      } else if (isMelodyRound) {
-        setCurrentRoundPoints(progress.persistentPoints?.[`${categoryId}-0`] || 20);
-      }
-    }, undefined, undefined, 'inline');
+    if (activeNote && !isPlaying) {
+      stopSong(true);                 // stop audio and clear timers
+      setActiveNote(null);             // clear the previous selection
+      // setCurrentRoundPoints(undefined);
+      if (roundId !== 4) { setTimeLeft(undefined); }; // Clear timer for non-sprint rounds
+      // Continue to the selection logic below (no return)
+    } else if (activeNote) {
+      // If playing, block changing the note
+      return;
+    }
+
+    // showModal(t.round, t.confirmNote, () => {
+    playSFX(SFX.select);
+    stopBGM();
+    setActiveNote({ categoryId, noteIndex });
+    // setTimeLeft(60);
+    setModal(null);
+    if (roundId !== 4) { setTimeLeft(60); };
+    if (roundId === 1) {
+      setCurrentRoundPoints(progress.pointMap[categoryId][noteIndex]);
+    } else if (isMelodyRound) {
+      setCurrentRoundPoints(progress.persistentPoints?.[`${categoryId}-0`] || 20);
+    }
+    // }, undefined, undefined, 'inline');
   };
 
   // UPDATED handleAudioControl function
@@ -1273,12 +1363,35 @@ const App: React.FC = () => {
         songIndex = activeNote.noteIndex;
       }
 
+
       const category = roundData.find(c => c.id === activeNote.categoryId);
       const song = category?.songs[songIndex];
+
       if (!song) return;
 
-      const isRevealMode = activeNote.isReveal || (isSprintRound && !r4IsActiveSession) || (isFinalRound && progress.currentTurnIndex !== songIndex);
+
+      let isSongCorrect = false;
+      if (isSprintRound) {
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        const playerProg = progress.r4PlayerProgress?.[currentPlayer.id];
+        isSongCorrect = playerProg?.correctIndices.has(songIndex) ?? false;
+      }
+
+      const isRevealMode = activeNote.isReveal ||
+        (isSprintRound && (!r4IsActiveSession || isSongCorrect)) ||
+        (isFinalRound && progress.currentTurnIndex !== songIndex);
+
+      // const isRevealMode = activeNote.isReveal || (isSprintRound && !r4IsActiveSession) || (isFinalRound && progress.currentTurnIndex !== songIndex);
       const audioUrlToPlay = (isRevealMode || (isFinalRound && selectedDuration === null)) ? (song.audioUrlFull || song.audioUrl) : song.audioUrl;
+
+
+      console.log("🔊 Audio debug:", {
+        isRevealMode,
+        activeNoteIsReveal: activeNote.isReveal,
+        songTitle: song?.title,
+        hasFullVersion: !!song?.audioUrlFull,
+        playingFull: isRevealMode || (isFinalRound && selectedDuration === null)
+      });
 
       if (!isRevealMode && (timeLeft === undefined || timeLeft <= 0)) {
         if (isFinalRound) setTimeLeft(selectedDuration || 0);
@@ -1332,24 +1445,62 @@ const App: React.FC = () => {
             });
           }, 1000);
         }
-        else if (isSprintRound && r4IsActiveSession) {
+        // Inside handleAudioControl, around where the Round 4 interval is set
+        else if (isSprintRound && r4IsActiveSession && !activeNote.isReveal) {
           countdownIntervalRef.current = window.setInterval(() => {
             setTimeLeft(prev => {
               if (prev === undefined) return prev;
+              const playerProg = gameState.roundProgress[roundId]?.r4PlayerProgress?.[gameState.players[gameState.currentPlayerIndex].id];
+              if (playerProg?.correctIndices.has(r4CurrentSongIdx)) {
+                return prev; // freeze timer
+              }
               if (prev > 0) return prev - 1;
 
+              // Timer expired – handle end of session
               window.clearInterval(countdownIntervalRef.current!);
               countdownIntervalRef.current = null;
+              stopSong(false);
+              playSFX(SFX.wrong);
 
-              if (isSprintRound && r4IsActiveSession) {
-                stopSong(false);
-                playSFX(SFX.wrong); // Play wrong sound once when time is up
-              }
-              else handleAudioControl('stop');
+              // Mark row as used
+              setGameState(prevState => {
+                const progress = prevState.roundProgress[roundId];
+                if (!progress) return prevState;
+                const usedRows = new Set(progress.usedRows || []);
+                if (selectedRow !== null) usedRows.add(selectedRow);
+                return {
+                  ...prevState,
+                  roundProgress: {
+                    ...prevState.roundProgress,
+                    [roundId]: { ...progress, usedRows }
+                  }
+                };
+              });
+
+              setR4IsActiveSession(false);
+              setShowScoreboard(true);
               return 0;
             });
           }, 1000);
         }
+        // else if (isSprintRound && r4IsActiveSession) {
+        //   countdownIntervalRef.current = window.setInterval(() => {
+        //     setTimeLeft(prev => {
+        //       if (prev === undefined) return prev;
+        //       if (prev > 0) return prev - 1;
+
+        //       window.clearInterval(countdownIntervalRef.current!);
+        //       countdownIntervalRef.current = null;
+
+        //       if (isSprintRound && r4IsActiveSession) {
+        //         stopSong(false);
+        //         playSFX(SFX.wrong); // Play wrong sound once when time is up
+        //       }
+        //       else handleAudioControl('stop');
+        //       return 0;
+        //     });
+        //   }, 1000);
+        // }
         else if (isFinalRound && selectedDuration !== null && !isR3Finalized) {
           countdownIntervalRef.current = window.setInterval(() => {
             setTimeLeft(prev => {
@@ -1391,28 +1542,29 @@ const App: React.FC = () => {
         setActiveResponder(null);
 
         let isRevealMode = false;
-        if (isBuzzerConnected) {
-          //CHeck to play minus or full
-          let songIndex = 0;
-          if (isMelodyRound) {
-            songIndex = activeNote.isReveal ? activeNote.noteIndex - 1 : (progress.activationCounts[activeNote.categoryId] || 0);
-          } else if (isFinalRound) {
-            songIndex = progress.currentTurnIndex || 0;
-          } else if (isSprintRound) {
-            songIndex = r4CurrentSongIdx;
-          } else {
-            songIndex = activeNote.noteIndex;
-          }
-          // Determine if we are in "Full/Reveal" mode or "Game" mode
-          // We use the same logic your startPlayback uses:
-          isRevealMode = activeNote.isReveal ||
-            (isSprintRound && !r4IsActiveSession) ||
-            (isFinalRound && progress.currentTurnIndex !== songIndex);
+        // if (isBuzzerConnected) {
+        //CHeck to play minus or full
+        let songIndex = 0;
+        if (isMelodyRound) {
+          songIndex = activeNote.isReveal ? activeNote.noteIndex - 1 : (progress.activationCounts[activeNote.categoryId] || 0);
+        } else if (isFinalRound) {
+          songIndex = progress.currentTurnIndex || 0;
+        } else if (isSprintRound) {
+          songIndex = r4CurrentSongIdx;
+        } else {
+          songIndex = activeNote.noteIndex;
         }
+        // Determine if we are in "Full/Reveal" mode or "Game" mode
+        // We use the same logic your startPlayback uses:
+        isRevealMode = activeNote.isReveal ||
+          (isSprintRound && !r4IsActiveSession) ||
+          (isFinalRound && progress.currentTurnIndex !== songIndex);
+        // }
 
 
-        if (isBuzzerConnected && !isRevealMode) {
+        const roundsThatUseBuzzers = [0, 1, 2, 4]; // Add or remove round IDs as needed
 
+        if (isBuzzerConnected && !isRevealMode && roundsThatUseBuzzers.includes(roundId)) {
           // 1. "CLEAN SLATE": Tell the server to clear old buzzes and go to IDLE
           console.log("🛠️ Sending DISARM (IDLE)");
           buzzerSocket.emit('gameAction', {
@@ -1423,11 +1575,11 @@ const App: React.FC = () => {
           // 2. DELAY: Wait 150ms for the "Reset" signal to clear all phones
           setTimeout(() => {
             console.log("🛠️ Sending ARM (BATTLE)");
-            armBuzzers();
+            armBuzzers();  // ← Only arms for rounds 0,1,2
             startPlayback();
           }, 150);
         } else {
-          // Fallback: If buzzer server is down, just play the music
+          // No buzzer arming for Round 3 (and other non-buzzer rounds)
           startPlayback();
         }
       };
@@ -1485,51 +1637,320 @@ const App: React.FC = () => {
     // =========================================================
     // ROUND 4: SPRINT LOGIC (Update state, don't return JSX)
     // =========================================================
-    // Inside App.tsx -> RoundView function
     if (isSprintRound) {
-      return (
-        <RoundSprint
-          gameState={gameState}
-          isPlaying={isPlaying}
-          timeLeft={timeLeft}
-          audioProgress={audioProgress}
-          modal={modal}
-          t={t}
-          // Pass the specific Sprint states
-          r4IsActiveSession={r4IsActiveSession}
-          selectedRow={selectedRow}
-          r4CurrentSongIdx={r4CurrentSongIdx}
-          playedButNotEvaluated={playedButNotEvaluated}
-          showTimerSettings={showTimerSettings}
-          timerDuration={timerDuration}
-          activeNote={activeNote}
-          // Pass the actions
-          onNavigate={navigateTo}
-          onInitializeRound={initializeRound}
-          onUpdatePlayer={handleUpdatePlayer}
-          onShowModal={showModal}
-          onSetModal={setModal}
-          onSetCurrentPlayer={(idx) => {
-            setGameState(prev => ({ ...prev, currentPlayerIndex: idx }));
-          }}
-          onAudioControl={handleAudioControl}
-          onFinalizeTurn={handleFinalizeTurn}
-          onSeek={handleSeek}
-          formatTime={formatTime}
-          onNoteClick={handleNoteClick}
-          onSetR4IsActiveSession={setR4IsActiveSession}
-          onSetSelectedRow={setSelectedRow}
-          onSetTimeLeft={setTimeLeft}
-          onSetShowTimerSettings={setShowTimerSettings}
-          onSetPlayedButNotEvaluated={setPlayedButNotEvaluated}
-          onSetTimerDuration={setTimerDuration}
-          onResetTimer={() => setTimeLeft(timerDuration)}
-          onStopSong={stopSong}
-          onShowRoundSummary={() => setShowScoreboard(true)}
-          onFinishRound={handleFinishRoundManual}
-        />
-      );
+      // Show confirmation modal
+      const title = status === 'correct' ? t.correct : status === 'wrong' ? t.wrong : t.skip;
+      const message = status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints;
+
+      showModal(title, message, () => {
+        // --- This runs after user confirms ---
+        const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        const playerId = currentPlayer.id;
+        const playerProg = progress.r4PlayerProgress?.[playerId];
+        if (!playerProg) return;
+
+        const currentSongIdx = r4CurrentSongIdx;
+
+        // Copy player progress (Set must be recreated)
+        const newPlayerProg = {
+          ...playerProg,
+          correctIndices: new Set(playerProg.correctIndices),
+          wrongIndex: playerProg.wrongIndex,
+        };
+
+        // Play sound
+        playSFX(status === 'correct' ? SFX.correct : SFX.wrong);
+
+        // Update based on status
+        if (status === 'correct') {
+
+          const currentCorrectCount = playerProg.correctIndices.size;
+          const pointsForThis = (currentCorrectCount + 1) * 10; // next correct value
+          newPlayerProg.correctIndices.add(currentSongIdx);
+
+
+          // Award 10 points
+          setGameState(prev => ({
+            ...prev,
+            players: prev.players.map(p =>
+              //p.id === playerId ? { ...p, score: p.score + 10 } : p
+              p.id === playerId ? { ...p, score: p.score + pointsForThis } : p
+            )
+          }));
+        } else if (status === 'wrong') {
+          newPlayerProg.wrongIndex = currentSongIdx;
+        }
+        // skip does nothing
+
+        // Check for perfect round bonus
+        if (newPlayerProg.correctIndices.size === 7) {
+          newPlayerProg.hasFinished = true;
+          setGameState(prev => ({
+            ...prev,
+            players: prev.players.map(p =>
+              p.id === playerId ? { ...p, score: p.score + 300 } : p
+            )
+          }));
+        }
+
+        // Update round progress
+        setGameState(prev => ({
+          ...prev,
+          roundProgress: {
+            ...prev.roundProgress,
+            [roundId]: {
+              ...progress,
+              r4PlayerProgress: {
+                ...progress.r4PlayerProgress,
+                [playerId]: newPlayerProg
+              }
+            }
+          }
+        }));
+
+        // Clean up
+        stopSong(true);
+        setActiveNote(null);
+        setCurrentRoundPoints(undefined);
+        // setTimeLeft(undefined);
+        setModal(null); // close confirmation modal
+      }, status === 'correct' ? t.correct : t.noAssign, undefined, 'inline');
+
+      return; // important: exit after showing modal
     }
+
+
+
+    // Inside App.tsx -> RoundView function
+    //   if (isSprintRound) {
+    //   return (
+    //     <RoundSprint
+    //       gameState={gameState}
+    //       isPlaying={isPlaying}
+    //       timeLeft={timeLeft}
+    //       audioProgress={audioProgress}
+    //       modal={modal}
+    //       t={t}
+    //       // Pass the specific Sprint states
+    //       r4IsActiveSession={r4IsActiveSession}
+    //       selectedRow={selectedRow}
+    //       r4CurrentSongIdx={r4CurrentSongIdx}
+    //       playedButNotEvaluated={playedButNotEvaluated}
+    //       showTimerSettings={showTimerSettings}
+    //       timerDuration={timerDuration}
+    //       activeNote={activeNote}
+    //       // Pass the actions
+    //       onNavigate={navigateTo}
+    //       onInitializeRound={initializeRound}
+    //       onUpdatePlayer={handleUpdatePlayer}
+    //       onShowModal={showModal}
+    //       onSetModal={setModal}
+    //       onSetCurrentPlayer={(idx) => {
+    //         setGameState(prev => ({ ...prev, currentPlayerIndex: idx }));
+    //       }}
+    //       onAudioControl={handleAudioControl}
+    //       onFinalizeTurn={handleFinalizeTurn}
+    //       onSeek={handleSeek}
+    //       formatTime={formatTime}
+    //       onNoteClick={handleNoteClick}
+    //       onSetR4IsActiveSession={setR4IsActiveSession}
+    //       onSetSelectedRow={setSelectedRow}
+    //       onSetTimeLeft={setTimeLeft}
+    //       onSetShowTimerSettings={setShowTimerSettings}
+    //       onSetPlayedButNotEvaluated={setPlayedButNotEvaluated}
+    //       onSetTimerDuration={setTimerDuration}
+    //       onResetTimer={() => setTimeLeft(timerDuration)}
+    //       onStopSong={stopSong}
+    //       onShowRoundSummary={() => setShowScoreboard(true)}
+    //       onFinishRound={handleFinishRoundManual}
+    //     />
+    //   );
+    // }
+    // if (isSprintRound) {
+    //   const pId = gameState.players[gameState.currentPlayerIndex].id;
+    //   const playerProg = progress.r4PlayerProgress?.[pId];
+
+    //   if (playerProg?.hasFinished) {
+    //     stopSong();
+    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+    //     setR4CurrentSongIdx(noteIndex);
+    //     playSFX(SFX.select);
+    //     return;
+    //   }
+
+    //   const isCorrect = playerProg?.correctIndices.has(noteIndex);
+
+    //   if (!r4IsActiveSession) {
+    //     const row = Math.floor(noteIndex / 7);
+    //     const usedRowsSet = progress.usedRows || new Set();
+
+    //     if (usedRowsSet.has(row)) {
+    //       // Row is used - only allow playing correct songs
+    //       if (isCorrect) {
+    //         stopSong();
+    //         setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+    //         setR4CurrentSongIdx(noteIndex);
+    //         playSFX(SFX.select);
+    //       }
+    //       return;
+    //     }
+
+    //     // Start new row - NO CONFIRMATION MODAL
+    //     const firstNoteInRow = row * 7;
+    //     setSelectedRow(row);
+    //     setR4CurrentSongIdx(firstNoteInRow);
+    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex: firstNoteInRow, isReveal: false });
+    //     setR4IsActiveSession(true);
+    //     setTimeLeft(timerDuration);
+    //     stopBGM();
+    //     playSFX(SFX.select);
+    //     return;
+    //   }
+
+    //   // Active session
+    //   if (selectedRow !== null) {
+    //     const startIdx = selectedRow * 7;
+    //     const endIdx = startIdx + 7;
+    //     if (noteIndex >= startIdx && noteIndex < endIdx) {
+    //       if (isPlaying && !isCorrect) return;
+
+    //       stopSong();
+    //       setR4CurrentSongIdx(noteIndex);
+    //       setActiveNote({
+    //         categoryId: 'r4_sprint',
+    //         noteIndex,
+    //         isReveal: isCorrect ? true : false
+    //       });
+    //       playSFX(SFX.select);
+    //     }
+    //   }
+    //   return;
+    // }
+    // if (isSprintRound) {
+    //   // Show confirmation modal
+    //   const title = status === 'correct' ? t.correct : status === 'wrong' ? t.wrong : t.skip;
+    //   const message = status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints;
+
+    //   showModal(title, message, () => {
+    //     // --- This runs after user confirms ---
+    //     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+    //     const playerId = currentPlayer.id;
+    //     const playerProg = progress.r4PlayerProgress?.[playerId];
+    //     if (!playerProg) return;
+
+    //     const currentSongIdx = r4CurrentSongIdx;
+
+    //     // Copy player progress (Set must be recreated)
+    //     const newPlayerProg = {
+    //       ...playerProg,
+    //       correctIndices: new Set(playerProg.correctIndices),
+    //       wrongIndex: playerProg.wrongIndex,
+    //     };
+
+    //     // Play sound
+    //     playSFX(status === 'correct' ? SFX.correct : SFX.wrong);
+
+    //     // Update based on status
+    //     if (status === 'correct') {
+
+    //       const currentCorrectCount = playerProg.correctIndices.size;
+    //       const pointsForThis = (currentCorrectCount + 1) * 10; // next correct value
+    //       newPlayerProg.correctIndices.add(currentSongIdx);
+
+
+    //       // Award 10 points
+    //       setGameState(prev => ({
+    //         ...prev,
+    //         players: prev.players.map(p =>
+    //           //p.id === playerId ? { ...p, score: p.score + 10 } : p
+    //           p.id === playerId ? { ...p, score: p.score + pointsForThis } : p
+    //         )
+    //       }));
+    //     } else if (status === 'wrong') {
+    //       newPlayerProg.wrongIndex = currentSongIdx;
+    //     }
+    //     // skip does nothing
+
+    //     // Check for perfect round bonus
+    //     if (newPlayerProg.correctIndices.size === 7) {
+    //       newPlayerProg.hasFinished = true;
+    //       setGameState(prev => ({
+    //         ...prev,
+    //         players: prev.players.map(p =>
+    //           p.id === playerId ? { ...p, score: p.score + 300 } : p
+    //         )
+    //       }));
+    //     }
+
+    //     // Update round progress
+    //     setGameState(prev => ({
+    //       ...prev,
+    //       roundProgress: {
+    //         ...prev.roundProgress,
+    //         [roundId]: {
+    //           ...progress,
+    //           r4PlayerProgress: {
+    //             ...progress.r4PlayerProgress,
+    //             [playerId]: newPlayerProg
+    //           }
+    //         }
+    //       }
+    //     }));
+
+    //     // Clean up
+    //     stopSong(true);
+    //     setActiveNote(null);
+    //     setCurrentRoundPoints(undefined);
+    //     // setTimeLeft(undefined);
+    //     setModal(null); // close confirmation modal
+    //   }, status === 'correct' ? t.correct : t.noAssign, undefined, 'inline');
+
+    //   return; // important: exit after showing modal
+    // }
+    // if (isSprintRound) {
+    //   return (
+    //     <RoundSprint
+    //       gameState={gameState}
+    //       isPlaying={isPlaying}
+    //       timeLeft={timeLeft}
+    //       audioProgress={audioProgress}
+    //       modal={modal}
+    //       t={t}
+    //       // Pass the specific Sprint states
+    //       r4IsActiveSession={r4IsActiveSession}
+    //       selectedRow={selectedRow}
+    //       r4CurrentSongIdx={r4CurrentSongIdx}
+    //       playedButNotEvaluated={playedButNotEvaluated}
+    //       showTimerSettings={showTimerSettings}
+    //       timerDuration={timerDuration}
+    //       activeNote={activeNote}
+    //       // Pass the actions
+    //       onNavigate={navigateTo}
+    //       onInitializeRound={initializeRound}
+    //       onUpdatePlayer={handleUpdatePlayer}
+    //       onShowModal={showModal}
+    //       onSetModal={setModal}
+    //       onSetCurrentPlayer={(idx) => {
+    //         setGameState(prev => ({ ...prev, currentPlayerIndex: idx }));
+    //       }}
+    //       onAudioControl={handleAudioControl}
+    //       onFinalizeTurn={handleFinalizeTurn}
+    //       onSeek={handleSeek}
+    //       formatTime={formatTime}
+    //       onNoteClick={handleNoteClick}
+    //       onSetR4IsActiveSession={setR4IsActiveSession}
+    //       onSetSelectedRow={setSelectedRow}
+    //       onSetTimeLeft={setTimeLeft}
+    //       onSetShowTimerSettings={setShowTimerSettings}
+    //       onSetPlayedButNotEvaluated={setPlayedButNotEvaluated}
+    //       onSetTimerDuration={setTimerDuration}
+    //       onResetTimer={() => setTimeLeft(timerDuration)}
+    //       onStopSong={stopSong}
+    //       onShowRoundSummary={() => setShowScoreboard(true)}
+    //       onFinishRound={handleFinishRoundManual}
+    //     />
+    //   );
+    // }
 
     // =========================================================
     // ROUND 3: DUEL LOGIC (Update state, don't return JSX)
