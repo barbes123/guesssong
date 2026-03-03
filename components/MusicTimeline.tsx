@@ -17,8 +17,8 @@ const MusicTimeline: React.FC<MusicTimelineProps> = ({
   formatTime,
   t
 }) => {
-  // SAFE GUARD: If progress is missing, don't render (but show the timeline even when not playing)
-  if (!progress) return null;
+  // SAFE GUARD: If progress is missing or empty, don't crash, just hide.
+  // if (!progress || (!isPlaying && progress.current === 0)) return null;
   
   // Safe extraction with fallbacks
   const current = progress.current || 0;
