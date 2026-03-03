@@ -103,9 +103,13 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
   const pId = currentPlayer.id;
 
   // Ensure player progress exists
-  let playerProg = progress.r4PlayerProgress?.[pId];
+  // let playerProg = progress.r4PlayerProgress?.[pId];
 
   const usedRowsSet = progress.usedRows || new Set();
+
+  const playerProg = progress.r4PlayerProgress?.[gameState.players[gameState.currentPlayerIndex].id];
+  const isCurrentSongCorrect = playerProg?.correctIndices.has(r4CurrentSongIdx) ?? false;
+  const shouldDisableActions = !r4IsActiveSession || !activeNote || activeNote.isReveal || (isCurrentSongCorrect && r4IsActiveSession);
 
   return (
     <div className="min-h-screen bg-slate-950 p-8 pt-24">
@@ -209,11 +213,11 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                             key={songIdx}
                             onClick={() => { if (isSelectable || playerProg?.hasFinished || isCorrect || isWrong) onNoteClick('r4_sprint', songIdx); }}
                             className={`h-24 rounded-2xl border-3 transition-all flex flex-col items-center justify-center ${isActive && r4IsActiveSession ? 'bg-indigo-600 border-white scale-110 z-10' :
-                                isCorrect ? 'bg-emerald-600 border-emerald-400' :
-                                  isWrong ? 'bg-rose-600 border-rose-400' :
-                                    playedButNotEvaluated.includes(songIdx) ? 'bg-yellow-600 border-yellow-400' :
-                                      isSelectable ? 'bg-slate-800 border-slate-600 hover:bg-slate-700' :
-                                        'bg-slate-900/50 opacity-60'
+                              isCorrect ? 'bg-emerald-600 border-emerald-400' :
+                                isWrong ? 'bg-rose-600 border-rose-400' :
+                                  playedButNotEvaluated.includes(songIdx) ? 'bg-yellow-600 border-yellow-400' :
+                                    isSelectable ? 'bg-slate-800 border-slate-600 hover:bg-slate-700' :
+                                      'bg-slate-900/50 opacity-60'
                               }`}
                           >
                             {isCorrect ? <CheckCircle size={28} /> : isWrong ? <XCircle size={28} /> : <MusicIcon size={28} />}
@@ -255,6 +259,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                 });
               }}
               t={t}
+              activePlayerIds={[gameState.players[gameState.currentPlayerIndex].id]} // 👈 only this player
             />
           </div>
         </div>
@@ -272,45 +277,9 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             </div>
           </div>
 
-          <div className="bg-slate-800 rounded-[3rem] p-8 border-2 border-slate-700 shadow-2xl">
-            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest text-center mb-6"> {t.round5Progress || "ROUND 4 PROGRESS"}</h3>
 
-            <div className="bg-slate-900/60 rounded-2xl p-6 mb-4 border border-slate-700">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-slate-400 text-sm font-bold"> {t.sessionPoints || "Session Points"} </span>
-                <span className="text-3xl font-black text-emerald-400">
-                  {(() => {
-                    const pId = currentPlayer.id;
-                    const correctCount = playerProg?.correctIndices?.size || 0;
-                    const isCurrentSongCorrect = playerProg?.correctIndices?.has(r4CurrentSongIdx);
-                    let sessionPoints = correctCount * 10;
-                    if (isCurrentSongCorrect && r4IsActiveSession) sessionPoints += 10;
-                    if (correctCount === 7 || (correctCount === 6 && isCurrentSongCorrect)) sessionPoints += 300;
-                    return sessionPoints;
-                  })()}
-                </span>
-              </div>
-              <div className="text-xs text-slate-500 font-medium">{t.tenPerCorrect || "+10 per correct song"}</div>
-            </div>
 
-            <div className="bg-slate-900/60 rounded-2xl p-6 border border-slate-700">
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-slate-400 text-sm font-bold block">{t.perfectRoundBonus || "Perfect Round Bonus"}</span>
-                  <span className="text-xs text-slate-500">{t.all7Correct || "All 7 songs correct"}</span>
-                </div>
-                <div className={`text-2xl font-black ${playerProg?.correctIndices?.size === 7 ? 'text-yellow-400' : 'text-slate-600'}`}>+300</div>
-              </div>
-              <div className="mt-4 flex gap-1">
-                {Array.from({ length: 7 }).map((_, idx) => {
-                  const isCorrect = playerProg?.correctIndices?.has(selectedRow !== null ? selectedRow * 7 + idx : idx);
-                  return <div key={idx} className={`flex-1 h-2 rounded-full ${isCorrect ? 'bg-emerald-500' : 'bg-slate-700'}`} />;
-                })}
-              </div>
-            </div>
-          </div>
-
-          <ControlPanel
+          {/* <ControlPanel
             isPlaying={isPlaying}
             onStart={() => onAudioControl('start')}
             onStop={() => onAudioControl('stop')}
@@ -321,6 +290,36 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             timeLeft={timeLeft}
             t={t}
             disabledActions={!r4IsActiveSession}
+          /> */}
+
+          {/* <ControlPanel
+            isPlaying={isPlaying}
+            onStart={() => onAudioControl('start')}
+            onStop={() => onAudioControl('stop')}
+            onCorrect={() => onFinalizeTurn('correct')}
+            onWrong={() => onFinalizeTurn('wrong')}
+            onSkip={() => onFinalizeTurn('skip')}
+            onFinishRound={onFinishRound}
+            timeLeft={timeLeft}
+            t={t}
+            disabledActions={!r4IsActiveSession || !activeNote || activeNote.isReveal}
+          // disabledActions={!r4IsActiveSession}
+          /> */}
+
+
+
+
+          <ControlPanel
+            isPlaying={isPlaying}
+            onStart={() => onAudioControl('start')}
+            onStop={() => onAudioControl('stop')}
+            onCorrect={() => onFinalizeTurn('correct')}
+            onWrong={() => onFinalizeTurn('wrong')}
+            timeLeft={timeLeft}
+            onFinishRound={onFinishRound}
+            t={t}
+            disabledActions={shouldDisableActions}
+            isStartDisabled={!activeNote}
           />
 
           <MusicTimeline

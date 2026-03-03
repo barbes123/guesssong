@@ -1,16 +1,16 @@
 02MAR2026
 - if "waiting" for a player from buzzer it should not display in Game
 - R3 change point per song from 10-> 10 20 30 ... 70 and put in in json config
-- points to round 0
-- R3 - buttons  should not be ARMED
+- add points to round 0
+= R3 - buttons  should not be ARMED [03MAR26]
 - R4 - only for the active player the buttons should be ARMED
 - Leader panel check style and colors
 = R2 - a window for leader does not display correctly [03MAR26]
 = R2 when replay when category is done, bug [03MAR26]
 27FEB26
 - R4 needs de-zoom
-- Confirmation panle in Round needs de-zoom
-- then go from R3->R4 by navigation button, it asks double confirmation
+- Confirmation panel in Round needs de-zoom
+= then go from R3->R4 by navigation button, it asks double confirmation [03MAR26]
 26FEB26
 = Add ScoreBar to shown at the end of Round3 [27FEB26]
 - Make player Screens More attractive
