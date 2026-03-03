@@ -243,6 +243,8 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                               <button
                                 key={idx}
                                 onClick={() => isUnlocked && onNoteClick(cat.id, idx)}
+                                // onClick={() => isUnlocked && onNoteClick(cat.id, songIdx)}
+                                
                                 className={btnCls}
                                 disabled={!isUnlocked}
                               >

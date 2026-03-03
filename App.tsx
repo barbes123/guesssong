@@ -402,19 +402,54 @@ const App: React.FC = () => {
     // Get current song data
     // CHANGE: Only update song info when activeNote changes (new song selected with PLAY)
     // Song info persists even if music is stopped (STOP) or buzzer is pressed
+    // let currentSong: any = null;
+    // if (activeNote && activeId !== null) {
+    //   const selectedSetId = gameState.roundSets[activeId] || 'default';
+    //   const roundData = getRoundData(activeId, selectedSetId) || [];
+    //   const category = roundData.find(c => c.id === activeNote.categoryId);
+    //   if (category) {
+    //     const songData = category.songs[activeNote.noteIndex];
+    //     currentSong = {
+    //       title: songData.title,
+    //       artist: songData.artist,
+    //       // Force the notes string into the object
+    //       notes: songData.notes || ""
+    //     };
+    //   }
+    // }
+    // Get current song data
+    // CHANGE: Only update song info when activeNote changes (new song selected with PLAY)
+    // Song info persists even if music is stopped (STOP) or buzzer is pressed
     let currentSong: any = null;
     if (activeNote && activeId !== null) {
       const selectedSetId = gameState.roundSets[activeId] || 'default';
       const roundData = getRoundData(activeId, selectedSetId) || [];
       const category = roundData.find(c => c.id === activeNote.categoryId);
       if (category) {
-        const songData = category.songs[activeNote.noteIndex];
-        currentSong = {
-          title: songData.title,
-          artist: songData.artist,
-          // Force the notes string into the object
-          notes: songData.notes || ""
-        };
+        // Determine the correct song index based on round type
+        let songIndex = activeNote.noteIndex;
+        const progress = gameState.roundProgress[activeId];
+
+        // Round 2 (melody round) needs special handling
+        if (activeId === 2) {
+          if (activeNote.isReveal) {
+            // Reveal buttons (1‑4) → song index = noteIndex - 1
+            songIndex = activeNote.noteIndex - 1;
+          } else if (activeNote.noteIndex === 0) {
+            // Points button (0) → song index = next unrevealed song
+            songIndex = progress?.activationCounts?.[activeNote.categoryId] || 0;
+          }
+        }
+        // For other rounds, noteIndex already matches the song
+
+        const songData = category.songs[songIndex];
+        if (songData) {
+          currentSong = {
+            title: songData.title,
+            artist: songData.artist,
+            notes: songData.notes || ""
+          };
+        }
       }
     }
 
@@ -1019,14 +1054,84 @@ const App: React.FC = () => {
 
   // UPDATED handleNoteClick function
   const handleNoteClick = (categoryId: string, noteIndex: number) => {
-    const roundId = gameState.activeRoundId;
-    if (roundId === null) return;
-    const progress = gameState.roundProgress[roundId];
-    if (!progress) return;
+//     const roundId = gameState.activeRoundId!;
+//     const selectedSetId = gameState.roundSets[roundId] || 'default';
+//     const roundData = getRoundData(roundId, selectedSetId) || [];
 
-    const isMelodyRound = roundId === 2;
-    const isSprintRound = roundId === 4;
-    const isFinalRound = roundId === 3;
+//     const category = roundData.find((c: any) => c.id === categoryId);
+
+//     // const dataIndex = (gameState.activeRoundId === 2) ? noteIndex - 1 : noteIndex;
+
+
+//     // console.log(`Current Category songs length: ${category?.songs?.length}`);
+//     // console.log(` Note index ${noteIndex} `);
+
+//     // if (!category || !category.songs || !category.songs[noteIndex]) {
+//     //   console.warn(`Blocked a crash! Note index ${noteIndex} doesn't exist in category ${categoryId}`);
+//     //   // console.log(`Current Category songs length: ${category?.songs?.length}`);
+//     //   return;
+//     // }
+//     // const songData = category.songs[dataIndex];
+
+// const dataIndex = (gameState.activeRoundId === 2) ? noteIndex - 1 : noteIndex;
+
+// console.log(`Current Category songs length: ${category?.songs?.length}`);
+// console.log(` Note index ${noteIndex}, data index ${dataIndex}`);
+
+// if (!category || !category.songs || !category.songs[dataIndex]) {
+//   console.warn(`Blocked a crash! Data index ${dataIndex} doesn't exist in category ${categoryId}`);
+//   return;
+// }
+// const songData = category.songs[dataIndex];
+
+
+
+//     // const roundId = gameState.activeRoundId;
+
+//     if (roundId === null) return;
+//     const progress = gameState.roundProgress[roundId];
+//     if (!progress) return;
+
+//     const isMelodyRound = roundId === 2;
+//     const isSprintRound = roundId === 4;
+//     const isFinalRound = roundId === 3;
+
+  const roundId = gameState.activeRoundId!;
+  const selectedSetId = gameState.roundSets[roundId] || 'default';
+  const roundData = getRoundData(roundId, selectedSetId) || [];
+
+  const category = roundData.find((c: any) => c.id === categoryId);
+  if (!category) return;
+
+  const progress = gameState.roundProgress[roundId];
+  if (!progress) return;
+
+  const isMelodyRound = roundId === 2;
+  const isSprintRound = roundId === 4;
+  const isFinalRound = roundId === 3;
+
+  // --- Determine the actual song index for existence check ---
+  let effectiveIndex = noteIndex; // default for non-melody rounds
+
+  if (isMelodyRound) {
+    if (noteIndex === 0) {
+      // Points button: use the next unrevealed song (activation count)
+      effectiveIndex = progress.activationCounts?.[categoryId] || 0;
+    } else {
+      // Reveal buttons: noteIndex maps to songIndex = noteIndex - 1
+      effectiveIndex = noteIndex - 1;
+    }
+  }
+
+  // Safety check: ensure the song exists
+  if (!category.songs || !category.songs[effectiveIndex]) {
+    console.warn(`Blocked a crash! Effective index ${effectiveIndex} doesn't exist in category ${categoryId}`);
+    return;
+  }
+
+  // (Optional) log for debugging
+  console.log(`Category: ${categoryId}, noteIndex: ${noteIndex}, effectiveIndex: ${effectiveIndex}`);
+
 
     if (isSprintRound) {
       const pId = gameState.players[gameState.currentPlayerIndex].id;
