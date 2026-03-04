@@ -45,6 +45,7 @@ interface RoundSprintProps {
   onStopSong: () => void;
   onShowRoundSummary: () => void;
   onFinishRound: () => void;
+  onArmSprintPlayer: () => void;
 }
 
 const RoundSprint: React.FC<RoundSprintProps> = ({
@@ -81,7 +82,8 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
   onResetTimer,
   onStopSong,
   onShowRoundSummary,
-  onFinishRound
+  onFinishRound,
+  onArmSprintPlayer
 }) => {
   const roundId = 4;
   const progress = gameState.roundProgress[roundId];
@@ -172,8 +174,8 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                 onClick={() => onSetShowTimerSettings(true)}
                 disabled={isPlaying}
                 className={`px-6 rounded-2xl font-bold border-2 transition-all flex items-center justify-center shadow-lg ${isPlaying
-                    ? 'bg-slate-900/50 border-slate-800 text-slate-600'
-                    : 'bg-slate-800 text-white border-slate-700 hover:bg-slate-700 active:scale-95'
+                  ? 'bg-slate-900/50 border-slate-800 text-slate-600'
+                  : 'bg-slate-800 text-white border-slate-700 hover:bg-slate-700 active:scale-95'
                   }`}
               >
                 <Timer size={24} />
@@ -248,7 +250,14 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
 
           <ControlPanel
             isPlaying={isPlaying}
-            onStart={() => onAudioControl('start')}
+            onStart={() => {
+              // 1. Arm the specific player's hardware first
+              onArmSprintPlayer();
+
+              // 2. Then start the music
+              onAudioControl('start');
+            }}
+            // onStart={() => onAudioControl('start')}
             onStop={() => onAudioControl('stop')}
             onCorrect={() => onFinalizeTurn('correct')}
             onWrong={() => onFinalizeTurn('wrong')}
