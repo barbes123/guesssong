@@ -112,96 +112,83 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
   const shouldDisableActions = !r4IsActiveSession || !activeNote || activeNote.isReveal || (isCurrentSongCorrect && r4IsActiveSession);
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 pt-24">
-      {/* TIMER SETTINGS MODAL */}
-      {showTimerSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-slate-900 rounded-3xl p-8 max-w-md w-full border-2 border-slate-700">
-            <h3 className="text-2xl font-black text-white mb-6">{t.timerSettings || "Timer Settings"}</h3>
-            <div className="space-y-4 mb-6">
-              <div>
-                <label className="block text-sm font-bold text-slate-400 mb-2">{t.timerDuration || "Timer Duration (seconds)"}</label>
-                <input
-                  type="number"
-                  min="10"
-                  max="300"
-                  value={timerDuration}
-                  onChange={(e) => onSetTimerDuration(parseInt(e.target.value) || 60)}
-                  className="w-full bg-slate-800 border-2 border-slate-700 rounded-2xl px-4 py-3 text-white text-xl font-bold outline-none focus:border-indigo-500"
-                />
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <button onClick={() => onSetShowTimerSettings(false)} className="flex-1 py-3 bg-slate-800 text-white font-bold rounded-2xl hover:bg-slate-700">{t.cancel}</button>
-              <button onClick={() => { onSetShowTimerSettings(false); onResetTimer(); }} className="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500">{t.save || "Save"}</button>
-            </div>
-          </div>
-        </div>
-      )}
+    <div className="min-h-screen bg-slate-950 p-6 pt-20"> {/* Standardized padding/top */}
+      {/* TIMER SETTINGS MODAL stays as is */}
 
-      <div className="max-w-[1600px] mx-auto flex gap-12">
-        <div className="flex-1 flex flex-col gap-12">
-          {/* HEADER & GRID */}
-          <div className="bg-slate-900/80 backdrop-blur-xl rounded-[5rem] p-16 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between mb-10">
-              <div className="flex items-center gap-6">
-                <div className="bg-indigo-600 text-white w-20 h-20 rounded-2xl flex items-center justify-center text-5xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">4</div>
+      <div className="max-w-[1600px] mx-auto flex gap-8"> {/* Gap reduced from 12 to 8 */}
+        <div className="flex-1 flex flex-col gap-8"> {/* Gap reduced from 12 to 8 */}
+
+          {/* HEADER & GRID AREA */}
+          <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 border-2 border-slate-800 text-center relative overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-indigo-600 text-white w-14 h-14 rounded-xl flex items-center justify-center text-3xl font-black shadow-lg shadow-indigo-900/30 ring-4 ring-indigo-500/20">4</div>
                 <div>
-                  <h2 className="text-6xl font-black text-white tracking-tighter uppercase">{t.RoundSprint}</h2>
-                  <div className="text-xl font-black text-slate-400 uppercase tracking-[0.3em] mt-2">{t.round} 4</div>
+                  <h2 className="text-4xl font-black text-white tracking-tighter uppercase">{t.RoundSprint}</h2>
+                  <div className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mt-1">{t.round} 4</div>
                 </div>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-2">
                 <button
                   onClick={() => {
                     if (isPlaying) return;
                     onStopSong();
-                    onInitializeRound(3); // Go back to Round 3 (Duel)
+                    onInitializeRound(3);
                     onNavigate('round', 3);
                   }}
-                  className={`p-6 rounded-2xl transition-all ${isPlaying ? 'opacity-20 cursor-not-allowed bg-slate-800' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:scale-105 active:scale-95 shadow-lg'
-                    }`}
+                  className={`p-3 rounded-lg transition-all ${isPlaying ? 'opacity-20 bg-slate-800' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
                   disabled={isPlaying}
                 >
-                  <ChevronLeft size={40} />
-                </button>
-                <button className="p-6 bg-slate-800/20 text-slate-700 rounded-2xl cursor-not-allowed transition-all" disabled>
-                  <ChevronRight size={40} />
+                  <ChevronLeft size={24} />
                 </button>
               </div>
             </div>
 
-            {!r4IsActiveSession && (
-              <div className="mb-10 flex justify-center">
-                <button onClick={() => onSetShowTimerSettings(true)} className="px-8 py-4 bg-slate-800 text-white rounded-3xl font-bold border-2 border-slate-700 hover:bg-slate-700 transition-all flex items-center gap-3 shadow-lg">
-                  <Timer size={24} />
-                  {t.TimerSettings}
-                </button>
-              </div>
-            )}
-
-            {r4IsActiveSession && (
-              <div className="mb-10 flex items-center justify-center gap-6">
-                <div className="bg-slate-800/50 px-10 py-6 rounded-3xl border-2 border-slate-700">
-                  <div className="text-sm font-black text-slate-500 uppercase tracking-widest mb-2">{t.timeLeft || "Time Left"}</div>
-                  <div className={`text-6xl font-black tabular-nums ${timeLeft && timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>
-                    {formatTime(timeLeft)}
-                  </div>
+            {/* TIMER DISPLAY */}
+            {/* {r4IsActiveSession && (
+            <div className="mb-6 flex items-center justify-center gap-4">
+              <div className="bg-slate-800/50 px-6 py-4 rounded-2xl border-2 border-slate-700">
+                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{t.timeLeft}</div>
+                <div className={`text-4xl font-black tabular-nums ${timeLeft && timeLeft <= 10 ? 'text-rose-500' : 'text-indigo-400'}`}>
+                  {formatTime(timeLeft)}
                 </div>
-                <button onClick={() => onSetShowTimerSettings(true)} className="px-8 py-6 bg-slate-800 text-white rounded-3xl font-bold border-2 border-slate-700">
-                  {t.settings || "Settings"}
-                </button>
               </div>
-            )}
+            </div>
+          )} */}
+            <div className="mb-8 flex items-stretch justify-center gap-3"> {/* items-stretch makes children equal height */}
 
-            <div className="mb-16">
+              {/* TIMER BOX */}
+              <div className="bg-slate-800/50 px-8 py-4 rounded-2xl border-2 border-slate-700 min-w-[200px] flex flex-col justify-center">
+                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">
+                  {t.timeLeft || "Time Left"}
+                </div>
+                <div className={`text-4xl font-black tabular-nums leading-none ${timeLeft && timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>
+                  {formatTime(timeLeft || timerDuration)}
+                </div>
+              </div>
+
+              {/* SETTINGS BUTTON - Matches height perfectly */}
+              <button
+                onClick={() => onSetShowTimerSettings(true)}
+                disabled={isPlaying}
+                className={`px-6 rounded-2xl font-bold border-2 transition-all flex items-center justify-center shadow-lg ${isPlaying
+                    ? 'bg-slate-900/50 border-slate-800 text-slate-600'
+                    : 'bg-slate-800 text-white border-slate-700 hover:bg-slate-700 active:scale-95'
+                  }`}
+              >
+                <Timer size={24} />
+              </button>
+            </div>
+
+            {/* GRID ROWS */}
+            <div className="mb-8">
               {[0].map(row => {
                 const startIdx = row * 7;
                 const isPlayerRow = selectedRow === row;
                 const isRowUsed = usedRowsSet.has(row);
                 return (
-                  <div key={row} className={`mb-8 p-8 rounded-[3rem] border-4 ${isPlayerRow && r4IsActiveSession ? 'bg-slate-800/50 border-slate-600' : isRowUsed ? 'opacity-50' : 'bg-slate-900/30'}`}>
-                    <div className="grid grid-cols-7 gap-4">
+                  <div key={row} className={`mb-4 p-4 rounded-2xl border-2 ${isPlayerRow && r4IsActiveSession ? 'bg-slate-800/50 border-slate-600' : isRowUsed ? 'opacity-50' : 'bg-slate-900/30'}`}>
+                    <div className="grid grid-cols-7 gap-3">
                       {Array.from({ length: 7 }, (_, i) => startIdx + i).map(songIdx => {
                         const isCorrect = playerProg?.correctIndices.has(songIdx);
                         const isWrong = playerProg?.wrongIndex === songIdx;
@@ -212,15 +199,15 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                           <button
                             key={songIdx}
                             onClick={() => { if (isSelectable || playerProg?.hasFinished || isCorrect || isWrong) onNoteClick('r4_sprint', songIdx); }}
-                            className={`h-24 rounded-2xl border-3 transition-all flex flex-col items-center justify-center ${isActive && r4IsActiveSession ? 'bg-indigo-600 border-white scale-110 z-10' :
+                            className={`h-20 rounded-xl border-2 transition-all flex flex-col items-center justify-center ${isActive && r4IsActiveSession ? 'bg-indigo-600 border-white scale-105 z-10' :
                               isCorrect ? 'bg-emerald-600 border-emerald-400' :
                                 isWrong ? 'bg-rose-600 border-rose-400' :
                                   playedButNotEvaluated.includes(songIdx) ? 'bg-yellow-600 border-yellow-400' :
-                                    isSelectable ? 'bg-slate-800 border-slate-600 hover:bg-slate-700' :
+                                    isSelectable ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' :
                                       'bg-slate-900/50 opacity-60'
                               }`}
                           >
-                            {isCorrect ? <CheckCircle size={28} /> : isWrong ? <XCircle size={28} /> : <MusicIcon size={28} />}
+                            {isCorrect ? <CheckCircle size={24} /> : isWrong ? <XCircle size={24} /> : <MusicIcon size={24} />}
                           </button>
                         );
                       })}
@@ -229,85 +216,35 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                 );
               })}
             </div>
-
-            {!r4IsActiveSession && playerProg?.hasFinished && (
-              <div className="flex flex-col items-center animate-in fade-in duration-700">
-                <div className="text-3xl font-black text-indigo-400 mb-4 uppercase">
-                  {playerProg.correctIndices.size === 7 ? t.perfectRound || "Perfect Round!" : `${playerProg.correctIndices.size} Correct`}
-                </div>
-                <button
-                  onClick={onShowRoundSummary}
-                  className="py-8 px-20 rounded-[2.5rem] bg-indigo-600 text-white font-black text-3xl uppercase"
-                >
-                  {t.continue || "Continue"}
-                </button>
-              </div>
-            )}
           </div>
 
-          <div className="bg-slate-900/50 p-12 rounded-[5rem] border-2 border-slate-800">
+          {/* PLAYER BOARD CONTAINER */}
+          <div className="bg-slate-900/50 p-6 rounded-3xl border-2 border-slate-800">
             <PlayerBoard
               players={gameState.players}
               currentPlayerIndex={gameState.currentPlayerIndex}
               onUpdatePlayer={onUpdatePlayer}
-              onSetCurrentPlayer={(idx) => {
-                if (r4IsActiveSession) return;
-                onShowModal(t.playerName, t.confirmPlayerActive, () => {
-                  onSetCurrentPlayer(idx);
-                  onSetR4IsActiveSession(false);
-                  onSetModal(null);
-                });
-              }}
+              onSetCurrentPlayer={onSetCurrentPlayer}
               t={t}
-              activePlayerIds={[gameState.players[gameState.currentPlayerIndex].id]} // 👈 only this player
+              activePlayerIds={[gameState.players[gameState.currentPlayerIndex].id]}
             />
           </div>
         </div>
 
-        {/* SIDEBAR */}
-        <div className="w-[450px] flex flex-col gap-10 relative">
-          <div className="bg-slate-800 rounded-[3rem] p-12 border-2 border-slate-700 shadow-2xl flex flex-col items-center gap-4">
-            <div className="text-4xl font-black text-white text-center truncate w-full">
-              {currentPlayer.name || `Player ${gameState.currentPlayerIndex + 1}`}
+        {/* SIDEBAR - DEZOOMED TO MATCH ROUND 1 */}
+        <div className="w-[380px] flex flex-col gap-6 relative">
+          {/* Player info panel */}
+          <div className="bg-slate-800 rounded-2xl p-6 border-2 border-slate-700 shadow-lg flex flex-col items-center gap-2 overflow-hidden">
+            <span className="text-xs font-black text-slate-500 uppercase tracking-[0.3em] mb-1">{t.currentTurn}</span>
+            <div className="text-2xl font-black text-white truncate text-center w-full mb-1 tracking-tight">
+              {gameState.players[gameState.currentPlayerIndex].name || `Player ${gameState.currentPlayerIndex + 1}`}
             </div>
-            <div className="bg-indigo-900/40 px-10 py-4 rounded-3xl border-2 border-indigo-500/30 shadow-inner">
-              <span className="text-4xl font-black text-indigo-400 tabular-nums">
-                {currentPlayer.score} <span className="text-xs uppercase opacity-60 ml-2 tracking-widest">PTS</span>
+            <div className="bg-indigo-900/40 px-6 py-2 rounded-2xl border-2 border-indigo-500/30 shadow-inner">
+              <span className="text-2xl font-black text-indigo-400 tabular-nums">
+                {gameState.players[gameState.currentPlayerIndex].score} <span className="text-xs uppercase opacity-60 ml-2 tracking-widest">{t.points || "PTS"}</span>
               </span>
             </div>
           </div>
-
-
-
-          {/* <ControlPanel
-            isPlaying={isPlaying}
-            onStart={() => onAudioControl('start')}
-            onStop={() => onAudioControl('stop')}
-            onCorrect={() => onFinalizeTurn('correct')}
-            onWrong={() => onFinalizeTurn('wrong')}
-            onSkip={() => onFinalizeTurn('skip')}
-            onFinishRound={onFinishRound}
-            timeLeft={timeLeft}
-            t={t}
-            disabledActions={!r4IsActiveSession}
-          /> */}
-
-          {/* <ControlPanel
-            isPlaying={isPlaying}
-            onStart={() => onAudioControl('start')}
-            onStop={() => onAudioControl('stop')}
-            onCorrect={() => onFinalizeTurn('correct')}
-            onWrong={() => onFinalizeTurn('wrong')}
-            onSkip={() => onFinalizeTurn('skip')}
-            onFinishRound={onFinishRound}
-            timeLeft={timeLeft}
-            t={t}
-            disabledActions={!r4IsActiveSession || !activeNote || activeNote.isReveal}
-          // disabledActions={!r4IsActiveSession}
-          /> */}
-
-
-
 
           <ControlPanel
             isPlaying={isPlaying}
@@ -332,16 +269,24 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
           />
 
           {modal?.isOpen && modal.position === 'inline' && (
-            <ConfirmationModal
-              isOpen={modal.isOpen}
-              title={modal.title}
-              message={modal.message}
-              onConfirm={modal.onConfirm}
-              onCancel={() => onSetModal(null)}
-              confirmLabel={modal.confirmLabel}
-              cancelLabel={modal.cancelLabel}
-              position={modal.position}
-            />
+            <div className="w-full bg-slate-800 rounded-2xl p-5 border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.3)] animate-in fade-in slide-in-from-top duration-300">
+              <h3 className="text-xs font-black text-white mb-2 leading-tight uppercase tracking-widest text-center">{modal.title}</h3>
+              <p className="text-slate-300 text-[11px] mb-4 font-medium text-center leading-relaxed">{modal.message}</p>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={modal.onConfirm}
+                  className="w-full py-2 rounded-lg bg-indigo-600 text-white font-black hover:bg-indigo-700 transition-all uppercase tracking-widest text-xs shadow-lg shadow-indigo-900/40"
+                >
+                  {modal.confirmLabel}
+                </button>
+                <button
+                  onClick={() => onSetModal(null)}
+                  className="w-full py-2 rounded-lg bg-slate-700 text-slate-300 font-bold hover:bg-slate-600 transition-colors uppercase tracking-widest text-xs"
+                >
+                  {modal.cancelLabel}
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

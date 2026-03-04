@@ -301,12 +301,21 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                               className={btnCls}
                               disabled={isCategoryFinished && !isUsed}
                             >
-                              {isCurrentlyPlayingThis && <div className="absolute inset-0 bg-white/20 animate-pulse" />}
+                              {/* {isCurrentlyPlayingThis && <div className="absolute inset-0 bg-white/20 animate-pulse" />}
                               {!pts ? (
                                 <MusicIcon size={28} className={`${isSelected ? 'animate-bounce' : 'group-hover:rotate-12 transition-transform opacity-60'}`} />
                               ) : (
                                 <span className="text-4xl font-black tracking-tighter">{pts}</span>
-                              )}
+                              )} */}
+                              {/* If pts is null AND it's not Round 0, show the Icon. 
+        If it's Round 0 OR pts is active, show the Number. */}
+    {(pts !== null || (roundId === 0 && isSelected)) ? (
+      <span className="text-4xl font-black tracking-tighter">
+        {pts ?? currentRoundPoints ?? 0}
+      </span>
+    ) : (
+      <MusicIcon size={28} className={`${isSelected ? 'animate-bounce' : 'group-hover:rotate-12 transition-transform opacity-60'}`} />
+    )}
 
                               {isRevealActive && (
                                 <div className="absolute bottom-2 right-2">

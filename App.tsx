@@ -301,13 +301,13 @@ const App: React.FC = () => {
     let points = 0;
     const progress = gameState.roundProgress[currentRoundId];
 
-    if (currentRoundId === 1 && progress?.pointMap) {
+    if ((currentRoundId === 0 || currentRoundId === 1) && progress?.pointMap) {
       points = progress.pointMap[activeNote.categoryId]?.[activeNote.noteIndex] || 0;
-    } else if (currentRoundId === 2 && progress?.persistentPoints) {
+    } else if (currentRoundId === 2 && progress?.persistentPoints) //{
       points = progress.persistentPoints[`${activeNote.categoryId}-0`] || 20;
-    } else if (currentRoundId === 0 && progress?.pointMap) {
-      points = progress.pointMap[activeNote.categoryId]?.[activeNote.noteIndex] || 0;
-    }
+    // } else if (currentRoundId === 0 && progress?.pointMap) {
+    //   points = progress.pointMap[activeNote.categoryId]?.[activeNote.noteIndex] || 0;
+    // }
 
     setBuzzerPlayerName(buzzingPlayer.name || `Player ${buzzingPlayer.id}`);
     setBuzzerPoints(points);
@@ -833,6 +833,9 @@ const App: React.FC = () => {
   };
 
   const navigateTo = (page: Page, roundId: number | null = null) => {
+
+    const leavingWarmup = gameState.activeRoundId === 0;
+
     const action = () => {
       if (roundId !== null) {
         initializeRound(roundId);
@@ -840,7 +843,23 @@ const App: React.FC = () => {
 
       stopSong();
       setCurrentPage(page);
-      setGameState(prev => ({ ...prev, activeRoundId: roundId }));
+
+      //Clean up points after round0
+      setGameState(prev => {
+        const leavingWarmup = prev.activeRoundId === 0;
+
+        return {
+          ...prev,
+          activeRoundId: roundId,
+          // If we are leaving the Warm-up (Round 0), reset scores to 0
+          // Otherwise, keep the current scores (prev.players)
+          players: leavingWarmup
+            ? prev.players.map(p => ({ ...p, score: 0 }))
+            : prev.players
+        };
+      });;
+
+      // setGameState(prev => ({ ...prev, activeRoundId: roundId }));
       setModal(null);
       setActiveNote(null);
       setCurrentRoundPoints(undefined);
@@ -1218,56 +1237,6 @@ const App: React.FC = () => {
       //   }
       // }
     }
-
-
-    // if (isSprintRound) {
-    //   const pId = gameState.players[gameState.currentPlayerIndex].id;
-    //   const playerProg = progress.r4PlayerProgress?.[pId];
-    //   if (playerProg?.hasFinished) {
-    //     stopSong();
-    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
-    //     setR4CurrentSongIdx(noteIndex);
-    //     playSFX(SFX.select);
-    //     return;
-    //   }
-    //   if (!r4IsActiveSession) {
-    //     const row = Math.floor(noteIndex / 7);
-    //     const usedRowsSet = progress.usedRows || new Set();
-
-    //     // (Optional) silently ignore clicks on already used rows
-    //     if (usedRowsSet.has(row)) {
-    //       return; // no modal, just do nothing
-    //     }
-
-    //     const firstNoteInRow = row * 7;
-    //     setSelectedRow(row);
-    //     setR4CurrentSongIdx(firstNoteInRow);
-    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex: firstNoteInRow });
-    //     setR4IsActiveSession(true);
-    //     setTimeLeft(timerDuration);
-    //     stopBGM();
-    //     playSFX(SFX.select);
-
-    //     return; // exit after starting session
-    //   }
-    //   if (selectedRow !== null) {
-    //     const startIdx = selectedRow * 7;
-    //     const endIdx = startIdx + 7;
-    //     if (noteIndex >= startIdx && noteIndex < endIdx) {
-    //       if (playerProg?.correctIndices.has(noteIndex)) return;
-
-    //       if (isPlaying) {
-    //         return;
-    //       }
-    //       stopSong();
-    //       setR4CurrentSongIdx(noteIndex);
-    //       setActiveNote({ categoryId: 'r4_sprint', noteIndex });
-    //       playSFX(SFX.select);
-    //     }
-    //   }
-    //   return;
-    // }
-
     if (isFinalRound) {
       stopSong();
       setActiveNote({ categoryId: 'r3_final', noteIndex, isReveal: true });
@@ -1322,7 +1291,7 @@ const App: React.FC = () => {
     // setTimeLeft(60);
     setModal(null);
     if (roundId !== 4) { setTimeLeft(60); };
-    if (roundId === 1) {
+    if (roundId === 0 || roundId === 1) {
       setCurrentRoundPoints(progress.pointMap[categoryId][noteIndex]);
     } else if (isMelodyRound) {
       setCurrentRoundPoints(progress.persistentPoints?.[`${categoryId}-0`] || 20);
@@ -2016,7 +1985,8 @@ const App: React.FC = () => {
 
     showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
       // If this is the Warm-up (Round 0), do not award points regardless of correctness
-      const addedPoints = status === 'correct' ? ((roundId === 0) ? 0 : (currentRoundPoints || 0)) : 0;
+      // const addedPoints = status === 'correct' ? ((roundId === 0) ? 0 : (currentRoundPoints || 0)) : 0;
+      const addedPoints = status === 'correct' ? (currentRoundPoints || 0) : 0;
       if (status === 'correct') {
         playSFX(SFX.correct);
         saveScoreSnapshot(gameState.players, roundId);
