@@ -244,7 +244,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                                 key={idx}
                                 onClick={() => isUnlocked && onNoteClick(cat.id, idx)}
                                 // onClick={() => isUnlocked && onNoteClick(cat.id, songIdx)}
-                                
+
                                 className={btnCls}
                                 disabled={!isUnlocked}
                               >
@@ -309,13 +309,13 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
                               )} */}
                               {/* If pts is null AND it's not Round 0, show the Icon. 
         If it's Round 0 OR pts is active, show the Number. */}
-    {(pts !== null || (roundId === 0 && isSelected)) ? (
-      <span className="text-4xl font-black tracking-tighter">
-        {pts ?? currentRoundPoints ?? 0}
-      </span>
-    ) : (
-      <MusicIcon size={28} className={`${isSelected ? 'animate-bounce' : 'group-hover:rotate-12 transition-transform opacity-60'}`} />
-    )}
+                              {(pts !== null || (roundId === 0 && isSelected)) ? (
+                                <span className="text-4xl font-black tracking-tighter">
+                                  {pts ?? currentRoundPoints ?? 0}
+                                </span>
+                              ) : (
+                                <MusicIcon size={28} className={`${isSelected ? 'animate-bounce' : 'group-hover:rotate-12 transition-transform opacity-60'}`} />
+                              )}
 
                               {isRevealActive && (
                                 <div className="absolute bottom-2 right-2">
