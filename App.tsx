@@ -1142,52 +1142,110 @@ const App: React.FC = () => {
 
     // (Optional) log for debugging
     console.log(`Category: ${categoryId}, noteIndex: ${noteIndex}, effectiveIndex: ${effectiveIndex}`);
-
     if (isSprintRound) {
-      const pId = gameState.players[gameState.currentPlayerIndex].id;
-      const playerProg = progress.r4PlayerProgress?.[pId];
+  const pId = gameState.players[gameState.currentPlayerIndex].id;
+  const playerProg = progress.r4PlayerProgress?.[pId];
 
-      // 1. KEEP: Finish check
-      if (playerProg?.hasFinished) {
-        stopSong();
-        setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
-        setR4CurrentSongIdx(noteIndex);
-        playSFX(SFX.select);
-        return;
-      }
+  if (playerProg?.hasFinished) {
+    stopSong(false);
+    setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+    setR4CurrentSongIdx(noteIndex);
+    playSFX(SFX.select);
+    return;
+  }
 
-      const isCorrect = playerProg?.correctIndices.has(noteIndex);
+  const isCorrect = playerProg?.correctIndices.has(noteIndex);
+  const row = Math.floor(noteIndex / 7);          // Determine which row
+  const usedRowsSet = progress.usedRows || new Set();
 
-      // 2. MODIFIED: Activation Logic (Removed the 'return')
-      if (!r4IsActiveSession) {
-        setSelectedRow(0); // Force row 0
-        setR4CurrentSongIdx(noteIndex); // Set the song immediately
-        setR4IsActiveSession(true);
-        setTimeLeft(timerDuration);
-        stopBGM();
-        playSFX(SFX.select);
-        // 🚩 WE REMOVED 'RETURN' HERE SO IT FLOWS INTO THE NEXT BLOCK
-      }
-
-      // 3. KEEP: Selection Logic
-      // This now runs on Click #1 because we didn't 'return' above!
-      if (selectedRow !== null || !r4IsActiveSession) {
-        // We check !r4IsActiveSession here too so the first click passes this IF
-        if (isPlaying) return;
-
-        stopSong();
-        setR4CurrentSongIdx(noteIndex);
-
-        if (isCorrect) {
-          console.log("🎵 Playing correct song as FULL version");
-          setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
-        } else {
-          setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: false });
-        }
-
-        playSFX(SFX.select);
-      }
+  // If the row is already used, only allow correct songs (as reveals)
+  if (usedRowsSet.has(row)) {
+    if (isCorrect) {
+      stopSong(false);                             // preserve timer at 0
+      setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+      setR4CurrentSongIdx(noteIndex);
+      playSFX(SFX.select);
     }
+    return;                                         // exit – do NOT start a new session
+  }
+
+  // Row is not used – start a new session (only if timer is not expired)
+  if (!r4IsActiveSession && timeLeft !== 0) {
+    setSelectedRow(row);
+    setR4CurrentSongIdx(noteIndex);
+    setR4IsActiveSession(true);
+    setTimeLeft(timerDuration);
+    stopBGM();
+    playSFX(SFX.select);
+  }
+
+  // Select the note (whether new session just started or already active)
+  if (selectedRow !== null || !r4IsActiveSession) {
+    if (isPlaying) return;
+
+    setR4CurrentSongIdx(noteIndex);
+    if (isCorrect) {
+      stopSong(false);                              // keep timer frozen for correct replay
+      setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+    } else {
+      // For a new, not‑yet‑answered song, we want a normal start (timer active)
+      // Here we do NOT stop the song – it will be started by onAudioControl later.
+      setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: false });
+    }
+    playSFX(SFX.select);
+  }
+}
+
+    // if (isSprintRound) {
+    //   const pId = gameState.players[gameState.currentPlayerIndex].id;
+    //   const playerProg = progress.r4PlayerProgress?.[pId];
+
+    //   // 1. KEEP: Finish check
+    //   if (playerProg?.hasFinished) {
+    //     stopSong();
+    //     setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+    //     setR4CurrentSongIdx(noteIndex);
+    //     playSFX(SFX.select);
+    //     return;
+    //   }
+
+    //   const isCorrect = playerProg?.correctIndices.has(noteIndex);
+
+    //   // 2. MODIFIED: Activation Logic (Removed the 'return')
+    //   if (!r4IsActiveSession && timeLeft !== 0) {
+    //     setSelectedRow(0);
+    //     setR4CurrentSongIdx(noteIndex);
+    //     setR4IsActiveSession(true);
+    //     setTimeLeft(timerDuration);
+    //     stopBGM();
+    //     playSFX(SFX.select);
+    //   }
+
+    //   // 3. KEEP: Selection Logic
+    //   // This now runs on Click #1 because we didn't 'return' above!
+    //   if (selectedRow !== null || !r4IsActiveSession) {
+    //     // We check !r4IsActiveSession here too so the first click passes this IF
+    //     if (isPlaying) return;
+
+
+    //     // stopSong();
+    //     setR4CurrentSongIdx(noteIndex);
+    //     if (isCorrect) {
+    //       stopSong(false);   // ← keep timer frozen for correct replay
+    //     } else {
+    //       stopSong(true);    // ← normal clear for new song
+    //     }
+
+    //     // if (isCorrect) {
+    //     //   console.log("🎵 Playing correct song as FULL version");
+    //     //   setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+    //     // } else {
+    //     //   setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: false });
+    //     // }
+
+    //     playSFX(SFX.select);
+    //   }
+    // }
     if (isFinalRound) {
       stopSong();
       setActiveNote({ categoryId: 'r3_final', noteIndex, isReveal: true });

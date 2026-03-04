@@ -109,15 +109,30 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
 
   const usedRowsSet = progress.usedRows || new Set();
 
+// const playerProg = progress.r4PlayerProgress?.[gameState.players[gameState.currentPlayerIndex].id];
+
+  // This checks the status of the CURRENTLY SELECTED note
   const playerProg = progress.r4PlayerProgress?.[gameState.players[gameState.currentPlayerIndex].id];
 
+  // Logic for the CURRENTLY SELECTED song
   const isCurrentSongCorrect = playerProg?.correctIndices.has(r4CurrentSongIdx) ?? false;
+  const isCurrentSongWrong = playerProg?.wrongIndex === r4CurrentSongIdx;
+  const isSongFinished = isCurrentSongCorrect || isCurrentSongWrong;
 
-  const shouldDisableActions =
-    !r4IsActiveSession ||
-    (activeNote?.isReveal ?? false) ||
-    (isCurrentSongCorrect && r4IsActiveSession);
+  // The Timer State
+  const isTimeOver = timeLeft === 0;
+  const isCurrentFinished = 
+    playerProg?.correctIndices.has(r4CurrentSongIdx) || 
+    playerProg?.wrongIndex === r4CurrentSongIdx;
 
+  const sidebarLocked = isTimeOver || isCurrentFinished || !r4IsActiveSession;
+
+  // Global Action Lock (Correct/Wrong buttons)
+  const shouldDisableActions = 
+    !r4IsActiveSession || 
+    (activeNote?.isReveal ?? false) || 
+    isSongFinished || 
+    isTimeOver;
   // const isCurrentSongCorrect = playerProg?.correctIndices.has(r4CurrentSongIdx) ?? false;
   // const shouldDisableActions = !r4IsActiveSession || activeNote.isReveal || (isCurrentSongCorrect && r4IsActiveSession);
 
@@ -205,32 +220,35 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                 return (
                   <div key={row} className="mb-4 p-4 rounded-2xl border-2 bg-slate-800/50 border-slate-600">
                     <div className="grid grid-cols-7 gap-3">
-                      {Array.from({ length: 7 }, (_, i) => startIdx + i).map(songIdx => {
-                        const isCorrect = playerProg?.correctIndices.has(songIdx);
-                        const isWrong = playerProg?.wrongIndex === songIdx;
+ {Array.from({ length: 7 }, (_, i) => startIdx + i).map(songIdx => {
+  // Check the status for THIS specific button
+  const thisSongCorrect = playerProg?.correctIndices.has(songIdx);
+  const thisSongWrong = playerProg?.wrongIndex === songIdx;
+  const thisSongFinished = thisSongCorrect || thisSongWrong;
 
-                        // FIX: If no note is clicked yet, default the highlight to song 0
-                        // const isActive = activeNote ? (r4CurrentSongIdx === songIdx) : (songIdx === 0);
-                        // const isActive = r4CurrentSongIdx === songIdx;
-                        const isActive = activeNote
-                          ? (r4CurrentSongIdx === songIdx)
-                          : (songIdx === r4CurrentSongIdx);
+  // 🔴 THE LOCK: If time is up, only allow if this specific song is finished
+  const canSelect = !isTimeOver || thisSongFinished;
 
-                        return (
-                          <button
-                            key={songIdx}
-                            // 🟢 CHANGE: Remove complex "isSelectable" logic, make it always clickable
-                            onClick={() => onNoteClick('r4_sprint', songIdx)}
-                            className={`h-20 rounded-xl border-2 transition-all flex flex-col items-center justify-center ${isActive ? 'bg-indigo-600 border-white scale-105 z-10' :
-                              isCorrect ? 'bg-emerald-600 border-emerald-400' :
-                                isWrong ? 'bg-rose-600 border-rose-400' :
-                                  'bg-slate-800 border-slate-700 hover:bg-slate-700'
-                              }`}
-                          >
-                            {isCorrect ? <CheckCircle size={24} /> : isWrong ? <XCircle size={24} /> : <MusicIcon size={24} />}
-                          </button>
-                        );
-                      })}
+  const isActive = activeNote ? (r4CurrentSongIdx === songIdx) : (songIdx === r4CurrentSongIdx);
+
+  return (
+    <button
+      key={songIdx}
+      onClick={() => {
+        if (canSelect) onNoteClick('r4_sprint', songIdx);
+      }}
+      className={`h-20 rounded-xl border-2 transition-all flex flex-col items-center justify-center 
+        ${isActive ? 'bg-indigo-600 border-white scale-105 z-10' :
+          thisSongCorrect ? 'bg-emerald-600 border-emerald-400' :
+          thisSongWrong ? 'bg-rose-600 border-rose-400' :
+          'bg-slate-800 border-slate-700 hover:bg-slate-700'}
+        ${!canSelect ? 'opacity-20 grayscale cursor-not-allowed pointer-events-none' : 'opacity-100'} 
+      `}
+    >
+      {thisSongCorrect ? <CheckCircle size={24} /> : thisSongWrong ? <XCircle size={24} /> : <MusicIcon size={24} />}
+    </button>
+  );
+})}
                     </div>
                   </div>
                 );
@@ -281,13 +299,13 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             onFinishRound={onFinishRound}
             t={t}
 
-            // 🟢 FIXED: The "Safety Lock"
-            // This greys out the Play button if no song is clicked.
-            isStartDisabled={!activeNote}
+// 🟢 Play only enabled if a note is selected AND (Time > 0 OR that specific song is finished)
+  isStartDisabled={!activeNote || (isTimeOver && !isSongFinished)}
 
-            // 🟢 FIXED: The "Action Lock"
-            // Prevents clicking Correct/Wrong if no note is active or it's already revealed.
-            disabledActions={!activeNote || activeNote.isReveal || shouldDisableActions}
+  // 🟢 Actions locked by the global state (including timeLeft === 0)
+  disabledActions={!activeNote || shouldDisableActions}
+
+
           />
 
           {/* <ControlPanel
