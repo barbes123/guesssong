@@ -808,14 +808,30 @@ const App: React.FC = () => {
       roundProgress: {}
     }));
 
+    // if (buzzerSocket) {
+    //   buzzerSocket.emit('updateGameState', {
+    //     currentPage: 'setup',  // This forces Display back to start
+    //     currentSong: null,     // Clears the "Ёлочка" info
+    //     activeResponder: null, // Clears the "Buzzer" light
+    //     players: []            // Optional: clears player list on display
+    //   });
+    // }
     if (buzzerSocket) {
+      // 1. ADDED: Lock the physical buzzers (Hardware level)
+      buzzerSocket.emit('gameAction', {
+        type: 'SET_STATE',
+        data: { state: 'LOCKED' }
+      });
+
+      // 2. KEPT: Your original display reset (Visual level)
       buzzerSocket.emit('updateGameState', {
-        currentPage: 'setup',  // This forces Display back to start
-        currentSong: null,     // Clears the "Ёлочка" info
-        activeResponder: null, // Clears the "Buzzer" light
-        players: []            // Optional: clears player list on display
+        currentPage: 'setup',  // Keep: Forces Display back to start
+        currentSong: null,     // Keep: Clears the song info
+        activeResponder: null, // Keep: Clears the "Buzzer" light
+        players: []            // Keep: Clears player list on display as requested
       });
     }
+
 
     setCurrentPage('setup');
     setModal(null);
@@ -839,6 +855,10 @@ const App: React.FC = () => {
     const action = () => {
       if (roundId !== null) {
         initializeRound(roundId);
+      }
+
+      if (buzzerSocket) {
+        buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
       }
 
       stopSong();
@@ -1534,6 +1554,14 @@ const App: React.FC = () => {
         const roundsThatUseBuzzers = [0, 1, 2, 4]; // Add or remove round IDs as needed
 
         if (isBuzzerConnected && !isRevealMode && roundsThatUseBuzzers.includes(roundId)) {
+
+          if (roundId === 4) {
+            console.log("⏭️ Round 4: Skipping generic ARM (BATTLE) to keep Sprint Lock.");
+            startPlayback();
+            return; // Exit early
+          }
+
+
           // 1. "CLEAN SLATE": Tell the server to clear old buzzes and go to IDLE
           console.log("🛠️ Sending DISARM (IDLE)");
           buzzerSocket.emit('gameAction', {
@@ -1588,6 +1616,29 @@ const App: React.FC = () => {
         stopSong(false);
       }
       playSFX(SFX.stop);
+    }
+  };
+
+  // Place this in App.tsx
+  const handleArmSprintPlayer = () => {
+    const currentSlot = gameState.players[gameState.currentPlayerIndex];
+    console.log("DEBUG: Current Player Index:", gameState.currentPlayerIndex);
+    console.log("DEBUG: Current Player Data:", currentSlot)
+
+    if (buzzerSocket && currentSlot && currentSlot.hubId) {
+      // 1. Tell the server to lock the hardware (the phone)
+      console.log(`[ARMING] Sending Hardware ID to Server: ${currentSlot.hubId}`);
+      buzzerSocket.emit('gameAction', {
+        type: 'ARM_SPECIFIC',
+        data: { playerId: currentSlot.hubId }
+      });
+
+      // 2. Optional: Sync your display to show WHO is sprinting
+      buzzerSocket.emit('updateGameState', {
+        currentPage: 'round-sprint',
+        activeResponder: currentSlot.name, // Highlights them on the big screen
+        isSprintActive: true
+      });
     }
   };
 
@@ -2212,6 +2263,7 @@ const App: React.FC = () => {
           onResetTimer={() => setTimeLeft(timerDuration)}
           onStopSong={stopSong}
           onShowRoundSummary={() => setShowScoreboard(true)}
+          onArmSprintPlayer={handleArmSprintPlayer}
           onFinishRound={handleFinishRoundManual} // 🟢 This connects your new button!
         />
       );
