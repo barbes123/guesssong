@@ -176,7 +176,8 @@ const PlayerScreen = () => {
     victoryContext,
     showScoreboard,
     r3Selection,
-    r4SelectedPlayerId
+    r4SelectedPlayerId,
+    r4CurrentSongIdx
   } = state;
 
   const t = translations[language] || translations['en'];
@@ -554,123 +555,107 @@ const PlayerScreen = () => {
     );
   };
 
-  const renderRound4 = () => {
-    const progress = roundProgress[4] || { usedRows: [], r4PlayerProgress: {} };
-    const selectedSetId = roundSets[4] || 'default';
-    const roundData = getRoundData(4, selectedSetId) || [];
-    const songs = roundData[0]?.songs || [];
+const renderRound4 = () => {
+  const progress = roundProgress[4] || { usedRows: [], r4PlayerProgress: {} };
+  const selectedSetId = roundSets[4] || 'default';
+  const roundData = getRoundData(4, selectedSetId) || [];
+  const songs = roundData[0]?.songs || [];
 
-    const currentPlayer = players[state.currentPlayerIndex];
-    if (!currentPlayer) return null;
+  const currentPlayer = players[state.currentPlayerIndex];
+  if (!currentPlayer) return null;
 
-    const playerProg = progress.r4PlayerProgress?.[currentPlayer.id] || { correctIndices: [], hasFinished: false };
-    const correctIndices = new Set(playerProg.correctIndices);
+  const playerProg = progress.r4PlayerProgress?.[currentPlayer.id] || { correctIndices: [], hasFinished: false };
+  const correctIndices = new Set(playerProg.correctIndices);
 
-    const formatTime = (seconds) => {
-      if (seconds === undefined) return "0:00";
-      const m = Math.floor(Math.abs(seconds) / 60);
-      const s = Math.floor(Math.abs(seconds) % 60);
-      return `${m}:${s.toString().padStart(2, '0')}`;
-    };
+  // FORCE Row 0 since we don't need activation/selection
+  const displayRow = 0; 
 
-    return (
-      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
-        {renderHeader(4, "SPRINT")}
-        <div className="max-w-[1800px] mx-auto w-full flex gap-8">
-          {/* Main Grid */}
-          <div className="flex-[3] bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-8">
-            {state.r4IsActiveSession ? (
-              <div className="flex flex-col h-full">
-                <div className="text-center mb-6">
-                  <div className="text-lg font-black text-slate-400 uppercase tracking-widest">Time Left</div>
-                  <div className={`text-8xl font-black tabular-nums ${state.timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>
-                    {formatTime(state.timeLeft)}
+  const formatTime = (seconds) => {
+    // If timer hasn't started, show the full duration (e.g., 30s) instead of 0:00
+    const timeToDisplay = (seconds === undefined || seconds === null) ? 30 : seconds;
+    const m = Math.floor(Math.abs(timeToDisplay) / 60);
+    const s = Math.floor(Math.abs(timeToDisplay) % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
+      {renderHeader(4, "SPRINT")}
+      <div className="max-w-[1800px] mx-auto w-full flex gap-8">
+        
+        {/* MAIN GRID - Always visible, no selection required */}
+        <div className="flex-[3] bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-8">
+          <div className="flex flex-col h-full">
+            <div className="text-center mb-6">
+              <div className="text-lg font-black text-slate-400 uppercase tracking-widest">Time Left</div>
+              <div className={`text-8xl font-black tabular-nums ${state.timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>
+                {formatTime(state.timeLeft)}
+              </div>
+            </div>
+
+            <div className="flex-1 grid grid-cols-7 gap-4">
+              {songs.slice(0, 7).map((song, i) => {
+                const songIdx = i; // Simplified since row is always 0
+                const isCorrect = correctIndices.has(songIdx);
+                const isWrong = playerProg.wrongIndex === songIdx;
+                
+                // If no note is active in state, visually highlight the first one
+                const isActive = state.activeNote 
+                  ? state.activeNote?.noteIndex === songIdx 
+                  : songIdx === r4CurrentSongIdx; // 👈 Change 0 to r4CurrentSongIdx
+                  // : state.r4CurrentSongIdx === songIdx;
+                  // : songIdx === 0; 
+
+                const isPlayed = state.playedButNotEvaluated?.includes(songIdx);
+
+                let bg = 'bg-slate-800';
+                let border = 'border-slate-700';
+                let iconColor = 'text-slate-600';
+                let scale = '';
+
+                if (isActive) {
+                  bg = 'bg-indigo-600';
+                  border = 'border-white';
+                  iconColor = 'text-white animate-pulse';
+                  scale = 'scale-110 z-10 shadow-[0_0_40px_rgba(99,102,241,0.4)]';
+                } else if (isCorrect) {
+                  bg = 'bg-emerald-600'; border = 'border-emerald-400'; iconColor = 'text-white';
+                } else if (isWrong) {
+                  bg = 'bg-rose-600'; border = 'border-rose-400'; iconColor = 'text-white';
+                } else if (isPlayed) {
+                  bg = 'bg-yellow-600'; border = 'border-yellow-400'; iconColor = 'text-white';
+                }
+
+                return (
+                  <div key={songIdx} className={`rounded-3xl border-4 flex items-center justify-center transition-all duration-500 ${bg} ${border} ${scale}`}>
+                    {isCorrect ? <CheckCircle size={48} className={iconColor} /> : isWrong ? <XCircle size={48} className={iconColor} /> : <Music size={48} className={iconColor} />}
                   </div>
-                </div>
-                <div className="flex-1 grid grid-cols-7 gap-4">
-                  {songs.slice(state.selectedRow * 7, state.selectedRow * 7 + 7).map((song, i) => {
-                    const songIdx = state.selectedRow * 7 + i;
-                    const isCorrect = correctIndices.has(songIdx);
-                    const isWrong = playerProg.wrongIndex === songIdx;
-                    const isActive = state.activeNote?.noteIndex === songIdx;
-                    const isPlayed = state.playedButNotEvaluated?.includes(songIdx);
-
-                    let bg = 'bg-slate-800';
-                    let border = 'border-slate-700';
-                    let iconColor = 'text-slate-600';
-                    let scale = '';
-
-                    if (isActive) {
-                      bg = 'bg-indigo-600';
-                      border = 'border-white';
-                      iconColor = 'text-white animate-pulse';
-                      scale = 'scale-110 z-10';
-                    } else if (isCorrect) {
-                      bg = 'bg-emerald-600';
-                      border = 'border-emerald-400';
-                      iconColor = 'text-white';
-                    } else if (isWrong) {
-                      bg = 'bg-rose-600';
-                      border = 'border-rose-400';
-                      iconColor = 'text-white';
-                    } else if (isPlayed) {
-                      bg = 'bg-yellow-600';
-                      border = 'border-yellow-400';
-                      iconColor = 'text-white';
-                    }
-
-                    return (
-                      <div key={songIdx} className={`rounded-3xl border-4 flex items-center justify-center transition-all ${bg} ${border} ${scale}`}>
-                        {isCorrect ? <CheckCircle size={48} className={iconColor} /> : isWrong ? <XCircle size={48} className={iconColor} /> : <Music size={48} className={iconColor} />}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4">
-                {Array.from({ length: Math.ceil(songs.length / 7) }).map((_, rowIdx) => {
-                  const isUsed = progress.usedRows?.includes(rowIdx);
-                  const isSelected = state.selectedRow === rowIdx;
-                  return (
-                    <div key={rowIdx} className={`p-4 rounded-2xl border-2 transition-all ${isUsed ? 'bg-slate-800/30 border-slate-700/30 opacity-50' : isSelected ? 'bg-indigo-600/20 border-indigo-500' : 'bg-slate-800 border-slate-700'}`}>
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1 grid grid-cols-7 gap-3">
-                          {Array.from({ length: 7 }).map((_, i) => (
-                            <div key={i} className={`h-12 rounded-lg flex items-center justify-center ${isUsed ? 'bg-slate-700/50' : 'bg-slate-900'}`}>
-                              <Music size={24} className="text-slate-600" />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                );
+              })}
+            </div>
           </div>
+        </div>
 
-          {/* Player Info */}
-          <div className="flex-1 bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-8 flex flex-col items-center justify-center text-center">
-            <h3 className="text-5xl font-black text-white mb-6 truncate w-full drop-shadow-md">{currentPlayer.name || `Player ${currentPlayer.id + 1}`}</h3>
-            <div className="text-7xl font-black text-indigo-400 tabular-nums mb-8">{currentPlayer.score}</div>
-            <div className="w-full bg-slate-800 rounded-2xl p-6 border-2 border-slate-700">
-              <div className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Sprint Progress</div>
-              <div className="text-5xl font-black text-emerald-400">
-                {correctIndices.size} / 7
-              </div>
-              <div className="flex gap-1 mt-4">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className={`h-2 flex-1 rounded-full ${i < correctIndices.size ? 'bg-emerald-500' : 'bg-slate-700'}`} />
-                ))}
-              </div>
+        {/* Player Info Sidebar */}
+        <div className="flex-1 bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-8 flex flex-col items-center justify-center text-center">
+          <h3 className="text-5xl font-black text-white mb-6 truncate w-full drop-shadow-md">{currentPlayer.name || `Player ${currentPlayer.id + 1}`}</h3>
+          <div className="text-7xl font-black text-indigo-400 tabular-nums mb-8">{currentPlayer.score}</div>
+          <div className="w-full bg-slate-800 rounded-2xl p-6 border-2 border-slate-700">
+            <div className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Sprint Progress</div>
+            <div className="text-5xl font-black text-emerald-400">
+              {correctIndices.size} / 7
+            </div>
+            <div className="flex gap-1 mt-4">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className={`h-2 flex-1 rounded-full ${i < correctIndices.size ? 'bg-emerald-500' : 'bg-slate-700'}`} />
+              ))}
             </div>
           </div>
         </div>
       </div>
-    );
-  };
-
+    </div>
+  );
+};
   const renderR3Select = () => {
     const selectedIds = r3Selection || [];
 

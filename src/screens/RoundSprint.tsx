@@ -110,8 +110,20 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
   const usedRowsSet = progress.usedRows || new Set();
 
   const playerProg = progress.r4PlayerProgress?.[gameState.players[gameState.currentPlayerIndex].id];
+
   const isCurrentSongCorrect = playerProg?.correctIndices.has(r4CurrentSongIdx) ?? false;
-  const shouldDisableActions = !r4IsActiveSession || !activeNote || activeNote.isReveal || (isCurrentSongCorrect && r4IsActiveSession);
+
+  const shouldDisableActions =
+    !r4IsActiveSession ||
+    (activeNote?.isReveal ?? false) ||
+    (isCurrentSongCorrect && r4IsActiveSession);
+
+  // const isCurrentSongCorrect = playerProg?.correctIndices.has(r4CurrentSongIdx) ?? false;
+  // const shouldDisableActions = !r4IsActiveSession || activeNote.isReveal || (isCurrentSongCorrect && r4IsActiveSession);
+
+
+  //const shouldDisableActions = !r4IsActiveSession || !activeNote || activeNote.isReveal || (isCurrentSongCorrect && r4IsActiveSession);
+  // const shouldDisableActions = activeNote?.isReveal ?? false;
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 pt-20"> {/* Standardized padding/top */}
@@ -186,27 +198,33 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             <div className="mb-8">
               {[0].map(row => {
                 const startIdx = row * 7;
-                const isPlayerRow = selectedRow === row;
-                const isRowUsed = usedRowsSet.has(row);
+                // const isPlayerRow = selectedRow === row;
+                // const isRowUsed = usedRowsSet.has(row);
+                const isPlayerRow = true;
+                const isRowUsed = false;
                 return (
-                  <div key={row} className={`mb-4 p-4 rounded-2xl border-2 ${isPlayerRow && r4IsActiveSession ? 'bg-slate-800/50 border-slate-600' : isRowUsed ? 'opacity-50' : 'bg-slate-900/30'}`}>
+                  <div key={row} className="mb-4 p-4 rounded-2xl border-2 bg-slate-800/50 border-slate-600">
                     <div className="grid grid-cols-7 gap-3">
                       {Array.from({ length: 7 }, (_, i) => startIdx + i).map(songIdx => {
                         const isCorrect = playerProg?.correctIndices.has(songIdx);
                         const isWrong = playerProg?.wrongIndex === songIdx;
-                        const isActive = r4CurrentSongIdx === songIdx;
-                        const isSelectable = !playerProg?.hasFinished && !isRowUsed && (!r4IsActiveSession || (isPlayerRow && r4IsActiveSession && !isCorrect));
+
+                        // FIX: If no note is clicked yet, default the highlight to song 0
+                        // const isActive = activeNote ? (r4CurrentSongIdx === songIdx) : (songIdx === 0);
+                        // const isActive = r4CurrentSongIdx === songIdx;
+                        const isActive = activeNote
+                          ? (r4CurrentSongIdx === songIdx)
+                          : (songIdx === r4CurrentSongIdx);
 
                         return (
                           <button
                             key={songIdx}
-                            onClick={() => { if (isSelectable || playerProg?.hasFinished || isCorrect || isWrong) onNoteClick('r4_sprint', songIdx); }}
-                            className={`h-20 rounded-xl border-2 transition-all flex flex-col items-center justify-center ${isActive && r4IsActiveSession ? 'bg-indigo-600 border-white scale-105 z-10' :
+                            // 🟢 CHANGE: Remove complex "isSelectable" logic, make it always clickable
+                            onClick={() => onNoteClick('r4_sprint', songIdx)}
+                            className={`h-20 rounded-xl border-2 transition-all flex flex-col items-center justify-center ${isActive ? 'bg-indigo-600 border-white scale-105 z-10' :
                               isCorrect ? 'bg-emerald-600 border-emerald-400' :
                                 isWrong ? 'bg-rose-600 border-rose-400' :
-                                  playedButNotEvaluated.includes(songIdx) ? 'bg-yellow-600 border-yellow-400' :
-                                    isSelectable ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' :
-                                      'bg-slate-900/50 opacity-60'
+                                  'bg-slate-800 border-slate-700 hover:bg-slate-700'
                               }`}
                           >
                             {isCorrect ? <CheckCircle size={24} /> : isWrong ? <XCircle size={24} /> : <MusicIcon size={24} />}
@@ -250,10 +268,37 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
 
           <ControlPanel
             isPlaying={isPlaying}
+            // 🟢 FIXED: Removed the "if (!activeNote) onNoteClick(..., 0)" 
+            // This stops the jump to the first song.
             onStart={() => {
+              onArmSprintPlayer();
+              onAudioControl('start');
+            }}
+            onStop={() => onAudioControl('stop')}
+            onCorrect={() => onFinalizeTurn('correct')}
+            onWrong={() => onFinalizeTurn('wrong')}
+            timeLeft={timeLeft}
+            onFinishRound={onFinishRound}
+            t={t}
+
+            // 🟢 FIXED: The "Safety Lock"
+            // This greys out the Play button if no song is clicked.
+            isStartDisabled={!activeNote}
+
+            // 🟢 FIXED: The "Action Lock"
+            // Prevents clicking Correct/Wrong if no note is active or it's already revealed.
+            disabledActions={!activeNote || activeNote.isReveal || shouldDisableActions}
+          />
+
+          {/* <ControlPanel
+            isPlaying={isPlaying}
+            onStart={() => {
+              if (!activeNote) {
+                onNoteClick('r4_sprint', 0);
+              }
+
               // 1. Arm the specific player's hardware first
               onArmSprintPlayer();
-
               // 2. Then start the music
               onAudioControl('start');
             }}
@@ -265,8 +310,9 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             onFinishRound={onFinishRound}
             t={t}
             disabledActions={shouldDisableActions}
-            isStartDisabled={!activeNote}
-          />
+            isStartDisabled={false}
+          // isStartDisabled={!activeNote}
+          /> */}
 
           <MusicTimeline
             isPlaying={isPlaying}
