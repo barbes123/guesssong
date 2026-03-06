@@ -1143,58 +1143,58 @@ const App: React.FC = () => {
     // (Optional) log for debugging
     console.log(`Category: ${categoryId}, noteIndex: ${noteIndex}, effectiveIndex: ${effectiveIndex}`);
     if (isSprintRound) {
-  const pId = gameState.players[gameState.currentPlayerIndex].id;
-  const playerProg = progress.r4PlayerProgress?.[pId];
+      const pId = gameState.players[gameState.currentPlayerIndex].id;
+      const playerProg = progress.r4PlayerProgress?.[pId];
 
-  if (playerProg?.hasFinished) {
-    stopSong(false);
-    setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
-    setR4CurrentSongIdx(noteIndex);
-    playSFX(SFX.select);
-    return;
-  }
+      if (playerProg?.hasFinished) {
+        stopSong(false);
+        setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+        setR4CurrentSongIdx(noteIndex);
+        playSFX(SFX.select);
+        return;
+      }
 
-  const isCorrect = playerProg?.correctIndices.has(noteIndex);
-  const row = Math.floor(noteIndex / 7);          // Determine which row
-  const usedRowsSet = progress.usedRows || new Set();
+      const isCorrect = playerProg?.correctIndices.has(noteIndex);
+      const row = Math.floor(noteIndex / 7);          // Determine which row
+      const usedRowsSet = progress.usedRows || new Set();
 
-  // If the row is already used, only allow correct songs (as reveals)
-  if (usedRowsSet.has(row)) {
-    if (isCorrect) {
-      stopSong(false);                             // preserve timer at 0
-      setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
-      setR4CurrentSongIdx(noteIndex);
-      playSFX(SFX.select);
+      // If the row is already used, only allow correct songs (as reveals)
+      if (usedRowsSet.has(row)) {
+        if (isCorrect) {
+          stopSong(false);                             // preserve timer at 0
+          setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+          setR4CurrentSongIdx(noteIndex);
+          playSFX(SFX.select);
+        }
+        return;                                         // exit – do NOT start a new session
+      }
+
+      // Row is not used – start a new session (only if timer is not expired)
+      if (!r4IsActiveSession && timeLeft !== 0) {
+        setSelectedRow(row);
+        setR4CurrentSongIdx(noteIndex);
+        setR4IsActiveSession(true);
+        setTimeLeft(timerDuration);
+        stopBGM();
+        playSFX(SFX.select);
+      }
+
+      // Select the note (whether new session just started or already active)
+      if (selectedRow !== null || !r4IsActiveSession) {
+        if (isPlaying) return;
+
+        setR4CurrentSongIdx(noteIndex);
+        if (isCorrect) {
+          stopSong(false);                              // keep timer frozen for correct replay
+          setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+        } else {
+          // For a new, not‑yet‑answered song, we want a normal start (timer active)
+          // Here we do NOT stop the song – it will be started by onAudioControl later.
+          setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: false });
+        }
+        playSFX(SFX.select);
+      }
     }
-    return;                                         // exit – do NOT start a new session
-  }
-
-  // Row is not used – start a new session (only if timer is not expired)
-  if (!r4IsActiveSession && timeLeft !== 0) {
-    setSelectedRow(row);
-    setR4CurrentSongIdx(noteIndex);
-    setR4IsActiveSession(true);
-    setTimeLeft(timerDuration);
-    stopBGM();
-    playSFX(SFX.select);
-  }
-
-  // Select the note (whether new session just started or already active)
-  if (selectedRow !== null || !r4IsActiveSession) {
-    if (isPlaying) return;
-
-    setR4CurrentSongIdx(noteIndex);
-    if (isCorrect) {
-      stopSong(false);                              // keep timer frozen for correct replay
-      setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
-    } else {
-      // For a new, not‑yet‑answered song, we want a normal start (timer active)
-      // Here we do NOT stop the song – it will be started by onAudioControl later.
-      setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: false });
-    }
-    playSFX(SFX.select);
-  }
-}
 
     // if (isSprintRound) {
     //   const pId = gameState.players[gameState.currentPlayerIndex].id;
@@ -1515,60 +1515,113 @@ const App: React.FC = () => {
     if (action === 'start') {
       console.log("🔄 STARTING: isBuzzerConnected is:", isBuzzerConnected);
 
+      // const initiateSequence = () => {
+      //   // Clear the old winner so the yellow box disappears
+      //   setActiveResponder(null);
+
+      //   let isRevealMode = false;
+      //   // if (isBuzzerConnected) {
+      //   //CHeck to play minus or full
+      //   let songIndex = 0;
+      //   if (isMelodyRound) {
+      //     songIndex = activeNote.isReveal ? activeNote.noteIndex - 1 : (progress.activationCounts[activeNote.categoryId] || 0);
+      //   } else if (isFinalRound) {
+      //     songIndex = progress.currentTurnIndex || 0;
+      //   } else if (isSprintRound) {
+      //     songIndex = r4CurrentSongIdx;
+      //   } else {
+      //     songIndex = activeNote.noteIndex;
+      //   }
+      //   // Determine if we are in "Full/Reveal" mode or "Game" mode
+      //   // We use the same logic your startPlayback uses:
+      //   isRevealMode = activeNote.isReveal ||
+      //     (isSprintRound && !r4IsActiveSession) ||
+      //     (isFinalRound && progress.currentTurnIndex !== songIndex);
+      //   // }
+
+
+      //   const roundsThatUseBuzzers = [0, 1, 2, 4]; // Add or remove round IDs as needed
+
+      //   if (isBuzzerConnected && !isRevealMode && roundsThatUseBuzzers.includes(roundId)) {
+
+      //     if (roundId === 4) {
+      //       console.log("⏭️ Round 4: Skipping generic ARM (BATTLE) to keep Sprint Lock.");
+      //       startPlayback();
+      //       return; // Exit early
+      //     }
+
+
+      //     // 1. "CLEAN SLATE": Tell the server to clear old buzzes and go to IDLE
+      //     console.log("🛠️ Sending DISARM (IDLE)");
+      //     buzzerSocket.emit('gameAction', {
+      //       type: 'SET_STATE',
+      //       data: { state: 'IDLE' }
+      //     });
+
+      //     // 2. DELAY: Wait 150ms for the "Reset" signal to clear all phones
+      //     setTimeout(() => {
+      //       console.log("🛠️ Sending ARM (BATTLE)");
+      //       armBuzzers();  // ← Only arms for rounds 0,1,2
+      //       startPlayback();
+      //     }, 150);
+      //   } else {
+      //     // No buzzer arming for Round 3 (and other non-buzzer rounds)
+      //     startPlayback();
+      //   }
+      // };
+
       const initiateSequence = () => {
-        // Clear the old winner so the yellow box disappears
-        setActiveResponder(null);
+  setActiveResponder(null);
 
-        let isRevealMode = false;
-        // if (isBuzzerConnected) {
-        //CHeck to play minus or full
-        let songIndex = 0;
-        if (isMelodyRound) {
-          songIndex = activeNote.isReveal ? activeNote.noteIndex - 1 : (progress.activationCounts[activeNote.categoryId] || 0);
-        } else if (isFinalRound) {
-          songIndex = progress.currentTurnIndex || 0;
-        } else if (isSprintRound) {
-          songIndex = r4CurrentSongIdx;
-        } else {
-          songIndex = activeNote.noteIndex;
-        }
-        // Determine if we are in "Full/Reveal" mode or "Game" mode
-        // We use the same logic your startPlayback uses:
-        isRevealMode = activeNote.isReveal ||
-          (isSprintRound && !r4IsActiveSession) ||
-          (isFinalRound && progress.currentTurnIndex !== songIndex);
-        // }
+  // Determine song index (needed for reveal mode)
+  let songIndex = 0;
+  if (isMelodyRound) {
+    songIndex = activeNote.isReveal ? activeNote.noteIndex - 1 : (progress.activationCounts[activeNote.categoryId] || 0);
+  } else if (isFinalRound) {
+    songIndex = progress.currentTurnIndex || 0;
+  } else if (isSprintRound) {
+    songIndex = r4CurrentSongIdx;
+  } else {
+    songIndex = activeNote.noteIndex;
+  }
 
+  // For Round 4, also check if the current song is already correct
+  let isSongCorrect = false;
+  if (isSprintRound) {
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+    const playerProg = progress.r4PlayerProgress?.[currentPlayer.id];
+    isSongCorrect = playerProg?.correctIndices.has(songIndex) ?? false;
+  }
 
-        const roundsThatUseBuzzers = [0, 1, 2, 4]; // Add or remove round IDs as needed
+  // Compute reveal mode – matches startPlayback exactly
+  const isRevealMode = activeNote.isReveal ||
+    (isSprintRound && (!r4IsActiveSession || isSongCorrect)) ||
+    (isFinalRound && progress.currentTurnIndex !== songIndex);
 
-        if (isBuzzerConnected && !isRevealMode && roundsThatUseBuzzers.includes(roundId)) {
+  const roundsThatUseBuzzers = [0, 1, 2, 4];
 
-          if (roundId === 4) {
-            console.log("⏭️ Round 4: Skipping generic ARM (BATTLE) to keep Sprint Lock.");
-            startPlayback();
-            return; // Exit early
-          }
+  if (isBuzzerConnected && !isRevealMode && roundsThatUseBuzzers.includes(roundId)) {
+    // Special handling for round 4 – skip generic arming (arming is done via onArmSprintPlayer)
+    if (roundId === 4) {
+      console.log("⏭️ Round 4: Skipping generic ARM – arming handled separately.");
+      startPlayback();
+      return;
+    }
 
+    // For other rounds, do the normal DISARM + ARM sequence
+    console.log("🛠️ Sending DISARM (IDLE)");
+    buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
 
-          // 1. "CLEAN SLATE": Tell the server to clear old buzzes and go to IDLE
-          console.log("🛠️ Sending DISARM (IDLE)");
-          buzzerSocket.emit('gameAction', {
-            type: 'SET_STATE',
-            data: { state: 'IDLE' }
-          });
-
-          // 2. DELAY: Wait 150ms for the "Reset" signal to clear all phones
-          setTimeout(() => {
-            console.log("🛠️ Sending ARM (BATTLE)");
-            armBuzzers();  // ← Only arms for rounds 0,1,2
-            startPlayback();
-          }, 150);
-        } else {
-          // No buzzer arming for Round 3 (and other non-buzzer rounds)
-          startPlayback();
-        }
-      };
+    setTimeout(() => {
+      console.log("🛠️ Sending ARM (BATTLE)");
+      armBuzzers();
+      startPlayback();
+    }, 150);
+  } else {
+    // No buzzer arming – start playback directly
+    startPlayback();
+  }
+};
 
       if (isFinalRound && !isPlaying && !isR3Finalized && selectedDuration === null) {
         showModal(t.currentTurn, t.confirmPlayerActive, () => {
@@ -1700,6 +1753,7 @@ const App: React.FC = () => {
               p.id === playerId ? { ...p, score: p.score + 300 } : p
             )
           }));
+          setShowScoreboard(true); // <-- ADD THIS LINE
         }
 
         // Update round progress
