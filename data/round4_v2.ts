@@ -24,7 +24,7 @@ const R5R24full  = audioUrl(
 
 const R5R25minus = audioUrl(
   'ischu-tebya-iz-k-f-31-iyunya--minus1_v9xmsj',
-  '/music/round4/ischu-tebya-iz-k-f-31-iyunya--minus1_v9xmsj.mp3'
+  '/music/round4/ischu-tebya-iz-k-f-31-iyunya--minus1_cut.mp3'
 );
 const R5R25full  = audioUrl(
   'ischu-tebya-iz-k-f-31-iyunya_aif0s0', 
@@ -60,15 +60,63 @@ export const round4v2Set: RoundSet = {
       id: 'r4_sprint',
       name: { en: 'Sprint', ru: 'Спринт' },
       songs: [
-        { id: 's5_8',  title: 'Sprint 1 (P2)',  artist: 'Artist 8',  audioUrl: R5R21minus, audioUrlFull: R5R21full },
-        { id: 's5_9',  title: 'Sprint 2 (P2)',  artist: 'Artist 9',  audioUrl: R5R22minus, audioUrlFull: R5R22full },
-        { id: 's5_10', title: 'Sprint 3 (P2)',  artist: 'Artist 10', audioUrl: R5R23minus, audioUrlFull: R5R23full },
-        { id: 's5_11', title: 'Sprint 4 (P2)',  artist: 'Artist 11', audioUrl: R5R24minus, audioUrlFull: R5R24full },
-        { id: 's5_12', title: 'Sprint 5 (P2)',  artist: 'Artist 12', audioUrl: R5R25minus, audioUrlFull: R5R25full },
-        { id: 's5_13', title: 'Sprint 6 (P2)',  artist: 'Artist 13', audioUrl: R5R26minus, audioUrlFull: R5R26full },
-        { id: 's5_14', title: 'Sprint 7 (P2)',  artist: 'Artist 14', audioUrl: R5R27minus, audioUrlFull: R5R27full },
+        {
+          id: 's5_8',
+          title: 'Александра',
+          artist: 'Сергей и Татьяна Никитины (из к/ф «Москва слезам не верит»)',
+          audioUrl: R5R21minus,
+          audioUrlFull: R5R21full,
+          notes: 'Песня из кинофильма «Москва слезам не верит» (1979). Музыка Сергея Никитина, стихи Дмитрия Сухарева и Юрия Визбора. Стала неофициальным гимном Москвы.\n\nНе сразу всё устроилось,\nМосква не сразу строилась,\nМосква слезам не верила –\nА верила любви.'
+        },
+        {
+          id: 's5_9',
+          title: 'Крылатые качели',
+          artist: 'Елена Камбурова и детский хор (из к/ф «Приключения Электроника»)',
+          audioUrl: R5R22minus,
+          audioUrlFull: R5R22full,
+          notes: 'Песня Евгения Крылатова на стихи Юрия Энтина из фильма «Приключения Электроника» (1979). Одна из самых узнаваемых детских песен.\n\nВ юном месяце апреле\nВ старом парке тает снег,\nИ весёлые качели\nНачинают свой разбег.'
+        },
+        {
+          id: 's5_10',
+          title: 'Трус не играет в хоккей',
+          artist: 'Вадим Мулерман',
+          audioUrl: R5R23minus,
+          audioUrlFull: R5R23full,
+          notes: 'Спортивный гимн, написанный Александрой Пахмутовой и Николаем Добронравовым в 1968 году. Песня стала неофициальным гимном хоккеистов и болельщиков.\n\nВ хоккей играют настоящие мужчины,\nТрус не играет в хоккей.\nСуров ты был, хоккейный бой,\nВ борьбе нелегкой.'
+        },
+        {
+          id: 's5_11',
+          title: 'Я шагаю по Москве',
+          artist: 'Никита Михалков (из к/ф «Я шагаю по Москве»)',
+          audioUrl: R5R24minus,
+          audioUrlFull: R5R24full,
+          notes: 'Песня Андрея Петрова на стихи Геннадия Шпаликова из фильма Георгия Данелии (1964). Исполняет сам Никита Михалков в кадре.\n\nА я иду, шагаю по Москве,\nИ я пройти ещё смогу\nСолёным Тихим океаном,\nИ тундрой, и тайгой.'
+        },
+        {
+          id: 's5_12',
+          title: 'Ищу тебя',
+          artist: 'Татьяна Анциферова (из к/ф «31 июня»)',
+          audioUrl: R5R25minus,
+          audioUrlFull: R5R25full,
+          notes: 'Песня Александра Зацепина на стихи Леонида Дербенёва из музыкального фильма «31 июня» (1978). Фантастическая лирическая композиция.\n\nИщу тебя в который раз,\nСпешу к тебе, но каждый раз\nЯ опаздываю, мой друг,\nИ мы не встретимся вдвоём.'
+        },
+        {
+          id: 's5_13',
+          title: 'До свиданья, Москва',
+          artist: 'Лев Лещенко и Татьяна Анциферова',
+          audioUrl: R5R26minus,
+          audioUrlFull: R5R26full,
+          notes: 'Прощальная песня XXII летних Олимпийских игр 1980 года. Музыка Александры Пахмутовой, слова Николая Добронравова. Именно под эту песню улетал олимпийский Мишка.\n\nНа трибунах становится тише,\nТает быстрое время чудес.\nДо свиданья, наш ласковый Миша,\nВозвращайся в свой сказочный лес.'
+        },
+        {
+          id: 's5_14',
+          title: 'Замечательный сосед',
+          artist: 'Эдуард Хиль',
+          audioUrl: R5R27minus,
+          audioUrlFull: R5R27full,
+          notes: 'Жизнерадостная песня Бориса Потемкина на стихи Михаила Пляцковского (1967). В исполнении Эдуарда Хиля стала всесоюзным хитом.\n\nРаньше думал я о том,\nПочему зима и лето\nВ этом доме, в доме том\nТак похожи друг на друга?'
+        }
       ],
     },
   ],
 };
-
