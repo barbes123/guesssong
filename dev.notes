@@ -1,3 +1,5 @@
+07MAR2026
+- Not ARM disabled players
 02MAR2026
 - if "waiting" for a player from buzzer it should not display in Game
 = R3 change point per song from 10-> 10 20 30 ... 70 and put in in json config [03MAR26]
