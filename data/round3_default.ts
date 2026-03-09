@@ -32,10 +32,11 @@ export const defaultSet: RoundSet = {
       songs: [
         {
           id: 'q1',
-          title: 'Smooth Criminal',
-          artist: 'Michael Jackson',
+          title: 'Песенка крокодила Гены',
+          artist: 'Владимир Ферапонтов (из м/ф "Чебурашка")',
           audioUrl: R61,
           audioUrlFull: R61f,
+          notes: 'Песня Владимира Шаинского на стихи Александра Тимофеевского впервые прозвучала в мультфильме «Чебурашка» (1971). Стала обязательным атрибутом дней рождения.\n\nПусть бегут неуклюже\nПешеходы по лужам,\nА вода по асфальту рекой.\nИ неясно прохожим\nВ этот день непогожий,\nПочему я весёлый такой.',
           hint: {
             en: 'This song sounds in the moment of loneliness. In the song there are noisy running heroes. In the song there is a contrast between the grayness of the surrounding world and the joyful occasion.',
             ru: 'Эта песня звучит в момент одиночества. В песне есть шумные бегущие герои, подчеркивается контраст между серостью окружающего мира и радостным поводом.'
@@ -43,10 +44,11 @@ export const defaultSet: RoundSet = {
         },
         {
           id: 'q2',
-          title: 'Billie Jean',
-          artist: 'Michael Jackson',
+          title: 'Кукушка',
+          artist: 'Виктор Цой (группа "Кино")',
           audioUrl: R62,
           audioUrlFull: R62f,
+          notes: 'Одна из последних песен Виктора Цоя, написанная в 1990 году. Вошла в альбом «Чёрный альбом», выпущенный уже после гибели музыканта.\n\nПесен, ещё не написанных, сколько?\nСкажи, кукушка, пропой.\nВ городе мне жить или на выселках,\nКамнем лежать или гореть звездой?',
           hint: {
             en: 'A song about someone who can tell you the allotted time of life.',
             ru: 'Песня про того, кто может сообщить отмеренное время жизни.'
@@ -54,10 +56,11 @@ export const defaultSet: RoundSet = {
         },
         {
           id: 'q3',
-          title: 'Bohemian Rhapsody',
-          artist: 'Queen',
+          title: 'Ветер перемен',
+          artist: 'Татьяна Анциферова (из к/ф «Мэри Поппинс, до свидания!»)',
           audioUrl: R63,
           audioUrlFull: R63f,
+          notes: 'Песня Максима Дунаевского на стихи Наума Олева из знаменитого фильма 1983 года. Стала гимном перемен в эпоху перестройки.\n\nВетер пере-пере-перемен,\nВетер пере-пере-перемен,\nОт земли отрывает с трудом,\nНо любовь оставляет двоим.',
           hint: {
             en: 'A song about a natural phenomenon that brings change.',
             ru: 'Песня про явление природы которое приносит изменения.'
@@ -65,10 +68,11 @@ export const defaultSet: RoundSet = {
         },
         {
           id: 'q4',
-          title: 'Take On Me',
-          artist: 'a-ha',
+          title: 'Выйду ночью в поле с конём',
+          artist: 'Пелагея (народная песня)',
           audioUrl: R64,
           audioUrlFull: R64f,
+          notes: 'Известная русская народная песня «Ой, мороз, мороз» в современной обработке. В репертуаре Пелагеи обрела новую жизнь и стала визитной карточкой певицы.\n\nВыйду ночью в поле с конём,\nНочкой тёмною тихо пойдём.\nМы пойдём с конём по полю вдвоём,\nМы пойдём с конём по полю вдвоём.',
           hint: {
             en: 'In this song, forward movement occurs in silence, under the gaze of countless witnesses who will never speak. It features two companions, one alive, the other seemingly eternal. Together, they move through space and time.',
             ru: 'В этой песне движение вперёд происходит в тишине, под взглядом бесчисленных свидетелей, которые никогда не скажут ни слова. В ней есть два спутника, один из которых живой, а другой кажется вечным. Вместе они идут сквозь пространство и время.'
@@ -76,10 +80,11 @@ export const defaultSet: RoundSet = {
         },
         {
           id: 'q5',
-          title: 'Rolling in the Deep',
-          artist: 'Adele',
+          title: 'Антошка',
+          artist: 'Владимир Шаинский (из м/ф «Антошка», исполняет Анатолий Горохов)',
           audioUrl: R65,
           audioUrlFull: R65f,
+          notes: 'Песня из первого выпуска мультжурнала «Весёлая карусель» (1969). Автор музыки Владимир Шаинский, стихи Юрия Энтина. Один из главных детских хитов СССР.\n\nАнтошка, Антошка,\nПойдём копать картошку.\nАнтошка, Антошка,\nПойдём копать картошку.\nЭто мы не проходили,\nЭто нам не задавали.\nТили-тили, трали-вали,\nЭто мы не проходили,\nЭто нам не задавали.',
           hint: {
             en: 'When the hero of this song encounters something completely new and unexpected, his reaction is: "Did this really happen in the textbook?"',
             ru: 'Когда герой этой песни сталкивается с чем-то совершенно новым и неожиданным, его реакция — это: "А это точно было в учебнике?"'
@@ -89,4 +94,3 @@ export const defaultSet: RoundSet = {
     }
   ]
 };
-
