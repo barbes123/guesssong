@@ -1,28 +1,27 @@
 import { RoundSet } from '../types';
 import { audioUrl } from './audioUtils';
 
-// ==================== ROUND 3 (DUEL) - SET 3 (Q11–Q15) ====================
-// Note: this set reuses existing audio assets; update with new songs when available.
+// ==================== ROUND 3 (DUEL) - NEW SET (5 songs) ====================
 
-const R61 = audioUrl('pesenka-krokodila-geny-minus_ebmqsh', '/music/round6/pesenka-krokodila-geny-minus.mp3');
-const R61f = audioUrl('pesenka-krokodila-geny_ggehic', '/music/round6/pesenka-krokodila-geny.mp3');
+const R71 = audioUrl('hutoryanka-minus-all_cut', '/music/round3/hutoryanka-minus-all_cut.mp3');
+const R71f = audioUrl('hutoryanka', '/music/round3/hutoryanka.mp3');
 
-const R62 = audioUrl('kukushka-minus_cut_ncxht2', '/music/round6/kukushka-minus_cut.mp3');
-const R62f = audioUrl('kukushka_ff7ce8', '/music/round6/kukushka.mp3');
+const R72 = audioUrl('valenki-da-valenki', '/music/round3/valenki-da-valenki.mp3');
+const R72f = audioUrl('valenki-da-valenki-full', '/music/round3/valenki-da-valenki.mp3');
 
-const R63 = audioUrl('veter_peremen_minus_cut_powyye', '/music/round6/veter_peremen_minus_cut.mp3');
-const R63f = audioUrl('veter_peremen_qgqsck', '/music/round6/veter_peremen.mp3');
+const R73 = audioUrl('lyuli-lyuli--vo-pole-bereza-stoyala_cut', '/music/round3/lyuli-lyuli--vo-pole-bereza-stoyala_cut.mp3');
+const R73f = audioUrl('lyuli-lyuli--vo-pole-bereza-stoyala', '/music/round3/lyuli-lyuli--vo-pole-bereza-stoyala.mp3');
 
-const R64 = audioUrl('vyydu-noch-yu-v-pole-s-konem-minus_cut_mdphjn', '/music/round6/vyydu-noch-yu-v-pole-s-konem-minus_cut.mp3');
-const R64f = audioUrl('vyydu-noch-yu-v-pole-s-konem_x004md', '/music/round6/vyydu-noch-yu-v-pole-s-konem-minus.mp3');
+const R74 = audioUrl('yablochko-bystroe--yablochko-bystroe', '/music/round3/yablochko-bystroe--yablochko-bystroe.mp3');
+const R74f = audioUrl('yablochko-bystroe--yablochko-bystroe-full', '/music/round3/yablochko-bystroe--yablochko-bystroe.mp3');
 
-const R65 = audioUrl('antoshka_minus_ttcnms', '/music/round6/antoshka_minus.mp3');
-const R65f = audioUrl('antoshka_fpdxti', '/music/round6/antoshka.mp3');
+const R75 = audioUrl('mumi_trol_utekai_minus_cut', '/music/round3/mumi_trol_utekai_minus_cut.mp3');
+const R75f = audioUrl('mumi_trol_utekai', '/music/round3/mumi_trol_utekai_minus.mp3');
 
 export const round3v3Set: RoundSet = {
   id: 'round3_v3',
   name: { en: 'Duel – Set 3', ru: 'Дуэль – Набор 3' },
-  description: { en: '5 questions (Q11–Q15)', ru: '5 вопросов (11–15)' },
+  description: { en: '5 folk and pop songs', ru: '5 народных и эстрадных песен' },
   author: 'DT',
   version: '1.0',
   data: [
@@ -31,62 +30,66 @@ export const round3v3Set: RoundSet = {
       name: { en: 'Duel', ru: 'Дуэль' },
       songs: [
         {
-          id: 'q11',
-          title: 'Smooth Criminal',
-          artist: 'Michael Jackson',
-          audioUrl: R61,
-          audioUrlFull: R61f,
+          id: 'q21',
+          title: 'Хуторянка',
+          artist: 'София Ротару',
+          audioUrl: R71,
+          audioUrlFull: R71f,
+          notes: 'Песня вошла в репертуар Софии Ротару в 1990-х годах и стала одной из визитных карточек певицы. Композиция сочетает эстрадное звучание с украинскими народными мотивами.\n\nА на хуторе, на хуторе,\nНа хуторе нашем,\nНет девчонки краше.\nХуторянка, хуторянка,\nЧернобровая цыганка.',
           hint: {
-            en: 'This song sounds in the moment of loneliness. In the song there are noisy running heroes. In the song there is a contrast between the grayness of the surrounding world and the joyful occasion.',
-            ru: 'Эта песня звучит в момент одиночества. В песне есть шумные бегущие герои, подчеркивается контраст между серостью окружающего мира и радостным поводом.'
+            en: 'In this song, the proud inhabitant of a small southern farmstead is glorified.',
+            ru: 'В этой песне воспевается гордая жительница небольшого южного хутора.'
           }
         },
         {
-          id: 'q12',
-          title: 'Billie Jean',
-          artist: 'Michael Jackson',
-          audioUrl: R62,
-          audioUrlFull: R62f,
+          id: 'q22',
+          title: 'Валенки',
+          artist: 'Лидия Русланова',
+          audioUrl: R72,
+          audioUrlFull: R72f,
+          notes: 'Песня стала особенно популярной во время Великой Отечественной войны благодаря Лидии Руслановой, которая исполняла её на фронте. Изначально это была плясовая цыганская песня, но Русланова сделала её поистине народной.\n\nВаленки, валенки,\nНе подшиты, стареньки.\nНельзя валенки носить,\nНе в чем к милому ходить.\nВаленки, валенки,\nЭх, не подшиты, стареньки.',
           hint: {
-            en: 'A song about someone who can tell you the allotted time of life.',
-            ru: 'Песня про того, кто может сообщить отмеренное время жизни.'
+            en: 'This song is an anthem to the most practical winter footwear worn by our grandparents.',
+            ru: 'Эта песня — гимн самой практичной зимней обуви, которую носили наши бабушки и дедушки.'
           }
         },
         {
-          id: 'q13',
-          title: 'Bohemian Rhapsody',
-          artist: 'Queen',
-          audioUrl: R63,
-          audioUrlFull: R63f,
+          id: 'q23',
+          title: 'Во поле берёза стояла',
+          artist: 'Русская народная',
+          audioUrl: R73,
+          audioUrlFull: R73f,
+          notes: 'Первая публикация песни датируется 1790 годом. Она вдохновляла многих композиторов, включая Чайковского, который использовал её мелодию в финале Четвертой симфонии. Традиционно девушки водили вокруг берёзы хороводы на Троицу.\n\nВо поле берёза стояла,\nВо поле кудрявая стояла.\nЛюли, люли, стояла,\nЛюли, люли, стояла.\nНекому берёзу заломати,\nНекому кудряву заломати.',
           hint: {
-            en: 'A song about a natural phenomenon that brings change.',
-            ru: 'Песня про явление природы которое приносит изменения.'
+            en: 'This song is the most famous Russian round dance. They don\'t just dance to it, they literally "weave" around.',
+            ru: 'Эта песня — самый популярный русский хоровод. Под неё не танцуют, а буквально «вьются».'
           }
         },
         {
-          id: 'q14',
-          title: 'Take On Me',
-          artist: 'a-ha',
-          audioUrl: R64,
-          audioUrlFull: R64f,
+          id: 'q24',
+          title: 'Эх, яблочко',
+          artist: 'Русская народная (частушка)',
+          audioUrl: R74,
+          audioUrlFull: R74f,
+          notes: 'Появилась в начале XX века как матросская плясовая. Существует более сотни вариантов текста — от сатирических до политических. Во время Гражданской войны песню исполняли и красные, и белые, переделывая слова на свой лад.\n\nЭх, яблочко,\nДа куда котишься?\nКо мне в рот попадешь —\nДа не воротишься.\nЭх, яблочко,\nДа на тарелочке.',
           hint: {
-            en: 'In this song, forward movement occurs in silence, under the gaze of countless witnesses who will never speak. It features two companions, one alive, the other seemingly eternal. Together, they move through space and time.',
-            ru: 'В этой песне движение вперёд происходит в тишине, под взглядом бесчисленных свидетелей, которые никогда не скажут ни слова. В ней есть два спутника, один из которых живой, а другой кажется вечным. Вместе они идут сквозь пространство и время.'
+            en: 'The title of this song matches the name of a juicy round fruit.',
+            ru: 'Название этой песни совпадает с названием сочного круглого фрукта.'
           }
         },
         {
-          id: 'q15',
-          title: 'Rolling in the Deep',
-          artist: 'Adele',
-          audioUrl: R65,
-          audioUrlFull: R65f,
+          id: 'q25',
+          title: 'Утекай',
+          artist: 'Мумий Тролль',
+          audioUrl: R75,
+          audioUrlFull: R75f,
+          notes: 'Песня с легендарного альбома «Морская», который в 1997 году произвел революцию в русском роке и открыл эпоху «новых волн». Характерный вокал Ильи Лагутенко и необычные тексты сделали группу культовой.\n\nУтекай, пока не поздно,\nУтекай, туман развёлся.\nУтекай, вода по трубам,\nУтекай к чужим подругам.\nА у нас своя волна,\nА у нас своя волна.',
           hint: {
-            en: 'When the hero of this song encounters something completely new and unexpected, his reaction is: "Did this really happen in the textbook?"',
-            ru: 'Когда герой этой песни сталкивается с чем-то совершенно новым и неожиданным, его реакция — это: "А это точно было в учебнике?"'
+            en: 'The performer advises someone to urgently hide due to an impending danger.',
+            ru: 'Исполнитель советует кому-то срочно скрыться, ввиду надвигающейся опасности.'
           }
         }
       ]
     }
   ]
 };
-
