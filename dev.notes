@@ -1,7 +1,7 @@
 07MAR2026
-- Not ARM disabled players
+= Not ARM disabled players [12MAR26]
 02MAR2026
-- if "waiting" for a player from buzzer it should not display in Game
++-/ if "waiting" for a player from buzzer it should not display in Game
 = R3 change point per song from 10-> 10 20 30 ... 70 and put in in json config [03MAR26]
 = add points to round 0 [04MAR26]
 = R3 - buttons  should not be ARMED [03MAR26]
@@ -16,5 +16,5 @@
 26FEB26
 = Add ScoreBar to shown at the end of Round3 [27FEB26]
 - Make player Screens More attractive
-- Implement and check data files for R2,3,4
++ Implement and check data files for R2,3,4 [06MAR26]
 - Uplaod new mp3 Files to cloud

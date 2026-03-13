@@ -25,6 +25,7 @@ import PasswordGuard from './components/PasswordGuard';
 /////////// Buzz---------------------------
 import configBuzz from './configBuzz.json';
 import { io } from 'socket.io-client';
+import './index.css'
 // const socket = io(configBuzz.SOCKET_URL);
 // ----------------------------------------
 
