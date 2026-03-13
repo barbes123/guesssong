@@ -308,24 +308,24 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
 
           /> */}
 
-        <ControlPanel
-  isPlaying={isPlaying}
-  onStart={() => {
-    // Only arm the specific player if this song is NOT already correct
-    if (!isCurrentSongCorrect) {
-      onArmSprintPlayer();
-    }
-    onAudioControl('start');
-  }}
-  onStop={() => onAudioControl('stop')}
-  onCorrect={() => onFinalizeTurn('correct')}
-  onWrong={() => onFinalizeTurn('wrong')}
-  timeLeft={timeLeft}
-  onFinishRound={onFinishRound}
-  t={t}
-  disabledActions={shouldDisableActions}
-  isStartDisabled={!activeNote || (isTimeOver && !isSongFinished)}
-/>
+          <ControlPanel
+            isPlaying={isPlaying}
+            onStart={() => {
+              // Only arm the specific player if this song is NOT already correct
+              if (!isCurrentSongCorrect) {
+                onArmSprintPlayer();
+              }
+              onAudioControl('start');
+            }}
+            onStop={() => onAudioControl('stop')}
+            onCorrect={() => onFinalizeTurn('correct')}
+            onWrong={() => onFinalizeTurn('wrong')}
+            timeLeft={timeLeft}
+            onFinishRound={onFinishRound}
+            t={t}
+            disabledActions={shouldDisableActions}
+            isStartDisabled={!activeNote || (isTimeOver && !isSongFinished)}
+          />
           <MusicTimeline
             isPlaying={isPlaying}
             progress={audioProgress}
