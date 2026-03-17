@@ -96,57 +96,53 @@ const PlayerScreen = () => {
 
 
   const BuzzerPopup = ({ show, playerName, points, isWarmup, onClose }) => {
-
-    // DEBUG: Log popup props and render decisions
-    useEffect(() => {
-      console.log('👑 [BuzzerPopup] Props received:', {
-        show,
-        playerName,
-        points,
-        isWarmup,
-        timestamp: new Date().toISOString()
-      });
-
-      if (show) {
-        console.log('✅ [BuzzerPopup] RENDERING POPUP');
-      } else {
-        console.log('❌ [BuzzerPopup] NOT rendering - show is false or undefined');
-      }
-    }, [show, playerName, points, isWarmup]);
-
     if (!show) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-        <div className="relative max-w-2xl w-full mx-4">
-          {/* Golden glow */}
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-3xl blur-2xl opacity-90 animate-pulse"></div>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="relative max-w-2xl w-full mx-4 animate-in zoom-in-95 duration-500 spring">
 
-          {/* Main window */}
-          <div className="relative bg-gradient-to-br from-yellow-400 to-amber-500 rounded-3xl p-8 border-4 border-yellow-300 shadow-2xl">
-            <div className="text-center">
-              <div className="text-7xl mb-4">👑</div>
-              {/* <h2 className="text-5xl font-black text-amber-900 mb-6">BUZZER PRESSED!</h2> */}
-              <h2 className="text-5xl font-black text-amber-900 mb-6">{t.buzzerPressed || "BUZZER PRESSED!"}</h2>
+          {/* Massive Golden Glow behind the card */}
+          <div className="absolute inset-0 bg-yellow-500/30 rounded-[3rem] blur-[80px] animate-pulse"></div>
 
-              <div className="bg-amber-900/20 rounded-2xl p-6 mb-4">
-                <div className="text-2xl text-amber-900 mb-2">{t.playerName || "Player"}</div>
-                <div className="text-6xl font-black text-white mb-4">{playerName}</div>
+          {/* Main Glass Window */}
+          <div className="relative bg-gradient-to-b from-slate-900 to-slate-950 rounded-[3rem] p-12 border border-yellow-500/30 shadow-2xl overflow-hidden text-center">
 
-                <div className="text-2xl text-amber-900 mb-2">{t.pointsToGain || "Points to Gain"} </div>
-                <div className="text-7xl font-black text-white">{points} {t.points || "PTS"} </div>
+            {/* Subtle top highlight line for 3D effect */}
+            <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-yellow-400 to-transparent opacity-50"></div>
 
-                {/* {isWarmup && (
-                  <div className="mt-4 text-xl bg-amber-200 text-amber-800 py-2 px-4 rounded-full">
-                    {isWarmup ? (language === 'en' ? "Settings" : "Настройка") : `${t.round} ${roundId}`}
-                  </div>
-                )
-                } */}
+            <div className="relative z-10">
+              <Trophy className="mx-auto text-yellow-500 mb-6 drop-shadow-[0_0_15px_rgba(234,179,8,0.5)]" size={80} />
+
+              <h2 className="text-4xl font-bold text-yellow-500 tracking-widest uppercase mb-8">
+                {t.buzzerPressed || "BUZZER PRESSED!"}
+              </h2>
+
+              <div className="bg-slate-900/50 backdrop-blur-md rounded-3xl p-8 mb-6 border border-slate-700 shadow-inner">
+                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  {t.playerName || "Player"}
+                </div>
+                <div className="text-6xl font-black text-white mb-8 tracking-tight drop-shadow-md">
+                  {playerName}
+                </div>
+
+                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+                  {t.pointsToGain || "Points to Gain"}
+                </div>
+                <div className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-yellow-600">
+                  +{points}
+                </div>
               </div>
 
-              <div className="text-lg text-amber-800">
-                {t.waitingForAnswer || "Waiting for answer..."}
-              </div>
+              {isWarmup ? (
+                <div className="inline-block mt-2 text-sm font-black tracking-widest bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 py-3 px-6 rounded-full animate-pulse">
+                  ⚡ WARM-UP / NO POINTS ⚡
+                </div>
+              ) : (
+                <div className="text-lg font-medium text-slate-400 animate-pulse">
+                  {t.waitingForAnswer || "Waiting for answer..."}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -382,16 +378,13 @@ const PlayerScreen = () => {
 
 
   const renderPlayersFooter = () => {
-    // 1. Check if a buzzer is currently active in the synchronized state
     const buzzerIdx = players.findIndex(p => p.hubId === state.activeResponder);
     const hasBuzzer = state.activeResponder && buzzerIdx !== -1;
-
-    // 2. The visual focus goes to the buzzer winner, otherwise the turn player
     const visualActiveIndex = hasBuzzer ? buzzerIdx : state.currentPlayerIndex;
 
     return (
-      <div className="mt-8 pb-8 w-full max-w-[1800px] mx-auto">
-        <div className="flex justify-center gap-6">
+      <div className="mt-12 pb-8 w-full max-w-[1800px] mx-auto">
+        <div className="flex justify-center gap-8">
           {players.map((p, idx) => {
             const isHighlighted = idx === visualActiveIndex;
             const isWinner = hasBuzzer && idx === buzzerIdx;
@@ -400,36 +393,43 @@ const PlayerScreen = () => {
               <div
                 key={p.id}
                 className={`
-                  relative flex-1 bg-slate-900/90 backdrop-blur-md px-6 py-4 rounded-[2rem] border-2 flex items-center justify-between shadow-xl transition-all duration-500
-                  ${isHighlighted
+                relative flex-1 px-8 py-5 rounded-3xl border flex items-center justify-between transition-all duration-500 overflow-hidden
+                ${isHighlighted
                     ? isWinner
-                      ? 'border-yellow-500 shadow-[0_0_40px_rgba(234,179,8,0.5)] scale-110 z-20 bg-slate-800' // BUZZER STATE
-                      : 'border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.4)] scale-105 z-10 bg-slate-800' // MANUAL STATE
-                    : 'border-slate-800 opacity-60 scale-95'
+                      ? 'border-yellow-400 bg-gradient-to-r from-yellow-900/40 to-slate-900 shadow-[0_0_40px_rgba(234,179,8,0.2)] scale-105 z-20'
+                      : 'border-indigo-500 bg-gradient-to-r from-indigo-900/40 to-slate-900 shadow-[0_0_40px_rgba(99,102,241,0.2)] scale-105 z-10'
+                    : 'border-slate-800/50 bg-slate-900/40 opacity-70 scale-100'
                   }
-                `}
+              `}
               >
+                {/* Highlight Badge */}
                 {isHighlighted && (
-                  <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-lg ${isWinner ? 'bg-yellow-600' : 'bg-indigo-600'}`}>
-                    {isWinner ? (t.buzzer || "BUZZER!") : (t.currentTurn || "Current Turn")}
-                  </div>
+                  <div className={`absolute top-0 left-0 w-full h-1 ${isWinner ? 'bg-yellow-400 animate-pulse' : 'bg-indigo-500'}`}></div>
                 )}
-                <div className="flex flex-col">
-                  <div className={`text-xl font-black truncate max-w-[180px] ${isHighlighted ? 'text-white' : 'text-slate-400'}`}>
+
+                <div className="flex flex-col gap-1 z-10">
+                  <div className={`text-xs font-bold uppercase tracking-widest ${isHighlighted ? (isWinner ? 'text-yellow-400' : 'text-indigo-400') : 'text-slate-600'}`}>
+                    {isHighlighted ? (isWinner ? (t.buzzer || "BUZZER!") : (t.currentTurn || "Current Turn")) : "Player"}
+                  </div>
+                  <div className={`text-2xl font-black truncate max-w-[200px] ${isHighlighted ? 'text-white' : 'text-slate-300'}`}>
                     {p.name || `Player ${p.id + 1}`}
                   </div>
                   <div className="flex gap-1 mt-1">
                     {[...Array(3)].map((_, i) => (
                       <Star
                         key={i}
-                        size={16}
-                        className={`${i < (p.stars || 0) ? 'text-yellow-500 fill-yellow-500' : 'text-slate-700 fill-slate-700'}`}
+                        size={14}
+                        className={`${i < (p.stars || 0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_5px_rgba(234,179,8,0.8)]' : 'text-slate-700 fill-slate-800'}`}
                       />
                     ))}
                   </div>
                 </div>
-                <div className={`text-4xl font-black tabular-nums ${isHighlighted ? (isWinner ? 'text-yellow-400' : 'text-indigo-400') : 'text-slate-500'}`}>
-                  {p.score}
+
+                <div className="text-right z-10">
+                  <div className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">Score</div>
+                  <div className={`text-5xl font-black tabular-nums tracking-tighter ${isHighlighted ? (isWinner ? 'text-yellow-400' : 'text-white') : 'text-slate-500'}`}>
+                    {p.score}
+                  </div>
                 </div>
               </div>
             );
@@ -504,158 +504,234 @@ const PlayerScreen = () => {
 
     const isFinalized = state.isR3Finalized;
 
+    // Determine active players for highlighting
+    const isLeftActive = state.currentPlayerIndex === players.indexOf(leftPlayer);
+    const isRightActive = state.currentPlayerIndex === players.indexOf(rightPlayer);
+
     return (
       <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
         {renderHeader(3, t.categories.superGame || "SUPER GAME")}
-        <div className="max-w-[1800px] mx-auto w-full flex gap-12">
-          {/* Left Player */}
-          <div className={`flex-1 p-12 rounded-[4rem] border-4 transition-all duration-500 ${state.currentPlayerIndex === players.indexOf(leftPlayer) ? 'bg-indigo-900/50 border-indigo-500 shadow-2xl shadow-indigo-900/30' : 'bg-slate-900 border-slate-800'}`}>
-            <h3 className="text-6xl font-black text-white text-center mb-8 truncate drop-shadow-lg">{leftPlayer.name || `Player ${leftPlayer.id + 1}`}</h3>
-            <div className="flex justify-center gap-4 mb-8">
-              {[1, 2, 3].map(s => <Star key={s} size={64} className={s <= (leftPlayer.stars || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-slate-700'} />)}
+
+        {/* We use gap-8 and fixed narrower widths for the sides so the center expands */}
+        <div className="max-w-[1800px] mx-auto w-full flex gap-8 items-stretch">
+
+          {/* ================= LEFT PLAYER (Narrowed, line removed) ================= */}
+          <div
+            className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isLeftActive
+                ? 'bg-gradient-to-b from-indigo-900/60 to-slate-900 border-indigo-400 shadow-[0_0_40px_rgba(99,102,241,0.3)] scale-105 z-10'
+                : 'bg-slate-900/80 border-slate-800 opacity-80'
+              }`}
+          >
+            {/* Reduced from text-6xl to text-4xl to fit narrow container */}
+            <h3 className="text-4xl font-black text-white text-center mb-6 truncate drop-shadow-md">
+              {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
+            </h3>
+
+            {/* Reduced star size from 64 to 36 */}
+            <div className="flex justify-center gap-3 mb-8 bg-slate-950/40 py-3 rounded-full border border-slate-800 shadow-inner">
+              {[1, 2, 3].map(s => (
+                <Star
+                  key={s}
+                  size={36}
+                  className={s <= (leftPlayer.stars || 0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'text-slate-700'}
+                />
+              ))}
             </div>
-            <div className="text-center text-7xl font-black text-indigo-400 tabular-nums">{leftPlayer.score}</div>
+
+            {/* Reduced score from text-7xl to text-6xl */}
+            <div className="text-center text-6xl font-black text-indigo-400 tabular-nums tracking-tighter drop-shadow-md">
+              {leftPlayer.score}
+            </div>
           </div>
 
-          {/* Center Info */}
-          <div className="flex-[2] flex flex-col items-center justify-center bg-slate-900/50 rounded-[4rem] p-12 border-2 border-slate-800">
+          {/* ================= CENTER INFO (Expanded) ================= */}
+          <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-slate-800/40 to-slate-900/60 rounded-[4rem] p-10 lg:p-14 border border-slate-700/50 shadow-2xl relative">
             <div className="text-2xl font-black text-slate-400 uppercase tracking-[0.3em] mb-6">
               {t.turn || "TURN"} {turnIdx + 1} / 5
             </div>
-            <div className="text-center bg-slate-800/70 rounded-3xl p-8 border-2 border-slate-700 mb-8 w-full">
-              <p className="text-4xl font-bold text-white italic">"{language === 'en' ? song?.hint?.en : song?.hint?.ru}"</p>
+
+            {/* HINT TEXT CONTAINER: Same text-4xl size, enhanced container styling */}
+            <div className="text-center bg-gradient-to-b from-slate-900/80 to-slate-950/90 rounded-[2.5rem] p-10 border border-slate-700 shadow-[inset_0_2px_15px_rgba(0,0,0,0.5)] mb-10 w-full relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
+
+              {/* Keeping original text-4xl size as requested */}
+              <p className="text-4xl font-bold text-white italic drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] relative z-10">
+                "{language === 'en' ? song?.hint?.en : song?.hint?.ru}"
+              </p>
             </div>
+
+            {/* DURATION BUTTONS (Premium 3D Style) */}
             <div className="flex justify-center gap-4">
-              {[1, 2, 3, 4, 5].map(s => (
-                <div key={s} className={`w-20 h-20 rounded-2xl border-4 flex items-center justify-center transition-all ${state.selectedDuration === s ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
-                  <span className="text-4xl font-black">{s}</span>
-                </div>
-              ))}
-              <div className={`w-32 h-20 rounded-2xl border-4 flex items-center justify-center transition-all ${state.selectedDuration === null && isPlaying ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
-                <span className="text-2xl font-black uppercase">{t.full || 'FULL'}</span>
+              {[1, 2, 3, 4, 5].map(s => {
+                const isSelected = state.selectedDuration === s;
+                return (
+                  <div
+                    key={s}
+                    className={`w-20 h-20 rounded-2xl border-2 flex items-center justify-center transition-all duration-300 ${isSelected
+                        ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-[0_0_30px_rgba(99,102,241,0.6),inset_0_2px_0_rgba(255,255,255,0.3)] scale-110 z-10'
+                        : 'bg-slate-800 border-slate-700/50 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] cursor-pointer hover:bg-slate-700'
+                      }`}
+                  >
+                    <span className="text-4xl font-black drop-shadow-md">{s}</span>
+                  </div>
+                );
+              })}
+
+              <div
+                className={`w-32 h-20 rounded-2xl border-2 flex items-center justify-center transition-all duration-300 ${state.selectedDuration === null && isPlaying
+                    ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-[0_0_30px_rgba(99,102,241,0.6),inset_0_2px_0_rgba(255,255,255,0.3)] scale-110 z-10'
+                    : 'bg-slate-800 border-slate-700/50 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] cursor-pointer hover:bg-slate-700'
+                  }`}
+              >
+                <span className="text-2xl font-black uppercase drop-shadow-md">{t.full || 'FULL'}</span>
               </div>
             </div>
+
             {isFinalized && (
-              <div className="mt-8 text-2xl font-black text-emerald-400 uppercase animate-pulse tracking-widest">
+              <div className="absolute bottom-6 text-xl font-black text-emerald-400 uppercase animate-pulse tracking-widest drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]">
                 {t.nextTurn || "Next Turn Pending..."}
               </div>
             )}
           </div>
 
-          {/* Right Player */}
-          <div className={`flex-1 p-12 rounded-[4rem] border-4 transition-all duration-500 ${state.currentPlayerIndex === players.indexOf(rightPlayer) ? 'bg-rose-900/50 border-rose-500 shadow-2xl shadow-rose-900/30' : 'bg-slate-900 border-slate-800'}`}>
-            <h3 className="text-6xl font-black text-white text-center mb-8 truncate drop-shadow-lg">{rightPlayer.name || `Player ${rightPlayer.id + 1}`}</h3>
-            <div className="flex justify-center gap-4 mb-8">
-              {[1, 2, 3].map(s => <Star key={s} size={64} className={s <= (rightPlayer.stars || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-slate-700'} />)}
+          {/* ================= RIGHT PLAYER (Narrowed, line removed) ================= */}
+          <div
+            className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isRightActive
+                ? 'bg-gradient-to-b from-rose-900/60 to-slate-900 border-rose-400 shadow-[0_0_40px_rgba(244,63,94,0.3)] scale-105 z-10'
+                : 'bg-slate-900/80 border-slate-800 opacity-80'
+              }`}
+          >
+            {/* Reduced from text-6xl to text-4xl */}
+            <h3 className="text-4xl font-black text-white text-center mb-6 truncate drop-shadow-md">
+              {rightPlayer.name || `Player ${rightPlayer.id + 1}`}
+            </h3>
+
+            {/* Reduced star size from 64 to 36 */}
+            <div className="flex justify-center gap-3 mb-8 bg-slate-950/40 py-3 rounded-full border border-slate-800 shadow-inner">
+              {[1, 2, 3].map(s => (
+                <Star
+                  key={s}
+                  size={36}
+                  className={s <= (rightPlayer.stars || 0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'text-slate-700'}
+                />
+              ))}
             </div>
-            <div className="text-center text-7xl font-black text-rose-400 tabular-nums">{rightPlayer.score}</div>
+
+            {/* Reduced score from text-7xl to text-6xl */}
+            <div className="text-center text-6xl font-black text-rose-400 tabular-nums tracking-tighter drop-shadow-md">
+              {rightPlayer.score}
+            </div>
           </div>
+
         </div>
       </div>
     );
   };
 
-const renderRound4 = () => {
-  const progress = roundProgress[4] || { usedRows: [], r4PlayerProgress: {} };
-  const selectedSetId = roundSets[4] || 'default';
-  const roundData = getRoundData(4, selectedSetId) || [];
-  const songs = roundData[0]?.songs || [];
+  const renderRound4 = () => {
+    const progress = roundProgress[4] || { usedRows: [], r4PlayerProgress: {} };
+    const selectedSetId = roundSets[4] || 'default';
+    const roundData = getRoundData(4, selectedSetId) || [];
+    const songs = roundData[0]?.songs || [];
 
-  const currentPlayer = players[state.currentPlayerIndex];
-  if (!currentPlayer) return null;
+    const currentPlayer = players[state.currentPlayerIndex];
+    if (!currentPlayer) return null;
 
-  const playerProg = progress.r4PlayerProgress?.[currentPlayer.id] || { correctIndices: [], hasFinished: false };
-  const correctIndices = new Set(playerProg.correctIndices);
+    const playerProg = progress.r4PlayerProgress?.[currentPlayer.id] || { correctIndices: [], hasFinished: false };
+    const correctIndices = new Set(playerProg.correctIndices);
 
-  // FORCE Row 0 since we don't need activation/selection
-  const displayRow = 0; 
+    // FORCE Row 0 since we don't need activation/selection
+    const displayRow = 0;
 
-  const formatTime = (seconds) => {
-    // If timer hasn't started, show the full duration (e.g., 30s) instead of 0:00
-    const timeToDisplay = (seconds === undefined || seconds === null) ? 30 : seconds;
-    const m = Math.floor(Math.abs(timeToDisplay) / 60);
-    const s = Math.floor(Math.abs(timeToDisplay) % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
+    const formatTime = (seconds) => {
+      // If timer hasn't started, show the full duration (e.g., 30s) instead of 0:00
+      const timeToDisplay = (seconds === undefined || seconds === null) ? 30 : seconds;
+      const m = Math.floor(Math.abs(timeToDisplay) / 60);
+      const s = Math.floor(Math.abs(timeToDisplay) % 60);
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    };
 
-  return (
-    <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
-      {renderHeader(4, "SPRINT")}
-      <div className="max-w-[1800px] mx-auto w-full flex gap-8">
-        
-        {/* MAIN GRID - Always visible, no selection required */}
-        <div className="flex-[3] bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-8">
-          <div className="flex flex-col h-full">
-            <div className="text-center mb-6">
-              <div className="text-lg font-black text-slate-400 uppercase tracking-widest">Time Left</div>
-              <div className={`text-8xl font-black tabular-nums ${state.timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>
-                {formatTime(state.timeLeft)}
+    return (
+      <div className="min-h-screen bg-slate-950 p-6 flex flex-col justify-center">
+
+        <div className="max-w-[1400px] mx-auto w-full flex flex-col gap-5">
+
+          {/* HEADER MOVED HERE: Now it is constrained by the 1400px wrapper and aligns perfectly with the left edge! */}
+          <div className="-mb-2">
+            {renderHeader(4, "SPRINT")}
+          </div>
+
+          {/* MAIN GRID */}
+          <div className="bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-6 lg:p-8">
+            <div className="flex flex-col h-full">
+
+              {/* TIMER */}
+              <div className="text-center mb-6">
+                <div className="text-base font-black text-slate-400 uppercase tracking-widest">Time Left</div>
+                <div className={`text-6xl lg:text-7xl font-black tabular-nums ${state.timeLeft <= 10 ? 'text-rose-500 animate-pulse' : 'text-indigo-400'}`}>
+                  {formatTime(state.timeLeft)}
+                </div>
+              </div>
+
+              {/* GRID */}
+              <div className="grid grid-cols-7 gap-3 lg:gap-4">
+                {songs.slice(0, 7).map((song, i) => {
+                  const songIdx = i; // Simplified since row is always 0
+                  const isCorrect = correctIndices.has(songIdx);
+                  const isWrong = playerProg.wrongIndex === songIdx;
+
+                  // If no note is active in state, visually highlight the first one
+                  const isActive = state.activeNote
+                    ? state.activeNote?.noteIndex === songIdx
+                    : songIdx === r4CurrentSongIdx;
+
+                  const isPlayed = state.playedButNotEvaluated?.includes(songIdx);
+
+                  let bg = 'bg-slate-800';
+                  let border = 'border-slate-700';
+                  let iconColor = 'text-slate-600';
+                  let scale = '';
+
+                  if (isActive) {
+                    bg = 'bg-indigo-600';
+                    border = 'border-white';
+                    iconColor = 'text-white animate-pulse';
+                    scale = 'scale-105 z-10 shadow-[0_0_30px_rgba(99,102,241,0.4)]';
+                  } else if (isCorrect) {
+                    bg = 'bg-emerald-600'; border = 'border-emerald-400'; iconColor = 'text-white';
+                  } else if (isWrong) {
+                    bg = 'bg-rose-600'; border = 'border-rose-400'; iconColor = 'text-white';
+                  } else if (isPlayed) {
+                    bg = 'bg-yellow-600'; border = 'border-yellow-400'; iconColor = 'text-white';
+                  }
+
+                  return (
+                    <div
+                      key={songIdx}
+                      className={`aspect-square rounded-2xl lg:rounded-3xl border-4 flex items-center justify-center transition-all duration-500 ${bg} ${border} ${scale}`}
+                    >
+                      <Music size={48} className={iconColor} />
+                    </div>
+                  );
+                })}
               </div>
             </div>
+          </div>
 
-            <div className="flex-1 grid grid-cols-7 gap-4">
-              {songs.slice(0, 7).map((song, i) => {
-                const songIdx = i; // Simplified since row is always 0
-                const isCorrect = correctIndices.has(songIdx);
-                const isWrong = playerProg.wrongIndex === songIdx;
-                
-                // If no note is active in state, visually highlight the first one
-                const isActive = state.activeNote 
-                  ? state.activeNote?.noteIndex === songIdx 
-                  : songIdx === r4CurrentSongIdx; // 👈 Change 0 to r4CurrentSongIdx
-                  // : state.r4CurrentSongIdx === songIdx;
-                  // : songIdx === 0; 
-
-                const isPlayed = state.playedButNotEvaluated?.includes(songIdx);
-
-                let bg = 'bg-slate-800';
-                let border = 'border-slate-700';
-                let iconColor = 'text-slate-600';
-                let scale = '';
-
-                if (isActive) {
-                  bg = 'bg-indigo-600';
-                  border = 'border-white';
-                  iconColor = 'text-white animate-pulse';
-                  scale = 'scale-110 z-10 shadow-[0_0_40px_rgba(99,102,241,0.4)]';
-                } else if (isCorrect) {
-                  bg = 'bg-emerald-600'; border = 'border-emerald-400'; iconColor = 'text-white';
-                } else if (isWrong) {
-                  bg = 'bg-rose-600'; border = 'border-rose-400'; iconColor = 'text-white';
-                } else if (isPlayed) {
-                  bg = 'bg-yellow-600'; border = 'border-yellow-400'; iconColor = 'text-white';
-                }
-
-                return (
-                  <div key={songIdx} className={`rounded-3xl border-4 flex items-center justify-center transition-all duration-500 ${bg} ${border} ${scale}`}>
-                    {isCorrect ? <CheckCircle size={48} className={iconColor} /> : isWrong ? <XCircle size={48} className={iconColor} /> : <Music size={48} className={iconColor} />}
-                  </div>
-                );
-              })}
+          {/* PLAYER INFO */}
+          <div className="bg-slate-900/50 border-2 border-slate-800 rounded-[2.5rem] px-8 py-5 flex items-center justify-between">
+            <h3 className="text-4xl font-black text-white truncate drop-shadow-md">
+              {currentPlayer.name || `Player ${currentPlayer.id + 1}`}
+            </h3>
+            <div className="text-5xl font-black text-indigo-400 tabular-nums">
+              {currentPlayer.score} <span className="text-2xl font-bold uppercase text-indigo-400/50 ml-2">pts</span>
             </div>
           </div>
-        </div>
 
-        {/* Player Info Sidebar */}
-        <div className="flex-1 bg-slate-900/50 border-2 border-slate-800 rounded-[3rem] p-8 flex flex-col items-center justify-center text-center">
-          <h3 className="text-5xl font-black text-white mb-6 truncate w-full drop-shadow-md">{currentPlayer.name || `Player ${currentPlayer.id + 1}`}</h3>
-          <div className="text-7xl font-black text-indigo-400 tabular-nums mb-8">{currentPlayer.score}</div>
-          <div className="w-full bg-slate-800 rounded-2xl p-6 border-2 border-slate-700">
-            <div className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Sprint Progress</div>
-            <div className="text-5xl font-black text-emerald-400">
-              {correctIndices.size} / 7
-            </div>
-            <div className="flex gap-1 mt-4">
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className={`h-2 flex-1 rounded-full ${i < correctIndices.size ? 'bg-emerald-500' : 'bg-slate-700'}`} />
-              ))}
-            </div>
-          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
   const renderR3Select = () => {
     const selectedIds = r3Selection || [];
 
@@ -728,29 +804,20 @@ const renderRound4 = () => {
     </div>
   );
 
-  // const renderRound1 = () => {
-  //   const progress = roundProgress[1] || { 
-  //     usedNotes: [], 
-  //     results: {}, 
-  //     pointMap: {} 
-  //   };
-
-  //   const selectedSetId = roundSets[1] || 'default';
-  //   const categories = getRoundData(1, selectedSetId) || [];
-  const renderRound1 = () => {
+const renderRound1 = () => {
     // 1. Get the actual ID (0, 1, etc.)
     const currentId = activeRoundId;
 
     // 2. Get the progress for THIS specific round
     const progress = roundProgress[currentId] || {
-      usedNotes: [],
+      usedNotes:[],
       results: {},
       pointMap: {}
     };
 
-    // 3. Get the correct data file (round0_default vs round1_default)
+    // 3. Get the correct data file
     const selectedSetId = roundSets[currentId] || 'default';
-    const categories = getRoundData(currentId, selectedSetId) || [];
+    const categories = getRoundData(currentId, selectedSetId) ||[];
 
     // 4. Set the title based on the round
     const title = currentId === 0
@@ -766,8 +833,6 @@ const renderRound4 = () => {
           isWarmup={state?.isWarmup}
         />
 
-
-
         <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
           {renderHeader(currentId, title)}
           <div className="max-w-[1800px] mx-auto w-full">
@@ -775,9 +840,9 @@ const renderRound4 = () => {
               {categories.slice(0, 4).map((cat) => (
                 <div key={cat.id} className="flex gap-6 h-32">
                   {/* Category Label */}
-                  <div className="w-80 bg-slate-800 rounded-3xl flex items-center justify-center p-6 border-2 border-slate-700 shadow-lg relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10">
+                  <div className="w-80 bg-gradient-to-b from-slate-800 to-slate-900 rounded-3xl flex items-center justify-center p-6 border border-slate-700/50 shadow-lg relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10 drop-shadow-md">
                       {language === 'ru' ? cat.name.ru : cat.name.en}
                     </span>
                   </div>
@@ -786,62 +851,61 @@ const renderRound4 = () => {
                   <div className="flex-1 grid grid-cols-4 gap-4">
                     {[0, 1, 2, 3].map((noteIdx) => {
                       const noteId = `${cat.id}-${noteIdx}`;
-                      // Handle both Set and Array for usedNotes
                       const isUsed = Array.isArray(progress.usedNotes)
                         ? progress.usedNotes.includes(noteId)
                         : progress.usedNotes?.has?.(noteId);
 
                       const result = progress.results?.[noteId];
                       const isActive = activeNote?.categoryId === cat.id && activeNote?.noteIndex === noteIdx;
+                      
+                      // Check if this specific note is currently outputting sound
+                      const isPlayingNow = isActive && isPlaying;
 
-                      let bgColor = 'bg-slate-900';
-                      let borderColor = 'border-slate-800';
-                      let textColor = 'text-indigo-400';
-                      let shadow = '';
+                      let bgColor = 'bg-gradient-to-b from-slate-800 to-slate-900';
+                      let borderColor = 'border-slate-700/50 text-slate-500';
+                      let shadow = 'shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]';
                       let scale = 'scale-100';
 
                       if (isActive) {
-                        bgColor = 'bg-indigo-600';
-                        borderColor = 'border-white';
-                        textColor = 'text-white';
-                        shadow = 'shadow-[0_0_30px_rgba(79,70,229,0.5)]';
-                        scale = 'scale-105 z-10';
+                        bgColor = 'bg-gradient-to-b from-indigo-500 to-indigo-700';
+                        borderColor = isPlayingNow ? 'border-white text-white' : 'border-indigo-400 text-white';
+                        shadow = isPlayingNow 
+                          ? 'shadow-[0_0_50px_rgba(255,255,255,0.4),inset_0_2px_0_rgba(255,255,255,0.6)]' 
+                          : 'shadow-[0_0_30px_rgba(99,102,241,0.5),inset_0_2px_0_rgba(255,255,255,0.2)]';
+                        scale = `z-20 ${isPlayingNow ? 'scale-110 ring-4 ring-white animate-pulse' : 'scale-105 ring-2 ring-indigo-400/50'}`;
                       } else if (isUsed) {
                         if (result === 'correct') {
-                          bgColor = 'bg-emerald-600';
-                          borderColor = 'border-emerald-400';
-                          textColor = 'text-white';
+                          bgColor = 'bg-gradient-to-b from-emerald-500 to-emerald-700';
+                          borderColor = 'border-emerald-400 text-white';
+                          shadow = 'shadow-[inset_0_1px_0_rgba(255,255,255,0.3)] opacity-90';
                         } else if (result === 'wrong') {
-                          bgColor = 'bg-rose-600';
-                          borderColor = 'border-rose-400';
-                          textColor = 'text-white';
+                          bgColor = 'bg-gradient-to-b from-rose-600 to-rose-800';
+                          borderColor = 'border-rose-400 text-white';
+                          shadow = 'opacity-50 grayscale-[50%]';
                         } else {
-                          bgColor = 'bg-slate-800';
-                          borderColor = 'border-slate-700';
-                          textColor = 'text-slate-600';
+                          bgColor = 'bg-slate-900/80';
+                          borderColor = 'border-slate-800/50 text-slate-700';
                         }
                       }
 
                       return (
-
                         <div
                           key={noteIdx}
-                          className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
+                          className={`relative rounded-3xl border-2 flex items-center justify-center text-5xl font-black transition-all duration-300 ease-out ${bgColor} ${borderColor} ${shadow} ${scale}`}
                         >
-                          {/* If the note is currently active (being played) or is already used, show points. 
-      Otherwise, show the music icon. */}
+                          {/* HIGHLIGHT: Bouncing music icon in the corner when audio is playing */}
+                          {isPlayingNow && (
+                            <Music size={28} className="absolute top-4 right-4 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-bounce" />
+                          )}
+
                           {isActive || isUsed ? (
-                            progress.pointMap?.[cat.id]?.[noteIdx] || 0
+                            <span className="drop-shadow-md relative z-10">
+                              {progress.pointMap?.[cat.id]?.[noteIdx] || 0}
+                            </span>
                           ) : (
-                            <Music size={48} className="text-slate-700/50" />
+                            <Music size={40} className="text-slate-600 opacity-50" />
                           )}
                         </div>
-                        // <div 
-                        //   key={noteIdx} 
-                        //   className={`rounded-3xl border-4 flex items-center justify-center text-5xl font-black transition-all duration-300 ${bgColor} ${borderColor} ${textColor} ${shadow} ${scale}`}
-                        // >
-                        //   {progress.pointMap?.[cat.id]?.[noteIdx] || 0}
-                        // </div>
                       );
                     })}
                   </div>
@@ -867,113 +931,148 @@ const renderRound4 = () => {
     const categories = getRoundData(2, selectedSetId) || [];
 
     return (
-          <>
+      <>
         <BuzzerPopup
           show={state?.showBuzzerPopup}
           playerName={state?.buzzerPlayerName}
-          // points={activeNote?.categoryId ? currentRoundPoints || state?.buzzerPoints : state?.buzzerPoints}
           points={currentRoundPoints || state?.buzzerPoints}
-          // points={state?.buzzerPoints}
           isWarmup={state?.isWarmup}
         />
 
+        <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
+          {renderHeader(2, t.melodyGuess || "MELODY GUESS")}
 
-      <div className="min-h-screen bg-slate-950 p-8 flex flex-col justify-center">
-        {renderHeader(2, t.melodyGuess || "MELODY GUESS")}
-        <div className="max-w-[1800px] mx-auto w-full">
-          <div className="flex flex-col gap-6">
-            {categories.slice(0, 4).map((cat) => {
-              const activationCount = progress.activationCounts?.[cat.id] || 0;
-              const isCategoryActive = activeNote?.categoryId === cat.id;
-              // Check if category is completed (all 4 songs done)
-              const isCompleted = progress.results?.[`${cat.id}-0`] !== undefined || (progress.usedNotes && (Array.isArray(progress.usedNotes) ? progress.usedNotes.includes(`${cat.id}-0`) : progress.usedNotes.has(`${cat.id}-0`)));
+          <div className="max-w-[1800px] mx-auto w-full">
+            <div className="flex flex-col gap-6">
+              {categories.slice(0, 4).map((cat) => {
+                const activationCount = progress.activationCounts?.[cat.id] || 0;
+                const isCategoryActive = activeNote?.categoryId === cat.id;
 
-              let displayScore = null;
+                // Check if category is completed
+                const isCompleted = progress.results?.[`${cat.id}-0`] !== undefined ||
+                  (progress.usedNotes && (Array.isArray(progress.usedNotes) ? progress.usedNotes.includes(`${cat.id}-0`) : progress.usedNotes.has(`${cat.id}-0`)));
 
-              if (activationCount > 0 || isCategoryActive) {
-                displayScore = progress.persistentPoints?.[`${cat.id}-0`];
-              }
+                let displayScore = null;
 
-              if (isCategoryActive && activeNote?.noteIndex === 0 && currentRoundPoints !== undefined) {
-                displayScore = currentRoundPoints;
-              }
+                if (activationCount > 0 || isCategoryActive) {
+                  displayScore = progress.persistentPoints?.[`${cat.id}-0`];
+                }
 
-              return (
-                <div key={cat.id} className="flex gap-6 h-32">
-                  {/* Category Label */}
-                  <div className="w-80 bg-slate-800 rounded-3xl flex items-center justify-center p-6 border-2 border-slate-700 shadow-lg relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10">
-                      {language === 'ru' ? cat.name.ru : cat.name.en}
-                    </span>
-                  </div>
+                if (isCategoryActive && activeNote?.noteIndex === 0 && currentRoundPoints !== undefined) {
+                  displayScore = currentRoundPoints;
+                }
 
-                  {/* Notes Grid - 5 columns (1 Price + 4 Songs) */}
-                  <div className="flex-1 grid grid-cols-5 gap-4">
-                    {/* Note 0: Price/Activator */}
-                    <div
-                      className={`
-                        rounded-3xl border-4 flex items-center justify-center text-4xl font-black transition-all duration-500 relative overflow-hidden
-                        ${isCompleted
-                          ? 'bg-slate-800 border-slate-700 text-slate-600'
-                          : isCategoryActive && activeNote?.noteIndex === 0
-                            ? 'bg-indigo-600 border-white text-white shadow-[0_0_30px_rgba(79,70,229,0.5)] scale-105 z-10'
-                            : 'bg-slate-900 border-slate-800 text-indigo-400/50'
-                        }
-                      `}
-                    >
-                      {displayScore !== null ? displayScore : '?'}
+                // --- STYLING NOTE 0 (PRICE / ACTIVATOR) ---
+                const isActiveActivator = isCategoryActive && activeNote?.noteIndex === 0;
+                const isActivatorPlaying = isActiveActivator && isPlaying;
+
+                let actBgColor = 'bg-gradient-to-b from-slate-800 to-slate-900';
+                let actBorderColor = 'border-slate-700/50 text-indigo-400';
+                let actShadow = 'shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]';
+                let actScale = 'scale-100 cursor-pointer hover:scale-[1.02]';
+
+                if (isCompleted) {
+                  actBgColor = 'bg-slate-900/80';
+                  actBorderColor = 'border-slate-800/50 text-slate-600';
+                  actShadow = 'opacity-50 grayscale-[50%]';
+                  actScale = 'scale-100 cursor-default';
+                } else if (isActiveActivator) {
+                  actBgColor = 'bg-gradient-to-b from-indigo-500 to-indigo-700';
+                  actBorderColor = isActivatorPlaying ? 'border-white text-white' : 'border-indigo-400 text-white';
+                  actShadow = isActivatorPlaying
+                    ? 'shadow-[0_0_50px_rgba(255,255,255,0.4),inset_0_2px_0_rgba(255,255,255,0.6)]'
+                    : 'shadow-[0_0_40px_rgba(99,102,241,0.6),inset_0_2px_0_rgba(255,255,255,0.3)]';
+                  actScale = `z-20 ${isActivatorPlaying ? 'scale-110 ring-4 ring-white animate-pulse' : 'scale-105 ring-4 ring-indigo-500/30'}`;
+                } else if (activationCount === 0 && !isCategoryActive) {
+                  actBorderColor = 'border-slate-700/50 text-indigo-400/50';
+                }
+
+                return (
+                  <div key={cat.id} className="flex gap-6 h-32">
+                    {/* Category Label (Glassmorphic) */}
+                    <div className="w-80 bg-gradient-to-b from-slate-800 to-slate-900 rounded-3xl flex items-center justify-center p-6 border border-slate-700/50 shadow-lg relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10 drop-shadow-md">
+                        {language === 'ru' ? cat.name.ru : cat.name.en}
+                      </span>
                     </div>
 
-                    {/* Notes 1-4: Songs */}
-                    {[1, 2, 3, 4].map((noteIdx) => {
-                      const resultKey = `${cat.id}-${noteIdx}`;
-                      const result = progress.results?.[resultKey];
-                      const isNoteActive = isCategoryActive && activeNote?.noteIndex === noteIdx;
+                    <div className="flex-1 grid grid-cols-5 gap-4">
 
-                      let bgColor = 'bg-slate-900/50';
-                      let borderColor = 'border-slate-800';
-                      let icon = <Music size={32} className="text-slate-700" />;
+                      {/* Note 0: Price/Activator */}
+                      <div className={`relative rounded-3xl border-2 flex items-center justify-center text-4xl font-black transition-all duration-300 ease-out overflow-hidden ${actBgColor} ${actBorderColor} ${actShadow} ${actScale}`}>
 
-                      if (result === 'correct') {
-                        bgColor = 'bg-emerald-900/30';
-                        borderColor = 'border-emerald-600/50';
-                        icon = <CheckCircle size={40} className="text-emerald-500" />;
-                      } else if (result === 'wrong') {
-                        bgColor = 'bg-rose-900/30';
-                        borderColor = 'border-rose-600/50';
-                        icon = <XCircle size={40} className="text-rose-500" />;
-                      } else if (isNoteActive) {
-                        bgColor = 'bg-indigo-900/30';
-                        borderColor = 'border-indigo-500';
-                        icon = <Music size={32} className="text-indigo-400 animate-pulse" />;
-                      }
+                        {/* HIGHLIGHT: Bouncing music icon inside Activator when playing */}
+                        {isActivatorPlaying && (
+                          <Music size={28} className="absolute top-4 right-4 text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] animate-bounce" />
+                        )}
 
-                      return (
-                        <div
-                          key={noteIdx}
-                          className={`
-                            rounded-3xl border-2 flex items-center justify-center transition-all duration-300
-                            ${bgColor} ${borderColor}
-                            ${isNoteActive ? 'scale-105 shadow-lg shadow-indigo-900/20' : ''}
-                          `}
-                        >
-                          {icon}
-                        </div>
-                      );
-                    })}
+                        <span className="drop-shadow-md relative z-10">
+                          {displayScore !== null ? displayScore : '?'}
+                        </span>
+                      </div>
+
+                      {/* Notes 1-4: Songs */}
+                      {[1, 2, 3, 4].map((noteIdx) => {
+                        const resultKey = `${cat.id}-${noteIdx}`;
+                        const result = progress.results?.[resultKey];
+                        const isNoteActive = isCategoryActive && activeNote?.noteIndex === noteIdx;
+
+                        // Check if this specific note is outputting audio
+                        const isPlayingNow = isNoteActive && isPlaying;
+
+                        let songBgColor = 'bg-gradient-to-b from-slate-800/40 to-slate-900/60';
+                        let songBorderColor = 'border-slate-700/50';
+                        let songShadow = 'shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]';
+                        let songScale = 'scale-100 hover:scale-[1.02] cursor-pointer';
+                        let icon = <Music size={32} className="text-slate-600/50" />;
+
+                        if (result === 'correct') {
+                          songBgColor = 'bg-gradient-to-b from-emerald-500/20 to-emerald-900/40';
+                          songBorderColor = 'border-emerald-500/50';
+                          songShadow = 'shadow-[inset_0_1px_0_rgba(16,185,129,0.2)]';
+                          icon = <Music size={40} className="text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]" />;
+                        } else if (result === 'wrong') {
+                          songBgColor = 'bg-gradient-to-b from-rose-500/20 to-rose-900/40';
+                          songBorderColor = 'border-rose-500/50';
+                          songShadow = 'shadow-[inset_0_1px_0_rgba(244,63,94,0.2)]';
+                          icon = <Music size={40} className="text-rose-400 drop-shadow-[0_0_10px_rgba(244,63,94,0.5)]" />;
+                        } else if (isNoteActive) {
+                          songBgColor = 'bg-gradient-to-b from-indigo-500/30 to-indigo-900/60';
+                          // HIGHLIGHT: Intense white border and glow when playing
+                          songBorderColor = isPlayingNow ? 'border-white' : 'border-indigo-400';
+                          songShadow = isPlayingNow
+                            ? 'shadow-[0_0_40px_rgba(255,255,255,0.3),inset_0_1px_0_rgba(255,255,255,0.8)]'
+                            : 'shadow-[0_0_30px_rgba(99,102,241,0.3),inset_0_1px_0_rgba(99,102,241,0.5)]';
+                          songScale = `z-20 ${isPlayingNow ? 'scale-110 ring-4 ring-white animate-pulse' : 'scale-105 ring-2 ring-indigo-500/30'}`;
+
+                          // HIGHLIGHT: Bouncing bright white icon when playing
+                          icon = <Music
+                            size={isPlayingNow ? 48 : 40}
+                            className={`${isPlayingNow ? 'text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] animate-bounce' : 'text-indigo-400 animate-pulse drop-shadow-[0_0_15px_rgba(99,102,241,0.8)]'}`}
+                          />;
+                        }
+
+                        return (
+                          <div
+                            key={noteIdx}
+                            className={`relative rounded-3xl border-2 flex items-center justify-center transition-all duration-300 ease-out ${songBgColor} ${songBorderColor} ${songShadow} ${songScale}`}
+                          >
+                            {icon}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
+          {renderPlayersFooter()}
         </div>
-        {renderPlayersFooter()}
-      </div>
       </>
     );
   };
-
   if (currentPage === 'victory' || showVictory) {
     return renderVictory();
   }
