@@ -1259,7 +1259,7 @@ const App: React.FC = () => {
     setActiveNote({ categoryId, noteIndex });
     // setTimeLeft(60);
     setModal(null);
-    if (roundId !== 4) { setTimeLeft(60); };
+    if (roundId !== 4) { setTimeLeft(30); };
     if (roundId === 0 || roundId === 1) {
       setCurrentRoundPoints(progress.pointMap[categoryId][noteIndex]);
     } else if (isMelodyRound) {
