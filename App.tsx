@@ -794,7 +794,7 @@ const App: React.FC = () => {
       t.confirmFinish,
       () => {
         stopSong(); // Stop any music playing
-        playSFX(SFX.scoreboard); 
+        playSFX(SFX.scoreboard);
         setShowScoreboard(true); // Show the scores to everyone
         setModal(null); // Close the confirmation box
       },
@@ -1423,6 +1423,12 @@ const App: React.FC = () => {
               stopSong(false);
               playSFX(SFX.wrong);
 
+              // Reset buzzer on timeout
+              setActiveResponder(null);
+              if (buzzerSocket) {
+                buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+              }
+
               // Mark row as used
               setGameState(prevState => {
                 const progress = prevState.roundProgress[roundId];
@@ -1439,7 +1445,7 @@ const App: React.FC = () => {
               });
 
               setR4IsActiveSession(false);
-              playSFX(SFX.scoreboard); 
+              playSFX(SFX.scoreboard);
               setShowScoreboard(true);
               return 0;
             });
@@ -1594,23 +1600,47 @@ const App: React.FC = () => {
   };
 
   // Place this in App.tsx
+  // const handleArmSprintPlayer = () => {
+  //   const currentSlot = gameState.players[gameState.currentPlayerIndex];
+  //   console.log("DEBUG: Current Player Index:", gameState.currentPlayerIndex);
+  //   console.log("DEBUG: Current Player Data:", currentSlot)
+
+  //   if (buzzerSocket && currentSlot && currentSlot.hubId) {
+  //     // 1. Tell the server to lock the hardware (the phone)
+  //     console.log(`[ARMING] Sending Hardware ID to Server: ${currentSlot.hubId}`);
+  //     buzzerSocket.emit('gameAction', {
+  //       type: 'ARM_SPECIFIC',
+  //       data: { playerId: currentSlot.hubId }
+  //     });
+
+  //     // 2. Optional: Sync your display to show WHO is sprinting
+  //     buzzerSocket.emit('updateGameState', {
+  //       currentPage: 'round-sprint',
+  //       activeResponder: currentSlot.name, // Highlights them on the big screen
+  //       isSprintActive: true
+  //     });
+  //   }
+  // };
+
   const handleArmSprintPlayer = () => {
     const currentSlot = gameState.players[gameState.currentPlayerIndex];
-    console.log("DEBUG: Current Player Index:", gameState.currentPlayerIndex);
-    console.log("DEBUG: Current Player Data:", currentSlot)
-
     if (buzzerSocket && currentSlot && currentSlot.hubId) {
-      // 1. Tell the server to lock the hardware (the phone)
-      console.log(`[ARMING] Sending Hardware ID to Server: ${currentSlot.hubId}`);
-      buzzerSocket.emit('gameAction', {
-        type: 'ARM_SPECIFIC',
-        data: { playerId: currentSlot.hubId }
-      });
+      // 1. First unlock any previous lock
+      buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
 
-      // 2. Optional: Sync your display to show WHO is sprinting
+      // 2. Small delay then arm the specific player
+      setTimeout(() => {
+        console.log(`[ARMING] Sending Hardware ID to Server: ${currentSlot.hubId}`);
+        buzzerSocket.emit('gameAction', {
+          type: 'ARM_SPECIFIC',
+          data: { playerId: currentSlot.hubId }
+        });
+      }, 100);
+
+      // 3. Optional: sync display
       buzzerSocket.emit('updateGameState', {
         currentPage: 'round-sprint',
-        activeResponder: currentSlot.name, // Highlights them on the big screen
+        activeResponder: currentSlot.name,
         isSprintActive: true
       });
     }
@@ -1685,7 +1715,7 @@ const App: React.FC = () => {
               p.id === playerId ? { ...p, score: p.score + 300 } : p
             )
           }));
-          playSFX(SFX.scoreboard); 
+          playSFX(SFX.scoreboard);
           setShowScoreboard(true); // <-- ADD THIS LINE
         }
 
@@ -1703,6 +1733,12 @@ const App: React.FC = () => {
             }
           }
         }));
+
+        // DDDDDDDDDDDDDDDDD
+        setActiveResponder(null);
+        if (buzzerSocket) {
+          buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+        }
 
         // Clean up
         stopSong(true);
@@ -1761,7 +1797,7 @@ const App: React.FC = () => {
             setTimeout(() => {
               setVictoryContext({ roundId: 3, winnerId });
               console.log("🏆 Winner detected! ID:", winnerId);
-              playSFX(SFX.scoreboard); 
+              playSFX(SFX.scoreboard);
               setShowScoreboard(true);
             }, 0);
           }
