@@ -35,6 +35,22 @@ const App: React.FC = () => {
   const isPlayerScreen = path.includes('display');
   const isLeaderScreen = path.includes('leader');
 
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  // 🛡️ The Security Gate: Block network users from the "Main" root
+  // If they aren't on localhost and haven't typed /display or /leader, kick them out.
+  if (!isLocal && !isPlayerScreen && !isLeaderScreen) {
+    return (
+      <div className="h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-700 font-black p-10 text-center">
+        <div className="text-8xl mb-4">🚫</div>
+        <h1 className="text-4xl uppercase tracking-tighter">Access Denied</h1>
+        <p className="text-sm mt-4 text-slate-800 font-bold uppercase tracking-widest">
+          Access is not authorized
+        </p>
+      </div>
+    );
+  }
+
   useEffect(() => {
     if (isLeaderScreen) {
       document.title = "GS Leader";
