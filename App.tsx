@@ -486,6 +486,24 @@ const App: React.FC = () => {
       }
     }
 
+    const getCurrentCategory = () => {
+      const activeId = gameState.activeRoundId;
+      if (!activeNote || !activeId) return null;
+
+      const selectedSetId = gameState.roundSets[activeId] || 'default';
+      const roundData = getRoundData(activeId, selectedSetId) || [];
+      const category = roundData.find(c => c.id === activeNote.categoryId);
+
+      if (category) {
+        return {
+          id: category.id,
+          name: category.name,
+          description: category.description || { ru: '', en: '' }
+        };
+      }
+      return null;
+    };
+
     stateToShareRef.current = {
       // Force victory page if showVictory is triggered
       currentPage: showVictory ? 'victory' : currentPage,
@@ -517,7 +535,8 @@ const App: React.FC = () => {
       showBuzzerPopup: showBuzzerPopup,
       buzzerPlayerName: buzzerPlayerName,
       buzzerPoints: buzzerPoints,
-      isWarmup: isWarmup
+      isWarmup: isWarmup,
+      currentCategory: getCurrentCategory(),
     };
 
     // DEBUG: Log what we're about to emit

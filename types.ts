@@ -28,6 +28,10 @@ export interface Category {
     en: string;
     ru: string;
   };
+  description?: {  // Add this optional field
+    en: string;
+    ru: string;
+  };
   songs: Song[];
 }
 
