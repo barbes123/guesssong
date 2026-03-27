@@ -22,7 +22,7 @@ const R4_2_C2B1full = audioUrl('ya_vstretil_Vas_mbhwzg', '/music/round2/ya_vstre
 const R4_2_C2B2minus = audioUrl('ochi-chernye-minus_usug0j', '/music/round2/ochi-chernye-minus_usug0j.mp3');
 const R4_2_C2B2full = audioUrl('ochi-chernye_marugh', '/music/round2/ochi-chernye_marugh.mp3');
 
-const R4_2_C2B3minus = audioUrl('iz-daleka-dolgo-techet-reka-volga-minus_xhz9ay', '/music/round2/iz-daleka-dolgo-techet-reka-volga-minus_xhz9ay.mp3');
+const R4_2_C2B3minus = audioUrl('iz-daleka-dolgo-techet-reka-volga-minus_xhz9ay', '/music/round2/iz-daleka-dolgo-techet-reka-volga-minus_xhz9ay_cut.mp3');
 const R4_2_C2B3full = audioUrl('iz-daleka-dolgo-techet-reka-volga_vubrfo', '/music/round2/iz-daleka-dolgo-techet-reka-volga_vubrfo.mp3');
 
 const R4_2_C2B4minus = audioUrl('Gori_moya_zvezda_minus_rjkalc', '/music/round2/Gori_moya_zvezda_minus_rjkalc.mp3');
@@ -68,6 +68,10 @@ export const round2v2Set: RoundSet = {
     {
       id: 'prof',
       name: { en: 'Professions', ru: 'Профессии' },
+      description: {
+        ru: 'Песни для тех, кто хочет сменить работу, не вставая с дивана. Выбирайте, какая профессия вам ближе по духу.',
+        en: 'Songs for those who want to change jobs without leaving the couch. Captain, boatman, driver — choose who resonates with your spirit.'
+      },
       songs: [
         { 
           id: 'p1_2_1', 
@@ -106,6 +110,10 @@ export const round2v2Set: RoundSet = {
     {
       id: 'romances',
       name: { en: 'Romances', ru: 'Романсы' },
+      description: {
+        ru: 'Для тех, у кого есть хотя бы одна несчастная любовь в багаже. И даже если нет — после этих песен захочется её придумать.',
+        en: 'For those who have at least one unhappy love in their baggage. And even if not — after these songs, you\'ll want to invent one.'
+      },
       songs: [
         { 
           id: 'p1_2_5', 
@@ -144,6 +152,10 @@ export const round2v2Set: RoundSet = {
     {
       id: 'winter',
       name: { en: 'Winter', ru: 'Песни о зиме' },
+      description: {
+        ru: 'Саундтрек к самому холодному времени года. Включайте, когда захочется снега, а за окном — мартвское солнце.',
+        en: 'The soundtrack to the coldest season of the year. Play it when you want snow, but outside it\'s November slush.'
+      },
       songs: [
         { 
           id: 'p1_2_9', 
@@ -182,6 +194,10 @@ export const round2v2Set: RoundSet = {
     {
       id: 'birthday',
       name: { en: 'Birthday', ru: 'День Рождения' },
+      description: {
+        ru: 'Торт, свечи, гости и эти мелодии. Если вы не знаете, что спеть имениннику — мы уже всё придумали. Останется только не фальшивить.',
+        en: 'Cake, candles, guests, and these melodies. If you don\'t know what to sing to the birthday person — we\'ve already figured it out. Just don\'t sing off-key.'
+      },
       songs: [
         { 
           id: 'p1_2_13', 

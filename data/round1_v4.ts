@@ -7,14 +7,14 @@ import { audioUrl } from './audioUtils';
 const R1_4_C1B1minus = audioUrl('tariverdiev_so_mnoyu_vot_chto_proishodit_minus_xxx33', '/music/round1/Mikael_Leonovich_Tariverdiev_So_mnoyu_vot_chto_proishodit_minus.mp3');
 const R1_4_C1B1full = audioUrl('tariverdiev_so_mnoyu_vot_chto_proishodit_xxx34', '/music/round1/Mikael_Leonovich_Tariverdiev_So_mnoyu_vot_chto_proishodit.mp3');
 
-const R1_4_C1B2minus = audioUrl('igor_savoshinskiy_a_vse_konchaetsya_minus_xxx35', '/music/round1/Igor_Savoshinskiy_A_vse_konchaetsya_minus.mp3');
-const R1_4_C1B2full = audioUrl('igor_savoshinskiy_a_vse_konchaetsya_xxx36', '/music/round1/Igor_Savoshinskiy_A_vse_konchaetsya.mp3');
+const R1_4_C1B2minus = audioUrl('', '/music/round1/Igor_Savoshinskiy_A_vse_konchaetsya_minus_cut.mp3');
+const R1_4_C1B2full = audioUrl('', '/music/round1/Igor_Savoshinskiy_A_vse_konchaetsya.mp3');
 
 const R1_4_C1B3minus = audioUrl('aleksandr_gorodnickiy_atlanty_minus_xxx37', '/music/round1/Aleksandr_Gorodnickiy_Atlanty_minus.mp3');
 const R1_4_C1B3full = audioUrl('aleksandr_gorodnickiy_atlanty_xxx38', '/music/round1/Aleksandr_Gorodnickiy_Atlanty.mp3');
 
-const R1_4_C1B4minus = audioUrl('elena_kamburova_zelenaya_kareta_minus_xxx39', '/music/round1/Elena_Kamburova_Zelenaya_kareta_minus.mp3');
-const R1_4_C1B4full = audioUrl('elena_kamburova_zelenaya_kareta_xxx40', '/music/round1/Elena_Kamburova_Zelenaya_kareta.mp3');
+const R1_4_C1B4minus = audioUrl('', '/music/round1/Elena_Kamburova_Zelenaya_kareta_minus_cut.mp3');
+const R1_4_C1B4full = audioUrl('', '/music/round1/Elena_Kamburova_Zelenaya_kareta.mp3');
 
 // Category 2: Булат Окуджава. Арбатский романс
 const R1_4_C2B1minus = audioUrl('bulat_okudzhava_molitva_minus_xxx41', '/music/round1/Bulat_Okudzhava_Molitva_minus.mp3');
@@ -50,8 +50,8 @@ const R1_4_C4B1full = audioUrl('kombinaciya_vishnevaya_devyatka_xxx58', '/music/
 const R1_4_C4B2minus = audioUrl('leprikonsy_moskvich_minus_xxx59', '/music/round1/Leprikonsy_Moskvich_minus.mp3');
 const R1_4_C4B2full = audioUrl('leprikonsy_moskvich_xxx60', '/music/round1/Leprikonsy_Moskvich.mp3');
 
-const R1_4_C4B3minus = audioUrl('lyubov_uspenskaya_kabriolet_minus_xxx61', '/music/round1/Lyubov_Uspenskaya_-_A_ya_syadu_v_kabriolet_low_bass_minus.mp3');
-const R1_4_C4B3full = audioUrl('lyubov_uspenskaya_kabriolet_xxx62', '/music/round1/Lyubov_Uspenskaya_-_A_ya_syadu_v_kabriolet_low_bass.mp3');
+const R1_4_C4B3minus = audioUrl('', '/music/round1/Lyubov_Uspenskaya_-_A_ya_syadu_v_kabriolet_low_bass_minus_cut.mp3');
+const R1_4_C4B3full = audioUrl('l', '/music/round1/Lyubov_Uspenskaya_-_A_ya_syadu_v_kabriolet_low_bass.mp3');
 
 const R1_4_C4B4minus = audioUrl('seryoga_chernyy_bumer_minus_xxx63', '/music/round1/SERYOGA_Chernyy_bumer_minus.mp3');
 const R1_4_C4B4full = audioUrl('seryoga_chernyy_bumer_xxx64', '/music/round1/SERYOGA_Chernyy_bumer.mp3');
@@ -72,6 +72,10 @@ export const round1v4Set: RoundSet = {
     {
       id: 'bards',
       name: { en: 'Bards & Author\'s Song', ru: 'Барды & Авторская песня' },
+      description: {
+        ru: 'Гитарный перебор и слова, которые хочется записывать в блокнот. Интеллигентный вечер у костра гарантирован.',
+        en: 'Guitar picking and lyrics you want to write down in a notebook. An intellectual evening is guaranteed.'
+      },
       songs: [
         { 
           id: 'p1_4_1', 
@@ -110,6 +114,10 @@ export const round1v4Set: RoundSet = {
     {
       id: 'okudzhava',
       name: { en: 'Bulat Okudzhava', ru: 'Булат Окуджава' },
+      description: {
+        ru: 'Московский дворик, старый Арбат и голос, который знает всё о жизни. Доставайте душевные запасы.',
+        en: 'A Moscow courtyard, the old Arbat, and a voice that knows everything about life. Tap into your emotional reserves.'
+      },
       songs: [
         { 
           id: 'p1_4_5', 
@@ -148,6 +156,10 @@ export const round1v4Set: RoundSet = {
     {
       id: 'songs_about_road',
       name: { en: 'Songs about the Road', ru: 'Песни о дороге' },
+      description: {
+        ru: 'Для тех, кто всегда в пути или только собирается. Дорога зовёт — подпевайте на остановках.',
+        en: 'For those who are always on the road or just about to leave. The road is calling — sing along at the stops.'
+      },
       songs: [
         { 
           id: 'p1_4_9', 
@@ -186,6 +198,10 @@ export const round1v4Set: RoundSet = {
     {
       id: 'auto_legends',
       name: { en: 'Auto Legends', ru: 'Автолегенды' },
+      description: {
+        ru: 'Мотор, бензин и немного хулиганства. Даже если у вас нет прав, эти песни заставят нажать на газ.',
+        en: 'Engine, gasoline, and a bit of mischief. Even if you don\'t have a license, these songs will make you step on the gas.'
+      },
       songs: [
         { 
           id: 'p1_4_13', 

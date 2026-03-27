@@ -59,11 +59,11 @@ export const round1v3Set: RoundSet = {
   id: 'round1_v3',
   name: {
     en: 'Round1-V3',
-    ru: 'Роунд1-3'
+    ru: 'Раунд 1 - Набор 3'
   },
   description: {
-    en: '',
-    ru: ''
+    en: 'Pop hits of the 2000s, rock classics, lyrics & ballads, and songs about the sun',
+    ru: 'Поп-хиты 2000-х, рок-классика, лирика & баллады и песни о солнце'
   },
   author: 'DT',
   version: '1.0',
@@ -71,6 +71,10 @@ export const round1v3Set: RoundSet = {
     {
       id: 'pop2000',
       name: { en: 'Pop Hits 2000s (Golden Era)', ru: 'Поп-хиты 2000-х (Золотая эра)' },
+      description: {
+        ru: 'Эпоха, когда кассеты перематывали карандашом, а припевы знал весь двор. Пыль с дискет стряхните — пора вспоминать.',
+        en: 'The era when cassettes were rewound with pencils, and everyone in the courtyard knew the choruses. Dust off your floppy disks — it\'s time to remember.'
+      },
       songs: [
         { 
           id: 'p1_3_1', 
@@ -109,6 +113,10 @@ export const round1v3Set: RoundSet = {
     {
       id: 'rock_classics',
       name: { en: 'Rock Classics (Legends)', ru: 'Рок-классика (Легенды)' },
+      description: {
+        ru: 'Гитары, философия и голоса, от которых мурашки до сих пор. Ваши родители точно знают эти песни. А вы?',
+        en: 'Guitars, philosophy, and voices that still give you goosebumps. Your parents definitely know these songs. Do you?'
+      },
       songs: [
         { 
           id: 'p1_3_5', 
@@ -147,6 +155,10 @@ export const round1v3Set: RoundSet = {
     {
       id: 'lyrics_ballads',
       name: { en: 'Lyrics & Ballads', ru: 'Лирика & Баллады' },
+      description: {
+        ru: 'Когда хочется тишины, но с гитарой. Свет выключите, душу приготовьте — будет пронзительно.',
+        en: 'When you want silence, but with a guitar. Turn off the lights, prepare your soul — it\'s going to be piercing.'
+      },
       songs: [
         { 
           id: 'p1_3_9', 
@@ -185,6 +197,10 @@ export const round1v3Set: RoundSet = {
     {
       id: 'songs_about_sun',
       name: { en: 'Songs about the Sun', ru: 'Песни о Солнце' },
+      description: {
+        ru: 'Самый тёплый плейлист вечера. Даже если за окном ночь, здесь всегда светло.',
+        en: 'The warmest playlist of the evening. Even if it\'s night outside, it\'s always bright here.'
+      },
       songs: [
         { 
           id: 'p1_3_13', 

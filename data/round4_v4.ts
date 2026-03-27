@@ -4,14 +4,14 @@ import { audioUrl } from './audioUtils';
 // ==================== ROUND 4 SPRINT - SET 4 (Songs 22–28) ====================
 
 // Source: Round 5, player 4, tracks 1–7
-const R4R41minus = audioUrl('Agata_Kristi_-_Vechnaya_lyubov_minus_abc123', '/music/round4/Agata_Kristi_-_Vechnaya_lyubov_minus.mp3');
-const R4R41full  = audioUrl('Agata_Kristi_-_Vechnaya_lyubov_xyz789', '/music/round4/Agata_Kristi_-_Vechnaya_lyubov.mp3');
+const R4R41minus = audioUrl('', '/music/round4/Agata_Kristi_-_Kak_na_vojne_minus.mp3');
+const R4R41full  = audioUrl('', '/music/round4/Agata_Kristi_-_Kak_na_vojne.mp3');
 
-const R4R42minus = audioUrl('moy-rok-n-roll-minus_def456', '/music/round4/moy-rok-n-roll-minus.mp3');
-const R4R42full  = audioUrl('', '/music/round4/moy-rok-n-roll.mp3'); // Full version not found in the list
+const R4R42minus = audioUrl('', '/music/round4/bi-2_-_polkovniku_nikto_minus.mp3');
+const R4R42full  = audioUrl('', '/music/round4/bi-2_-_polkovniku_nikto.mp3'); 
 
-const R4R43minus = audioUrl('tatu-nas-ne-dogonyat--staraya_minus_cut_xxx', '/music/round4/tatu-nas-ne-dogonyat--staraya_minus_cut.mp3'); // Minus not found in the list
-const R4R43full  = audioUrl('tatu-nas-ne-dogonyat--staraya_minus_yyy', '/music/round4/tatu-nas-ne-dogonyat--staraya.mp3'); // Full not found in the list
+const R4R43minus = audioUrl('', '/music/round4/tatu-nas-ne-dogonyat--staraya_minus_cut.mp3'); 
+const R4R43full  = audioUrl('', '/music/round4/tatu-nas-ne-dogonyat--staraya.mp3'); 
 
 const R4R44minus = audioUrl('davay-za--lyube-minus_ghi789', '/music/round4/davay-za--lyube-minus.mp3');
 const R4R44full  = audioUrl('davay-za--lyube_jkl012', '/music/round4/davay-za--lyube.mp3');
@@ -44,19 +44,19 @@ export const round4v4Set: RoundSet = {
       songs: [
         { 
           id: 's5_22', 
-          title: 'Вечная Любовь', 
+          title: 'Как на войне', 
           artist: 'Агата Кристи', 
           audioUrl: R4R41minus, 
           audioUrlFull: R4R41full,
-          notes: 'Узнать по: Характерному женскому смеху в начале и сразу за ним гитарному рифу.'
+          notes: 'Один из самых мощных и узнаваемых хитов Агаты Кристи, который врывается в сознание с первых секунд гитарным риффом. Песня о любви, которая ощущается как сражение, о жизни, проходящей на грани, и об усталости от вечной борьбы. Мрачная, завораживающая атмосфера и характерный вокал Вадима Самойлова сделали этот трек визитной карточкой группы и гимном для миллионов слушателей. Идеально для спринта — мгновенная узнаваемость и энергия с первой ноты. «Я устал от этой вечной войны, / Я устал от любви, я устал от тебя.» «Как на войне, как на войне, / Нас с тобой никто не ждёт на этой земле.» «Я вчера смотрел в глаза урагану, / Я сегодня устал, я сегодня устал.» «И я знаю, что так будет всегда, / И я знаю, что так будет всегда.»'
         },
         { 
           id: 's5_23', 
-          title: 'Мой рок-н-ролл', 
-          artist: 'Би-2 (feat. Чичерина)', 
+          title: 'Полковнику никто не пишет', 
+          artist: 'Би-2', 
           audioUrl: R4R42minus, 
           audioUrlFull: R4R42full,
-          notes: 'Узнать по: Характерному женскому смеху в начале и сразу за ним гитарному рифу.'
+          notes: 'Культовый хит Би-2, который мгновенно узнаётся по гитарному риффу и голосу Лёвы Би-2. Песня о поиске смысла, надежде на лучшее и ощущении, что мир замер в ожидании. Стала гимном целого поколения в конце 1990-х, а сегодня звучит так же свежо, как и двадцать лет назад. Идеально для спринта — энергичная, с запоминающимся припевом и характерным звучанием. «Полковнику никто не пишет, / Полковника никто не ждёт.» «Всё будет так, как мы захочешь, / Всё будет так, как мы решим.» «На пепел серых облаков / Ложится белый свет.» «Летят, летят, летят года, / А я всё жду, а я всё жду.".'
         },
         { 
           id: 's5_24', 
@@ -64,7 +64,7 @@ export const round4v4Set: RoundSet = {
           artist: 'Тату', 
           audioUrl: R4R43minus, 
           audioUrlFull: R4R43full,
-          notes: 'Узнать по: Электронному голосу "I\'m your doll" и резкому вступлению ударных.'
+          notes: 'Узнать по: Электронному голосу "I\'m your doll" и резкому вступлению ударных. Первые строки: "Нас не догонят, нас не догонят / Нас не догонят, мы улетаем". Припев: "Нас не догонят, нас не догонят / Мы в небесах, ты меня не ищи".'
         },
         { 
           id: 's5_25', 
@@ -72,7 +72,7 @@ export const round4v4Set: RoundSet = {
           artist: 'Любэ', 
           audioUrl: R4R44minus, 
           audioUrlFull: R4R44full,
-          notes: 'Узнать по: Звуку вертолётных лопастей в самом начале и мощному гитарному аккорду.'
+          notes: 'Узнать по: Звуку вертолётных лопастей в самом начале и мощному гитарному аккорду. Первые строки: "Давай за жизнь, давай за братву / Давай за тех, кто с нами был". Припев: "Давай за... давай за... / За тех, кто в поле, за тех, кто в море".'
         },
         { 
           id: 's5_26', 
@@ -80,7 +80,7 @@ export const round4v4Set: RoundSet = {
           artist: 'Кино', 
           audioUrl: R4R45minus, 
           audioUrlFull: R4R45full,
-          notes: 'Узнать по: Иконному перезвону колокольчиков/камертону в первых секундах.'
+          notes: 'Узнать по: Иконному перезвону колокольчиков/камертону в первых секундах. Первые строки: "Тёплое место, но улицы ждут отпечатков наших ног". Припев: "Группа крови — на рукаве, мой порядковый номер — на рукаве / Пожелай мне удачи в бою, пожелай мне".'
         },
         { 
           id: 's5_27', 
@@ -88,7 +88,7 @@ export const round4v4Set: RoundSet = {
           artist: 'Мумий Тролль', 
           audioUrl: R4R46minus, 
           audioUrlFull: R4R46full,
-          notes: 'Узнать по: Фразе "Один-н-н-н!", выкрикиваемой Ильей Лагутенко, и сразу энергичному биту.'
+          notes: 'Узнать по: Фразе "Один-н-н-н!", выкрикиваемой Ильей Лагутенко, и сразу энергичному биту. Первые строки: "Владивосток 2000, я остаюсь с тобой / Владивосток 2000, мы делаем новый год". Припев: "И мы как будто в последний раз / И мы не ищем лишних фраз".'
         },
         { 
           id: 's5_28', 
@@ -96,7 +96,7 @@ export const round4v4Set: RoundSet = {
           artist: 'Дискотека Авария', 
           audioUrl: R4R47minus, 
           audioUrlFull: R4R47full,
-          notes: 'Узнать по: Звуку лопающегося шампанского и праздничному синтезаторному вступлению.'
+          notes: 'Узнать по: Звуку лопающегося шампанского и праздничному синтезаторному вступлению. Первые строки: "Новый год к нам мчится, скоро всё случится / Сбываются мечты, и мы с тобой близки". Припев: "И раз, и два, и три, и раз, и два, и три / И Новый год, и Новый год, и Новый год в пути".'
         },
       ],
     },

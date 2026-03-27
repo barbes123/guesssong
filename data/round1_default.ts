@@ -20,8 +20,8 @@ const R1C1B4full = audioUrl('novogodnie-igrushki_wv0i3m', '/music/round1/novogod
 const R1C2B1minus = audioUrl('tri-mushketera-minus_m00pud', '/music/round1/tri-mushketera-minus_m00pud.mp3');
 const R1C2B1full = audioUrl('tri-mushketera_pbxarx', '/music/round1/tri-mushketera_pbxarx.mp3');
 
-const R1C2B2minus = audioUrl('zvenit-yanvarskaya-vyuga-minus', '/music/round1/zvenit-yanvarskaya-vyuga-minus.mp3');
-const R1C2B2full = audioUrl('zvenit-yanvarskaya-vyuga', '/music/round1/zvenit-yanvarskaya-vyuga.mp3');
+const R1C2B2minus = audioUrl('', '/music/round1/iz-k-f-karnaval-naya-noch--5-minut-minus.mp3');
+const R1C2B2full = audioUrl('', '/music/round1/iz-k-f-karnaval-naya-noch--5-minut.mp3');
 
 const R1C2B3minus = audioUrl('pesenka-o-medvedjah-minus_ccuru1', '/music/round1/pesenka-o-medvedjah-minus_ccuru1.mp3');
 const R1C2B3full = audioUrl('pesenka-o-medvedjah_ptrxzr', '/music/round1/pesenka-o-medvedjah_ptrxzr.mp3');
@@ -62,8 +62,8 @@ export const defaultSet: RoundSet = {
     ru: 'Раунд 1 - Набор 1'
   },
   description: {
-    en: 'New Year songs, cinema songs, school songs and songs about animals',
-    ru: 'Новогодние песни, песни из кино, школьные песни и песни о животных'
+    en: '',
+    ru: ''
   },
   author: 'DT',
   version: '1.0',
@@ -71,6 +71,10 @@ export const defaultSet: RoundSet = {
     {
       id: 'newyear',
       name: { en: 'New Year', ru: 'Новый Год' },
+      description: {
+        ru: 'Тот самый плейлист, под который ёлка загорается сама. Если вы не знаете слов — значит, вы росли на другой планете.',
+        en: 'The ultimate playlist that makes the Christmas tree light up by itself. If you don\'t know the lyrics — you must have grown up on another planet.'
+      },
       songs: [
         { 
           id: 'p1_1', 
@@ -109,6 +113,10 @@ export const defaultSet: RoundSet = {
     {
       id: 'cinema',
       name: { en: 'Cinema', ru: 'Кино' },
+      description: {
+        ru: 'Кино, которое поют, а не смотрят. Готовьте голосовые связки — они потребуются.',
+        en: 'Cinema that you sing, not just watch. Warm up your vocal cords — you\'re going to need them.'
+      },
       songs: [
         { 
           id: 'r1_1', 
@@ -120,11 +128,11 @@ export const defaultSet: RoundSet = {
         },
         { 
           id: 'r1_2', 
-          title: 'Звенит январская вьюга', 
-          artist: 'Из к/ф «Иван Васильевич меняет профессию»', 
+          title: 'Хорошее настроение', 
+          artist: 'Людмила Гурченко (из к/ф «Карнавальная ночь»)', 
           audioUrl: R1C2B2minus, 
           audioUrlFull: R1C2B2full,
-          notes: 'Песня из комедии Леонида Гайдая «Иван Васильевич меняет профессию» (1973). Исполняет Нина Маслова в роли царицы. Музыка Александра Зацепина, стихи Леонида Дербенёва.\n\n«Звенит январская вьюга, / И ливни хлещут упруго, / И звёзды мчатся по кругу, / И тонет в музыке снегопад. / А я всё жду, когда стихия утихнет, / И ты ко мне, мой мальчик, выйдешь, / И нас никто не остановит, / Ни дождь, ни снег, ни этот звёздопад!»'
+          notes: 'Легендарная песня из фильма «Карнавальная ночь», которая открывает новогодний праздник. Энергичная, жизнерадостная, с характерным голосом Людмилы Гурченко. Та же кино-вселенная, что и «Звенит январская вьюга», но другая песня. Идеально подходит для зимней категории. «А у нас сегодня ёлка, / А у нас сегодня смех, / А у нас сегодня праздник / Для весёлых для всех!» «Пять минут, пять минут — / Это много или мало?» «А у нас сегодня гости, / А у нас сегодня ждут / Тех, кто с нами в Новый год / В хоровод пойдёт.»'
         },
         { 
           id: 'r1_3', 
@@ -147,6 +155,10 @@ export const defaultSet: RoundSet = {
     {
       id: 'school',
       name: { en: 'School', ru: 'Школа' },
+      description: {
+        ru: 'Перемена кончилась, звонок зовёт на урок. Парты, доска, учитель — и мы снова в первом классе..',
+        en: ''
+      },
       songs: [
         { 
           id: 'c1_1', 
@@ -185,6 +197,10 @@ export const defaultSet: RoundSet = {
     {
       id: 'animals',
       name: { en: 'Our smaller brothers', ru: 'Братья наши меньшие' },
+      description: {
+        ru: 'Клетки открыты, звери на сцене. Поют все — от кузнечика до коня. Хвосты не трогать, подпевать обязательно.',
+        en: ''
+      },
       songs: [
         { 
           id: 'rt1_1', 

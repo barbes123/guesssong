@@ -24,7 +24,7 @@ const R2421f = audioUrl('Marina Tsvetaeva - Prokhozhiy-full', '/music/round2/Mar
 const R2422 = audioUrl('Sergey Yesenin - Ne zhaleyu-ne-zovu-neplachu', '/music/round2/Sergey Yesenin - Ne zhaleyu-ne-zovu-neplachu.mp3');
 const R2422f = audioUrl('Sergey Yesenin - Ne zhaleyu-ne-zovu-neplachu-full', '/music/round2/Sergey Yesenin - Ne zhaleyu-ne-zovu-neplachu.mp3');
 
-const R2423 = audioUrl('Boris Pasternak - Zimnyaya noch', '/music/round2/Boris Pasternak - Zimnyaya noch.mp3');
+const R2423 = audioUrl('Boris Pasternak - Zimnyaya noch', '/music/round2/Boris_Pasternak-_Zimnyaya_noch_cut.mp3');
 const R2423f = audioUrl('Boris Pasternak - Zimnyaya noch-full', '/music/round2/Boris Pasternak - Zimnyaya noch.mp3');
 
 const R2424 = audioUrl('Vladimir Mayakovskiy - Pasport', '/music/round2/Vladimir Mayakovskiy - Pasport .mp3');
@@ -58,7 +58,14 @@ const R2444f = audioUrl('smuglyanka-vitaliy', '/music/round2/smuglyanka-vitaliy.
 
 export const round2v4Set: RoundSet = {
   id: 'round2_v4',
-  name: { en: 'round2_v4', ru: 'round2_v4' },
+  name: { 
+    en: 'Round2-V4', 
+    ru: 'Раунд 2 - Набор 4' 
+  },
+  description: {
+    en: 'Songs about rain, poems by great Russian poets, songs about horses, and remade birthday songs',
+    ru: 'Песни о дожде, стихи великих русских поэтов, песни о конях и переделанные песни для именинников'
+  },
   author: 'DT',
   version: '1.0',
   data: [
@@ -69,10 +76,10 @@ export const round2v4Set: RoundSet = {
         en: 'Songs about Rain', 
         ru: 'Песни о дожде' 
       },
-    //   description: {
-    //     en: 'Lyrics in which rain becomes an interlocutor, an obstacle or salvation',
-    //     ru: 'Лирика, в которой дождь становится собеседником, преградой или спасением'
-    //   },
+      description: {
+        ru: 'Зонты не понадобятся, а вот настроение — обязательно. Обещают осадки в виде ностальгии и лёгкой грусти.',
+        en: 'You won\'t need umbrellas, but you will need a mood. Expect precipitation in the form of nostalgia and light sadness.'
+      },
       songs: [
         {
           id: 'r24_q1',
@@ -131,10 +138,10 @@ export const round2v4Set: RoundSet = {
         en: 'AI: Songs to poems by great Russian poets', 
         ru: 'Искусственный Интеллект: Песни на стихи великих русских поэтов' 
       },
-    //   description: {
-    //     en: 'When immortal lines acquire musical breath',
-    //     ru: 'Когда бессмертные строки обретают музыкальное дыхание'
-    //   },
+      description: {
+        ru: 'Искусственный Интеллект: Песни на стихи великих русских поэтов. Классика, которую теперь можно не читать, а петь. Правда, мелодии пришлось добавить.',
+        en: ''
+      },
       songs: [
         {
           id: 'r24_q5',
@@ -193,10 +200,10 @@ export const round2v4Set: RoundSet = {
         en: 'Songs about Horses', 
         ru: 'Песни о Конях' 
       },
-    //   description: {
-    //     en: 'Songs in which the image of a horse is used as a powerful artistic symbol',
-    //     ru: 'Песни, в которых образ коня используется как мощный художественный символ'
-    //   },
+      description: {
+        ru: 'Если вы думали, что лошади — это только про спорт и природу, вы ошибались. Здесь философия, драма и даже небо на куски.',
+        en: 'If you thought horses were only about sports and nature, you were wrong. Here you\'ll find philosophy, drama, and even the sky breaking into pieces.'
+      },
       songs: [
         {
           id: 'r24_q9',
@@ -255,10 +262,10 @@ export const round2v4Set: RoundSet = {
         en: 'Songs remade for our birthday people', 
         ru: 'ТыГыДы-ки: Песни, переделанные для наших именинников' 
       },
-    //   description: {
-    //     en: 'Musical gifts with soul and humor',
-    //     ru: 'Музыкальные подарки с душой и юмором'
-    //   },
+      description: {
+        ru: 'Песни, которые переделали специально для наших именинников. Угадать оригинал — полдела. Главное — не начать петь не то имя. Именинники обидятся.',
+        en: 'Songs remade especially for our birthday people. Guessing the original is half the battle. The main thing is not to start singing the wrong name. The birthday people will be offended.'
+      },
       songs: [
         {
           id: 'r24_q13',

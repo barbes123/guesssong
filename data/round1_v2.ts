@@ -4,59 +4,59 @@ import { audioUrl } from './audioUtils';
 // ==================== ROUND 1-2 AUDIO FILES ====================
 
 // Детские песни
-const R1_2_C1B1minus = audioUrl('ulybka_minus_cut_jsvcut', '/music/round2/ulybka_minus_cut_jsvcut.mp3');
-const R1_2_C1B1full = audioUrl('ulybka_wu1dge', '/music/round2/ulybka_wu1dge.mp3');
+const R1_2_C1B1minus = audioUrl('', '/music/round1/pesnya-mamontenka_minus.mp3');
+const R1_2_C1B1full = audioUrl('', '/music/round1/pesnya-mamontenka.mp3');
 
-const R1_2_C1B2minus = audioUrl('nastoyashiy_drug_minus_hf79gf', '/music/round2/nastoyashiy_drug_minus_hf79gf.mp3');
-const R1_2_C1B2full = audioUrl('nastoyashiy_drug_rgxpe8', '/music/round2/nastoyashiy_drug_rgxpe8.mp3');
+const R1_2_C1B2minus = audioUrl('nastoyashiy_drug_minus_hf79gf', '/music/round1/nastoyashiy_drug_minus_hf79gf.mp3');
+const R1_2_C1B2full = audioUrl('nastoyashiy_drug_rgxpe8', '/music/round1/nastoyashiy_drug_rgxpe8.mp3');
 
-const R1_2_C1B3minus = audioUrl('my_malenkie_deti_minus_hr8ms3', '/music/round2/my_malenkie_deti_minus_hr8ms3.mp3');
-const R1_2_C1B3full = audioUrl('my_malenkie_deti_bidbr8', '/music/round2/my_malenkie_deti_bidbr8.mp3');
+const R1_2_C1B3minus = audioUrl('my_malenkie_deti_minus_hr8ms3', '/music/round1/my_malenkie_deti_minus_hr8ms3.mp3');
+const R1_2_C1B3full = audioUrl('my_malenkie_deti_bidbr8', '/music/round1/my_malenkie_deti_bidbr8.mp3');
 
-const R1_2_C1B4minus = audioUrl('krylatye_kacheli_minus_exthl0', '/music/round2/krylatye_kacheli_minus_exthl0.mp3');
-const R1_2_C1B4full = audioUrl('krylatye_kacheli_gmtcac', '/music/round2/krylatye_kacheli_gmtcac.mp3');
+const R1_2_C1B4minus = audioUrl('krylatye_kacheli_minus_exthl0', '/music/round1/krylatye_kacheli_minus_exthl0.mp3');
+const R1_2_C1B4full = audioUrl('krylatye_kacheli_gmtcac', '/music/round1/krylatye_kacheli_gmtcac.mp3');
 
 
 // Песни о России
-const R1_2_C2B1minus = audioUrl('berezy-minus_sff6l8', '/music/round2/berezy-minus_sff6l8.mp3');
-const R1_2_C2B1full = audioUrl('berezy_bvoiea', '/music/round2/berezy_bvoiea.mp3');
+const R1_2_C2B1minus = audioUrl('berezy-minus_sff6l8', '/music/round1/berezy-minus_sff6l8.mp3');
+const R1_2_C2B1full = audioUrl('berezy_bvoiea', '/music/round1/berezy_bvoiea.mp3');
 
-const R1_2_C2B2minus = audioUrl('kak-upoitel-ny-v-rossii-vechera-minus_qo6pfx', '/music/round2/kak-upoitel-ny-v-rossii-vechera-minus_qo6pfx.mp3');
-const R1_2_C2B2full = audioUrl('kak-upoitel-ny-v-rossii-vechera_por3ci', '/music/round2/kak-upoitel-ny-v-rossii-vechera_por3ci.mp3');
+const R1_2_C2B2minus = audioUrl('kak-upoitel-ny-v-rossii-vechera-minus_qo6pfx', '/music/round1/kak-upoitel-ny-v-rossii-vechera-minus.mp3');
+const R1_2_C2B2full = audioUrl('kak-upoitel-ny-v-rossii-vechera_por3ci', '/music/round1/kak-upoitel-ny-v-rossii-vechera_por3ci.mp3');
 
-const R1_2_C2B3minus = audioUrl('s_chego_nachinaetsya_Rodina_minus_arxtzc', '/music/round2/s_chego_nachinaetsya_Rodina_minus_arxtzc.mp3');
-const R1_2_C2B3full = audioUrl('s_chego_nachinaetsya_Rodina_c4ghwp', '/music/round2/s_chego_nachinaetsya_Rodina_c4ghwp.mp3');
+const R1_2_C2B3minus = audioUrl('s_chego_nachinaetsya_Rodina_minus_arxtzc', '/music/round1/s_chego_nachinaetsya_Rodina_minus_arxtzc.mp3');
+const R1_2_C2B3full = audioUrl('s_chego_nachinaetsya_Rodina_c4ghwp', '/music/round1/s_chego_nachinaetsya_Rodina_c4ghwp.mp3');
 
-const R1_2_C2B4minus = audioUrl('russkoe-pole-minus_ruymua', '/music/round2/russkoe-pole-minus_ruymua.mp3');
-const R1_2_C2B4full = audioUrl('russkoe-pole_vtnc6o', '/music/round2/russkoe-pole_vtnc6o.mp3');
+const R1_2_C2B4minus = audioUrl('russkoe-pole-minus_ruymua', '/music/round1/russkoe-pole-minus_ruymua.mp3');
+const R1_2_C2B4full = audioUrl('russkoe-pole_vtnc6o', '/music/round1/russkoe-pole_vtnc6o.mp3');
 
 
 // Песни из советских фильмов
-const R1_2_C3B1minus = audioUrl('est-tolko-mig-minus_kk13xz', '/music/round2/est-tolko-mig-minus_kk13xz.mp3');
-const R1_2_C3B1full = audioUrl('est-tolko-mig_fmgvto', '/music/round2/est-tolko-mig_fmgvto.mp3');
+const R1_2_C3B1minus = audioUrl('est-tolko-mig-minus_kk13xz', '/music/round1/est-tolko-mig-minus_kk13xz.mp3');
+const R1_2_C3B1full = audioUrl('est-tolko-mig_fmgvto', '/music/round1/est-tolko-mig_fmgvto.mp3');
 
-const R1_2_C3B2minus = audioUrl('pozvoni-mne-minus_yooxil', '/music/round2/pozvoni-mne-minus_yooxil.mp3');
-const R1_2_C3B2full = audioUrl('pozvoni-mne_f628en', '/music/round2/pozvoni-mne_f628en.mp3');
+const R1_2_C3B2minus = audioUrl('pozvoni-mne-minus_yooxil', '/music/round1/pozvoni-mne-minus_yooxil.mp3');
+const R1_2_C3B2full = audioUrl('pozvoni-mne_f628en', '/music/round1/pozvoni-mne_f628en.mp3');
 
-const R1_2_C3B3minus = audioUrl('tri-tankista-minus_ekrfdo', '/music/round2/tri-tankista-minus_ekrfdo.mp3');
-const R1_2_C3B3full = audioUrl('tri-tankista_cb59ui', '/music/round2/tri-tankista_cb59ui.mp3');
+const R1_2_C3B3minus = audioUrl('tri-tankista-minus_ekrfdo', '/music/round1/tri-tankista-minus_ekrfdo.mp3');
+const R1_2_C3B3full = audioUrl('tri-tankista_cb59ui', '/music/round1/tri-tankista_cb59ui.mp3');
 
-const R1_2_C3B4minus = audioUrl('smuglyanka-minus_ncekac', '/music/round2/smuglyanka-minus_ncekac.mp3');
-const R1_2_C3B4full = audioUrl('smuglyanka_mtiuoy', '/music/round2/smuglyanka_mtiuoy.mp3');
+const R1_2_C3B4minus = audioUrl('smuglyanka-minus_ncekac', '/music/round1/smuglyanka-minus_ncekac.mp3');
+const R1_2_C3B4full = audioUrl('smuglyanka_mtiuoy', '/music/round1/smuglyanka_mtiuoy.mp3');
 
 
 // Хиты 60-х и 70-х годов
-const R1_2_C4B1minus = audioUrl('Landyshi-GelenaVelikanova-minus_xbaf0v', '/music/round2/Landyshi-GelenaVelikanova-minus_xbaf0v.mp3');
-const R1_2_C4B1full = audioUrl('Landyshi-GelenaVelikanova_k1vxod', '/music/round2/Landyshi-GelenaVelikanova_k1vxod.mp3');
+const R1_2_C4B1minus = audioUrl('Landyshi-GelenaVelikanova-minus_xbaf0v', '/music/round1/Landyshi-GelenaVelikanova-minus_xbaf0v.mp3');
+const R1_2_C4B1full = audioUrl('Landyshi-GelenaVelikanova_k1vxod', '/music/round1/Landyshi-GelenaVelikanova_k1vxod.mp3');
 
-const R1_2_C4B2minus = audioUrl('snegIdiet-minus_qgkijc', '/music/round2/snegIdiet-minus_qgkijc.mp3');
-const R1_2_C4B2full = audioUrl('snegIdiet_am3d45', '/music/round2/snegIdiet_am3d45.mp3');
+const R1_2_C4B2minus = audioUrl('', '/music/round1/MUSLIM_MAGOMAEV_-_KOROLEVA_KRASOTY_1962g_minus.mp3');
+const R1_2_C4B2full = audioUrl('', '/music/round1/MUSLIM_MAGOMAEV_-_KOROLEVA_KRASOTY_1962g.mp3');
 
-const R1_2_C4B3minus = audioUrl('NaDalneiyStanciiSoiydu-munus_rokslz', '/music/round2/NaDalneiyStanciiSoiydu-munus_rokslz.mp3');
-const R1_2_C4B3full = audioUrl('NaDalneiyStanciiSoiydu_sxgbnr', '/music/round2/NaDalneiyStanciiSoiydu_sxgbnr.mp3');
+const R1_2_C4B3minus = audioUrl('NaDalneiyStanciiSoiydu-munus_rokslz', '/music/round1/NaDalneiyStanciiSoiydu-munus_rokslz_cut.mp3');
+const R1_2_C4B3full = audioUrl('NaDalneiyStanciiSoiydu_sxgbnr', '/music/round1/NaDalneiyStanciiSoiydu_sxgbnr.mp3');
 
-const R1_2_C4B4minus = audioUrl('nadezhda_minus_h24xio', '/music/round2/nadezhda_minus_h24xio.mp3');
-const R1_2_C4B4full = audioUrl('nadezhda_ujmrfc', '/music/round2/nadezhda_ujmrfc.mp3');
+const R1_2_C4B4minus = audioUrl('nadezhda_minus_h24xio', '/music/round1/nadezhda_minus_h24xio.mp3');
+const R1_2_C4B4full = audioUrl('nadezhda_ujmrfc', '/music/round1/nadezhda_ujmrfc.mp3');
 
 export const round1v2Set: RoundSet = {
   id: 'round1_v2',
@@ -74,14 +74,18 @@ export const round1v2Set: RoundSet = {
     {
       id: 'children',
       name: { en: 'Children\'s songs', ru: 'Детские песни' },
+      description: {
+        ru: 'Ностальгия в чистом виде. После этих песен захочется найти старые игрушки и поплакать от умиления.',
+        en: 'Nostalgia in its purest form. After these songs, you\'ll want to find old toys and cry with tenderness.'
+      },
       songs: [
         { 
           id: 'p1_2_1', 
-          title: 'Улыбка', 
-          artist: 'Из м/ф «Крошка Енот»', 
+          title: 'Песенка мамонтёнка', 
+          artist: 'Клара Румянова', 
           audioUrl: R1_2_C1B1minus, 
           audioUrlFull: R1_2_C1B1full,
-          notes: 'Знаменитая детская песня из мультфильма «Крошка Енот» (1974). Музыка Владимира Шаинского, стихи Михаила Пляцковского. Стала гимном дружбы и хорошего настроения.\n\n«От улыбки хмурый день светлей, / От улыбки в небе радуга проснётся. / Поделись улыбкою своей, / И она к тебе не раз ещё вернётся.»'
+          notes: 'Классическая детская песня о поиске мамы, которую знают все поколения. Трогательная песня о поиске мамы, которая заставляет плакать даже взрослых. История маленького мамонтёнка, который отправился через океан на льдине, чтобы найти самого родного человека. «По синему морю, к зелёной земле / Плыву я на белом своём корабле.» «Мама, мама, я тебя так люблю, / Что просто не найти таких слов!»'
         },
         { 
           id: 'p1_2_2', 
@@ -112,6 +116,10 @@ export const round1v2Set: RoundSet = {
     {
       id: 'russia',
       name: { en: 'Songs about Russia', ru: 'Россия' },
+      description: {
+        ru: 'Для тех, кто скучал по деревьям, полям и ощущению, что родина — это не просто слово.',
+        en: 'For those who miss the birches, fields, and the feeling that homeland is more than just a word.'
+      },
       songs: [
         { 
           id: 'p1_2_5', 
@@ -150,6 +158,10 @@ export const round1v2Set: RoundSet = {
     {
       id: 'soviet_films',
       name: { en: 'Soviet films', ru: 'Советские фильмы' },
+      description: {
+        ru: 'Эти мелодии звучали в залах, где пахло газировкой и счастьем. Проверьте, помнит ли их ваш внутренний киномеханик.',
+        en: 'These melodies played in halls that smelled of soda and happiness. See if your inner projectionist remembers them.'
+      },
       songs: [
         { 
           id: 'p1_2_9', 
@@ -188,6 +200,10 @@ export const round1v2Set: RoundSet = {
     {
       id: 'hits60_70',
       name: { en: 'Hits of the 60s and 70s', ru: 'Хиты 60-х и 70-х годов' },
+      description: {
+        ru: 'Винтажный плейлист, под который даже стулья начинают танцевать. Бабушки и дедушки уже навострили уши.',
+        en: 'A vintage playlist that makes even chairs start dancing. Grandparents are already perking up their ears.'
+      },
       songs: [
         { 
           id: 'p1_2_13', 
@@ -199,11 +215,11 @@ export const round1v2Set: RoundSet = {
         },
         { 
           id: 'p1_2_14', 
-          title: 'А снег идёт', 
-          artist: 'Майя Кристалинская', 
+          title: 'Королева красоты', 
+          artist: 'Муслим Магомаев', 
           audioUrl: R1_2_C4B2minus, 
           audioUrlFull: R1_2_C4B2full,
-          notes: 'Лирическая песня Майи Кристалинской о снеге как метафоре времени и воспоминаний. Музыка Андрея Эшпая, стихи Евгения Евтушенко.\n\n«А снег идёт, а снег идёт, / И всё вокруг чего-то ждёт.»'
+          notes: 'Зажигательный хит 1960-х годов, который стал визитной карточкой Муслима Магомаева. Лёгкая, танцевальная мелодия и романтический текст о девушке, которая затмила всех своей красотой. Песня звучала на всех танцплощадках и радиостанциях СССР. «Королева красоты, королева красоты, / Ты мне сердце покорила, ты мне сердце покорила.» «Улыбнись, улыбнись, / В этом мире мы не одни.» «Среди тысячи звёзд, среди тысячи лиц / Ты одна, ты одна — королева.»'
         },
         { 
           id: 'p1_2_15', 

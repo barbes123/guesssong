@@ -7,8 +7,8 @@ import { audioUrl } from './audioUtils';
 const R5R21minus = audioUrl('Moskva_slezam_ne_verit_minus_cut_tbwvxu', '/music/round4/Moskva_slezam_ne_verit_minus_cut_tbwvxu.mp3');
 const R5R21full  = audioUrl('Moskva_slezam_ne_verit_bgy5go', '/music/round4/Moskva_slezam_ne_verit_bgy5go.mp3');
 
-const R5R22minus = audioUrl('krylatye_kacheli_minus_cut_zymfnb', '/music/round4/krylatye_kacheli_minus_cut_zymfnb.mp3');
-const R5R22full  = audioUrl('krylatye_kacheli_onunkp', '/music/round4/krylatye_kacheli_onunkp.mp3');
+const R5R22minus = audioUrl('', '/music/round4/prekrasnoe-daleko-minus_cut.mp3');
+const R5R22full  = audioUrl('', '/music/round4/prekrasnoe-daleko.mp3');
 
 const R5R23minus = audioUrl('trus_ne_igraet_v_hokkej_minus_xgbt7c', '/music/round4/trus_ne_igraet_v_hokkej_minus_xgbt7c.mp3');
 const R5R23full  = audioUrl('trus_ne_igraet_v_hokkej_sxcgox', '/music/round4/trus_ne_igraet_v_hokkej_sxcgox.mp3');
@@ -70,11 +70,11 @@ export const round4v2Set: RoundSet = {
         },
         {
           id: 's5_9',
-          title: 'Крылатые качели',
-          artist: 'Елена Камбурова и детский хор (из к/ф «Приключения Электроника»)',
+          title: 'Прекрасное далёко',
+          artist: 'Татьяна Дасковская',
           audioUrl: R5R22minus,
           audioUrlFull: R5R22full,
-          notes: 'Песня Евгения Крылатова на стихи Юрия Энтина из фильма «Приключения Электроника» (1979). Одна из самых узнаваемых детских песен.\n\nВ юном месяце апреле\nВ старом парке тает снег,\nИ весёлые качели\nНачинают свой разбег.'
+          notes: 'Главная песня из культового фильма о путешествиях во времени и мечтах о будущем. Пронзительный детский голос и философские строки, которые запоминаются навсегда. «Прекрасное далёко, не будь ко мне жестоко, / Не будь ко мне жестоко, жестоко не будь.» «Я начинаю путь, а впереди — мечта, / Мне только б не свернуть, мне только б удержаться!'
         },
         {
           id: 's5_10',

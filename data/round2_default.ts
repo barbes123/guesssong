@@ -13,7 +13,7 @@ const R2_1_C1B2full = audioUrl('lyube_gimn_rossii_zqowqc', '/music/round2/lyube_
 const R2_1_C1B3minus = audioUrl('proekt-zhit-minus_kzrsp4', '/music/round2/proekt-zhit-minus_kzrsp4.mp3');
 const R2_1_C1B3full = audioUrl('proekt-zhit_k0jt6r', '/music/round2/proekt-zhit_k0jt6r.mp3');
 
-const R2_1_C1B4minus = audioUrl('shaman-shaman-vstanem_minus_tedto9', '/music/round2/shaman-shaman-vstanem_minus_tedto9.mp3');
+const R2_1_C1B4minus = audioUrl('shaman-shaman-vstanem_minus_tedto9', '/music/round2/shaman-shaman-vstanem_minus_tedto9_cut.mp3');
 const R2_1_C1B4full = audioUrl('shaman-shaman-vstanem_hintiz', '/music/round2/shaman-shaman-vstanem_hintiz.mp3');
 
 // Туристические песни
@@ -30,10 +30,10 @@ const R2_1_C2B4minus = audioUrl('Valerij_Kaner_-_A_vse_konchaetsya_minus_ckfder'
 const R2_1_C2B4full = audioUrl('Valerij_Kaner_-_A_vse_konchaetsya_kehaab', '/music/round2/Valerij_Kaner_-_A_vse_konchaetsya_kehaab.mp3');
 
 // Застольные песни
-const R2_1_C3B1minus = audioUrl('odnazhdy-morem-ya-plyla_minus_vqop94', '/music/round2/odnazhdy-morem-ya-plyla_minus_vqop94.mp3');
+const R2_1_C3B1minus = audioUrl('odnazhdy-morem-ya-plyla_minus_vqop94', '/music/round2/odnazhdy-morem-ya-plyla_minus_vqop94_cut.mp3');
 const R2_1_C3B1full = audioUrl('odnazhdy-morem-ya-plyla_b9qk4r', '/music/round2/odnazhdy-morem-ya-plyla_b9qk4r.mp3');
 
-const R2_1_C3B2minus = audioUrl('da_ne_vecher_minus_ql59gq', '/music/round2/da_ne_vecher_minus_ql59gq.mp3');
+const R2_1_C3B2minus = audioUrl('da_ne_vecher_minus_ql59gq', '/music/round2/da_ne_vecher_minus_ql59gq_cut.mp3');
 const R2_1_C3B2full = audioUrl('da_ne_vecher_kzkx9i', '/music/round2/da_ne_vecher_kzkx9i.mp3');
 
 const R2_1_C3B3minus = audioUrl('Napilas_ya_pyana_minus_i9ifis', '/music/round2/Napilas_ya_pyana_minus_i9ifis.mp3');
@@ -71,6 +71,10 @@ export const defaultSet: RoundSet = {
     {
       id: 'patriot',
       name: { en: 'Patriotic', ru: 'Патриотическая' },
+      description: {
+        ru: 'Тот самый плейлист, под который хочется выпрямить спину и вспомнить, где лежат документы. Даже кот с подоконника замирает.',
+        en: 'The playlist that makes you want to straighten your back and remember where your documents are. Even the cat on the windowsill freezes.'
+      },
       songs: [
         { 
           id: 'p2_1', 
@@ -109,6 +113,10 @@ export const defaultSet: RoundSet = {
     {
       id: 'tourists',
       name: { en: 'Tourist Songs', ru: 'Туристическая' },
+      description: {
+        ru: 'Песни, которые сами просятся к костру и гитаре. Если после них вам не захотелось собрать рюкзак — проверьте, бьётся ли ещё сердце.',
+        en: 'Songs that naturally call for a campfire and guitar. If after these you don\'t feel like packing a backpack — check if your heart is still beating.'
+      },
       songs: [
         { 
           id: 'p2_5', 
@@ -147,6 +155,10 @@ export const defaultSet: RoundSet = {
     {
       id: 'table',
       name: { en: 'Table Songs', ru: 'Застольная' },
+      description: {
+        ru: 'Музыка для момента, когда тарелки уже отодвинуты, а тосты ещё не закончились. Голоса становятся громче, соседи — счастливее.',
+        en: 'Music for that moment when plates have been pushed aside, but toasts are still going. Voices get louder, neighbors get happier.'
+      },
       songs: [
         { 
           id: 'p2_9', 
@@ -185,6 +197,10 @@ export const defaultSet: RoundSet = {
     {
       id: 'hits80',
       name: { en: 'Hits of the 80s', ru: 'Хиты 80-х' },
+      description: {
+        ru: 'Эпоха, когда причёски были выше, а джинсы — уже. Если вы не застали — спросите родителей, они всё ещё танцуют под это на кухне.',
+        en: 'An era when hairstyles were higher and jeans were tighter. If you weren\'t there — ask your parents, they still dance to this in the kitchen.'
+      },
       songs: [
         { 
           id: 'p2_13', 
