@@ -1,65 +1,95 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+## 🛠️ Prerequisites
 
-# Run and deploy your AI Studio app
+* Node.js (v18+ recommended)
+* FFmpeg (for audio processing tasks)
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/drive/1VamFCCnprJzKgxNNPLVTsogiQi-ClLk-
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
+## 🚀 Quick Start
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
-   
+   npm install
+
+2. Configure environment variables:
+   Set your `GEMINI_API_KEY` inside `.env.local`:
+   GEMINI_API_KEY=your_gemini_api_key_here
+
+3. Run the development server:
+   npm run dev
+
+---
+
+## 🔌 Port Configuration
+
+* Port 3001: Reserved for `useBuzzer`
+* Port 3002: Reserved for `usePads`
+
+If a port is locked or in use, release it using:
+  fuser -k 3002/tcp
+  kill -9 \$(lsof -t -i:3002)
+
+---
+
+## 📦 Additional Setup & Dependencies
+
+* Install Socket.IO Client:
+  ```bash
+  npm install socket.io-client
+  ```
+
+* Fix CSS import issues (TypeScript):
+  Create a `vite-env.d.ts` file in the root directory with the following contents:
+
 ```bash
-rm -rf node_modules package-lock.json
-npm cache clean --force
-npm pkg delete overrides
-npm install
+  declare module '*.css' {
+    const content: Record<string, string>;
+    export default content;
+  }
 ```
-npm install socket.io-client
-   
-ffmpeg -i nadezhda-kadysheva-techet-ruchey-minus.mp3 -vn -acodec copy -ss 00:00:50 -to 00:02:00 nadezhda-kadysheva-techet-ruchey-minus_cut.mp3
+
+* Fetch Cloudflare/Cloudinary asset IDs:
+  node get-cloudinary-ids.js
+
+---
+
+## Pages
+
+```bash
+/leader
+```
+
+```bash
+/display
+```
+
+## 🎵 Audio Processing
+
+Cut audio files using FFmpeg (e.g., extract segment from 00:00:50 to 00:02:00):
+  ffmpeg -i nadezhda-kadysheva-techet-ruchey-minus.mp3 -vn -acodec copy -ss 00:00:50 -to 00:02:00 nadezhda-kadysheva-techet-ruchey-minus_cut.mp3
+
+---
+
+## 🔧 Troubleshooting
+
+### Standard Reinstallation (Package Fixes)
+If you encounter dependency issues:
+  rm -rf node_modules package-lock.json
+  npm cache clean --force
+  npm pkg delete overrides
+  npm install
+
+### Issues with `@babel/helper-compilation-targets`
+  rm -rf node_modules package-lock.json
+  npm ci
+  npm install
+
+### TypeScript Errors (`import React from "react"` highlighted red)
+  npm install --save-dev @types/react @types/react-dom
+
+### Gemini Extension Infinite Loading in VS Code
+Clear the extension cache and restart VS Code:
+  rm -rf ~/.config/Code/User/globalStorage/google.cloud-code
+
+```
 
 
-
-if problems with node_modules @babel/helper-compilation-targets
-
-rm -rf node_modules package-lock.json
-npm ci
-npm install
-
-
-node get-cloudinary-ids.js
-
-to get list of IDs from cloudfare
-
-if gemini infine thinking in VS do rm -rf ~/.config/Code/User/globalStorage/google.cloud-code and restart the VS
-
-
-if import React from "react" is red try: 
-npm install --save-dev @types/react @types/react-dom
-
-to fix index.css
-
-create vite-env.d.ts file:
-declare module '*.css' {
-  const content: Record<string, string>;
-  export default content;
-}
-
-
-port 3001 for useBuzzer
-port 3002 for usePads
-
-to release port:
-fuser -k 3002/tcp
-kill -9 $(lsof -t -i:3002)
