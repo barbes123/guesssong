@@ -3,7 +3,7 @@ import { Music, CheckCircle, XCircle, Trophy, Star } from 'lucide-react';
 import { ROUND_DATA, getRoundData } from '../../data/index_data';
 import { translations } from '../../translations';
 
-import { io } from 'socket.io-client';  // ← ДОБАВЬТЕ ЭТУ СТРОКУ!
+import { io } from 'socket.io-client';
 import configBuzz from '../../configBuzz.json';  // ← И ЭТУ (если нет)
 
 // import { BuzzerPopupProps } from '../../types';
@@ -98,7 +98,16 @@ const PlayerScreen = () => {
   //   return () => clearInterval(interval);
   // }, []);
   useEffect(() => {
-    const socket = io(configBuzz.SOCKET_URL);
+    // const socket = io(configBuzz.SOCKET_URL);
+
+    // const socketPort =
+    //   inputMode === 'USB_PADS'
+    //     ? configBuzz.PADS_PORT
+    //     : configBuzz.PHONES_PORT;
+
+    const socketUrl = `http://${configBuzz.SERVER_IP}:${configBuzz.LEADER_PORT}`;
+
+    const socket = io(socketUrl);
 
     // Получаем данные через сокет
     socket.on('gameStateLink', (data) => {
@@ -544,8 +553,8 @@ const PlayerScreen = () => {
           {/* ================= LEFT PLAYER (Narrowed, line removed) ================= */}
           <div
             className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isLeftActive
-                ? 'bg-gradient-to-b from-indigo-900/60 to-slate-900 border-indigo-400 shadow-[0_0_40px_rgba(99,102,241,0.3)] scale-105 z-10'
-                : 'bg-slate-900/80 border-slate-800 opacity-80'
+              ? 'bg-gradient-to-b from-indigo-900/60 to-slate-900 border-indigo-400 shadow-[0_0_40px_rgba(99,102,241,0.3)] scale-105 z-10'
+              : 'bg-slate-900/80 border-slate-800 opacity-80'
               }`}
           >
             {/* Reduced from text-6xl to text-4xl to fit narrow container */}
@@ -594,8 +603,8 @@ const PlayerScreen = () => {
                   <div
                     key={s}
                     className={`w-20 h-20 rounded-2xl border-2 flex items-center justify-center transition-all duration-300 ${isSelected
-                        ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-[0_0_30px_rgba(99,102,241,0.6),inset_0_2px_0_rgba(255,255,255,0.3)] scale-110 z-10'
-                        : 'bg-slate-800 border-slate-700/50 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] cursor-pointer hover:bg-slate-700'
+                      ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-[0_0_30px_rgba(99,102,241,0.6),inset_0_2px_0_rgba(255,255,255,0.3)] scale-110 z-10'
+                      : 'bg-slate-800 border-slate-700/50 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] cursor-pointer hover:bg-slate-700'
                       }`}
                   >
                     <span className="text-4xl font-black drop-shadow-md">{s}</span>
@@ -605,8 +614,8 @@ const PlayerScreen = () => {
 
               <div
                 className={`w-32 h-20 rounded-2xl border-2 flex items-center justify-center transition-all duration-300 ${state.selectedDuration === null && isPlaying
-                    ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-[0_0_30px_rgba(99,102,241,0.6),inset_0_2px_0_rgba(255,255,255,0.3)] scale-110 z-10'
-                    : 'bg-slate-800 border-slate-700/50 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] cursor-pointer hover:bg-slate-700'
+                  ? 'bg-gradient-to-b from-indigo-500 to-indigo-700 border-indigo-400 text-white shadow-[0_0_30px_rgba(99,102,241,0.6),inset_0_2px_0_rgba(255,255,255,0.3)] scale-110 z-10'
+                  : 'bg-slate-800 border-slate-700/50 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] cursor-pointer hover:bg-slate-700'
                   }`}
               >
                 <span className="text-2xl font-black uppercase drop-shadow-md">{t.full || 'FULL'}</span>
@@ -623,8 +632,8 @@ const PlayerScreen = () => {
           {/* ================= RIGHT PLAYER (Narrowed, line removed) ================= */}
           <div
             className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isRightActive
-                ? 'bg-gradient-to-b from-rose-900/60 to-slate-900 border-rose-400 shadow-[0_0_40px_rgba(244,63,94,0.3)] scale-105 z-10'
-                : 'bg-slate-900/80 border-slate-800 opacity-80'
+              ? 'bg-gradient-to-b from-rose-900/60 to-slate-900 border-rose-400 shadow-[0_0_40px_rgba(244,63,94,0.3)] scale-105 z-10'
+              : 'bg-slate-900/80 border-slate-800 opacity-80'
               }`}
           >
             {/* Reduced from text-6xl to text-4xl */}
@@ -830,20 +839,20 @@ const PlayerScreen = () => {
     </div>
   );
 
-const renderRound1 = () => {
+  const renderRound1 = () => {
     // 1. Get the actual ID (0, 1, etc.)
     const currentId = activeRoundId;
 
     // 2. Get the progress for THIS specific round
     const progress = roundProgress[currentId] || {
-      usedNotes:[],
+      usedNotes: [],
       results: {},
       pointMap: {}
     };
 
     // 3. Get the correct data file
     const selectedSetId = roundSets[currentId] || 'default';
-    const categories = getRoundData(currentId, selectedSetId) ||[];
+    const categories = getRoundData(currentId, selectedSetId) || [];
 
     // 4. Set the title based on the round
     const title = currentId === 0
@@ -883,7 +892,7 @@ const renderRound1 = () => {
 
                       const result = progress.results?.[noteId];
                       const isActive = activeNote?.categoryId === cat.id && activeNote?.noteIndex === noteIdx;
-                      
+
                       // Check if this specific note is currently outputting sound
                       const isPlayingNow = isActive && isPlaying;
 
@@ -895,8 +904,8 @@ const renderRound1 = () => {
                       if (isActive) {
                         bgColor = 'bg-gradient-to-b from-indigo-500 to-indigo-700';
                         borderColor = isPlayingNow ? 'border-white text-white' : 'border-indigo-400 text-white';
-                        shadow = isPlayingNow 
-                          ? 'shadow-[0_0_50px_rgba(255,255,255,0.4),inset_0_2px_0_rgba(255,255,255,0.6)]' 
+                        shadow = isPlayingNow
+                          ? 'shadow-[0_0_50px_rgba(255,255,255,0.4),inset_0_2px_0_rgba(255,255,255,0.6)]'
                           : 'shadow-[0_0_30px_rgba(99,102,241,0.5),inset_0_2px_0_rgba(255,255,255,0.2)]';
                         scale = `z-20 ${isPlayingNow ? 'scale-110 ring-4 ring-white animate-pulse' : 'scale-105 ring-2 ring-indigo-400/50'}`;
                       } else if (isUsed) {

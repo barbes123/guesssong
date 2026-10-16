@@ -1,0 +1,9 @@
+{
+  "SERVER_IP": "192.168.0.17",
+  "SERVER_PORT": 5173,  
+  "SOCKET_URL": "http://192.168.0.17:3001/",
+  "MAX_PLAYERS": 10,
+  "leaderPassword": "leader123",
+  "HOST_PASSWORD": "dumon"
+}
+

@@ -14,9 +14,9 @@ import StartView from './src/screens/StartView';
 import RoundStandard from './src/screens/RoundStandard';
 import RoundDuel from './src/screens/RoundDuel';
 import RoundSprint from './src/screens/RoundSprint';
-import MusicTimeline from './components/MusicTimeline'; // The file you just created
+import MusicTimeline from './components/MusicTimeline';
 
-import PlayerScreen from './src/displays/PlayerScreen'; // Adjust path if needed
+import PlayerScreen from './src/displays/PlayerScreen';
 import LeaderDisplay from './src/displays/LeaderDisplay'; // Leader display for host notes
 
 // import { useBuzzer } from './src/hooks/useBuzzer';
@@ -26,10 +26,12 @@ import { useGameEngine } from './src/hooks/useGameEngine';
 import { saveScoreSnapshot, downloadFinalLog } from './src/utils/logger';
 import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
 import PasswordGuard from './components/PasswordGuard';
-/////////// Buzz---------------------------
-// import configBuzz from './configBuzz.json';
-// import { io } from 'socket.io-client';
+
 import './index.css'
+
+//---------------------------
+import configBuzz from './configBuzz.json';
+import { io } from 'socket.io-client';
 // const socket = io(configBuzz.SOCKET_URL);
 // ----------------------------------------
 
@@ -267,14 +269,101 @@ const App: React.FC = () => {
     handleToggleBuzz,
   } = engine;
 
+  // useEffect(() => {
+  //   const syncInterval = setInterval(() => {
+  //     const stateData = stateToShareRef.current;
+  //     if (!stateData) return;
+
+  //     // DEBUG: Log if popup is being synced
+  //     if (stateData.showBuzzerPopup) {
+  //       console.log('📤 [App.tsx] Syncing buzzer popup to localStorage:', {
+  //         showBuzzerPopup: stateData.showBuzzerPopup,
+  //         playerName: stateData.buzzerPlayerName,
+  //         points: stateData.buzzerPoints,
+  //         isWarmup: stateData.isWarmup,
+  //         timestamp: new Date().toISOString()
+  //       });
+  //     }
+
+  //     // 1. SYNC TO PLAYER DISPLAY (Same Laptop)
+  //     // This fixed the "Stuck on Starting Page" issue for /display
+  //     try {
+  //       localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateData));
+  //     } catch (e) {
+  //       console.error("Local storage sync error", e);
+  //     }
+
+  //     // 2. SYNC TO LEADER DISPLAY (Phone / Network)
+  //     // Removed isBuzzerConnected so it works in "Manual Mode"
+  //     if (buzzerSocket?.connected) {
+  //       buzzerSocket.emit('updateGameState', stateData);
+  //     }
+  //   }, 500);
+
+  //   return () => clearInterval(syncInterval);
+  // }, [buzzerSocket]);
+
+
+  // useEffect(() => {
+  //   const stateSocketUrl =
+  //     `http://${configBuzz.SERVER_IP}:${configBuzz.LEADER_PORT}`;
+
+  //   const stateSocket = io(stateSocketUrl, {
+  //     reconnection: true,
+  //     reconnectionDelay: 1000,
+  //     reconnectionAttempts: Infinity,
+  //     transports: ['websocket', 'polling']
+  //   });
+
+  //   stateSocket.on('connect', () => {
+  //     console.log('[STATE SYNC] Connected to:', stateSocketUrl);
+  //   });
+
+  //   stateSocket.on('connect_error', (error) => {
+  //     console.error('[STATE SYNC] Connection error:', error.message);
+  //   });
+
+  //   const syncInterval = setInterval(() => {
+  //     const stateData = stateToShareRef.current;
+  //     if (!stateData || !stateSocket.connected) return;
+
+  //     stateSocket.emit('updateGameState', stateData);
+  //   }, 500);
+
+  //   return () => {
+  //     clearInterval(syncInterval);
+  //     stateSocket.disconnect();
+  //   };
+  // }, []);
+
   useEffect(() => {
+    const stateSocketUrl =
+      `http://${configBuzz.SERVER_IP}:${configBuzz.LEADER_PORT}`;
+
+      console.log(`http://${configBuzz.SERVER_IP}:${configBuzz.LEADER_PORT}`)
+
+    const stateSocket = io(stateSocketUrl, {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: Infinity,
+      transports: ['polling', 'websocket']
+    });
+
+    stateSocket.on('connect', () => {
+      console.log('[STATE SYNC] Connected to:', stateSocketUrl);
+    });
+
+    stateSocket.on('connect_error', (error) => {
+      console.error('[STATE SYNC] Connection error:', error.message);
+    });
+
     const syncInterval = setInterval(() => {
       const stateData = stateToShareRef.current;
       if (!stateData) return;
 
       // DEBUG: Log if popup is being synced
       if (stateData.showBuzzerPopup) {
-        console.log('📤 [App.tsx] Syncing buzzer popup to localStorage:', {
+        console.log('📤 [App.tsx] Syncing buzzer popup:', {
           showBuzzerPopup: stateData.showBuzzerPopup,
           playerName: stateData.buzzerPlayerName,
           points: stateData.buzzerPoints,
@@ -284,22 +373,26 @@ const App: React.FC = () => {
       }
 
       // 1. SYNC TO PLAYER DISPLAY (Same Laptop)
-      // This fixed the "Stuck on Starting Page" issue for /display
       try {
-        localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateData));
+        localStorage.setItem(
+          'musicQuizPlayerState',
+          JSON.stringify(stateData)
+        );
       } catch (e) {
-        console.error("Local storage sync error", e);
+        console.error('Local storage sync error', e);
       }
 
-      // 2. SYNC TO LEADER DISPLAY (Phone / Network)
-      // Removed isBuzzerConnected so it works in "Manual Mode"
-      if (buzzerSocket?.connected) {
-        buzzerSocket.emit('updateGameState', stateData);
+      // 2. SYNC TO LEADER DISPLAY (Network, independent of input mode)
+      if (stateSocket.connected) {
+        stateSocket.emit('updateGameState', stateData);
       }
     }, 500);
 
-    return () => clearInterval(syncInterval);
-  }, [buzzerSocket]);
+    return () => {
+      clearInterval(syncInterval);
+      stateSocket.disconnect();
+    };
+  }, []);
 
 
   // Show popup on PlayerScreen when buzzer is pressed in rounds 0,1,2
@@ -594,70 +687,6 @@ const App: React.FC = () => {
     isWarmup
   ]);
 
-
-  // useEffect(() => {
-  //   const syncInterval = setInterval(() => {
-  //     // 🔴 REMOVED: 'isBuzzerConnected' from the if-statement
-  //     // Now it only cares if the socket is physically connected to the server
-  //     if (stateToShareRef.current && buzzerSocket?.connected) {
-
-  //       // Optional: Add a log to see it working in your Laptop console
-  //       console.log("Manual Syncing to Phone...");
-
-  //       buzzerSocket.emit('updateGameState', stateToShareRef.current);
-  //     }
-  //   }, 500);
-
-  //   return () => clearInterval(syncInterval);
-  // }, [buzzerSocket]); // Removed isBuzzerConnected from dependency array
-  //   useEffect(() => {
-  //   const syncInterval = setInterval(() => {
-  //     if (stateToShareRef.current) {
-  //       // 1. Update the TV/Display window (Same device)
-  //       try {
-  //         localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShareRef.current));
-  //       } catch (e) {
-  //         console.error("Local storage error", e);
-  //       }
-
-  //       // 2. Update the Phone/Leader display (Network device)
-  //       // Note: I removed the "isBuzzerConnected" check so the phone works even 
-  //       // if you haven't clicked 'Connect' on the buzzer yet.
-  //       if (buzzerSocket?.connected) {
-  //         buzzerSocket.emit('updateGameState', stateToShareRef.current);
-  //       }
-  //     }
-  //   }, 500);
-
-  //   return () => clearInterval(syncInterval);
-  // }, [buzzerSocket]);
-
-  // useEffect(() => {
-  //   // Share game state with player screen and leader display
-  //   const interval = setInterval(() => {
-  //     if (stateToShareRef.current) {
-  //       try {
-  //         localStorage.setItem('musicQuizPlayerState', JSON.stringify(stateToShareRef.current));
-
-  //         // Send song state to server via HTTP for network access
-  //         if (stateToShareRef.current.currentSong) {
-  //           fetch('/api/current-song', {
-  //             method: 'POST',
-  //             headers: { 'Content-Type': 'application/json' },
-  //             body: JSON.stringify({
-  //               currentSong: stateToShareRef.current.currentSong
-  //             })
-  //           }).catch(() => {
-  //             // Silently fail if server endpoint not available
-  //           });
-  //         }
-  //       } catch (error) {
-  //         console.log('Error sharing state:', error);
-  //       }
-  //     }
-  //   }, 300);
-  //   return () => clearInterval(interval);
-  // }, []);
   // Add this function to open/close player window
   const handleOpenPlayerWindow = () => {
     // Close existing window if open

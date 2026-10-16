@@ -43,3 +43,23 @@ node get-cloudinary-ids.js
 to get list of IDs from cloudfare
 
 if gemini infine thinking in VS do rm -rf ~/.config/Code/User/globalStorage/google.cloud-code and restart the VS
+
+
+if import React from "react" is red try: 
+npm install --save-dev @types/react @types/react-dom
+
+to fix index.css
+
+create vite-env.d.ts file:
+declare module '*.css' {
+  const content: Record<string, string>;
+  export default content;
+}
+
+
+port 3001 for useBuzzer
+port 3002 for usePads
+
+to release port:
+fuser -k 3002/tcp
+kill -9 $(lsof -t -i:3002)

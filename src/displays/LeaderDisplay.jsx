@@ -10,6 +10,7 @@ const LeaderDisplay = () => {
     const [error, setError] = useState('');
     const [socketConnected, setSocketConnected] = useState(false);
 
+
     // Video reference for the "Stay Awake" hack
     const videoRef = useRef(null);
 
@@ -30,15 +31,21 @@ const LeaderDisplay = () => {
 
     // 2. Socket Connection & Listeners
     useEffect(() => {
-        const socket = io(configBuzz.SOCKET_URL, {
+
+        const socketUrl = `http://${configBuzz.SERVER_IP}:${configBuzz.LEADER_PORT}`;
+
+        // const socket = io(configBuzz.SOCKET_URL, {
+        const socket = io(socketUrl, {
             reconnection: true,
             reconnectionDelay: 1000,
-            transports: ['websocket', 'polling']
+            transports: ['polling', 'websocket']
+            // transports: ['websocket', 'polling']
         });
 
         socket.on('connect', () => {
             console.log('Leader display connected to socket server');
             setSocketConnected(true);
+            socket.emit('requestGameState');
         });
 
         socket.on('disconnect', () => {
@@ -79,7 +86,7 @@ const LeaderDisplay = () => {
     // 3. Login Logic with Video Trigger
     const handleLoginSubmit = (e) => {
         e.preventDefault();
-        if (passwordInput === configBuzz.leaderPassword) {
+        if (passwordInput === configBuzz.LEADER_PASS) {
             setIsAuthenticated(true);
             sessionStorage.setItem('leaderAuthenticated', 'true');
             setError('');
@@ -131,6 +138,8 @@ const LeaderDisplay = () => {
     if (!isAuthenticated) {
         return (
             <div style={{ backgroundColor: '#fff', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif' }}>
+
+                {/* style={{ backgroundColor: '#fff', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif' }} */}
                 <video ref={videoRef} loop muted playsInline style={{ display: 'none' }}>
                     <source src="/video/silent.mp4" type="video/mp4" />
                 </video>
@@ -164,9 +173,21 @@ const LeaderDisplay = () => {
     // --- RENDER LEADER UI ---
     return (
         <div
-            style={{ backgroundColor: '#fff', color: '#000', height: '100vh', padding: '20px', fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
-            onClick={() => videoRef.current?.play()}
+            style={{
+                backgroundColor: '#fff',
+                color: '#000',
+                minHeight: '100vh',
+                width: '100%',
+                boxSizing: 'border-box',
+                padding: '20px',
+                fontFamily: 'sans-serif',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                overflowY: 'auto'
+            }}
         >
+            {/* style={{ backgroundColor: '#fff', color: '#000', height: '100vh', padding: '20px', fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column', justifyContent: 'center' }} */}
             <video ref={videoRef} loop muted playsInline style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}>
                 <source src="/video/silent.mp4" type="video/mp4" />
             </video>
@@ -222,11 +243,11 @@ const LeaderDisplay = () => {
                         )}
                     </div>
                 )}
-       
+
                 <div style={{ marginBottom: '5px' }}>
                     <label style={{ fontWeight: 'bold', display: 'block', fontSize: '12px', textTransform: 'uppercase', marginBottom: '8px', color: '#666' }}>
                         {/* Title */}
-                        </label>
+                    </label>
                     <p style={{ fontSize: '32px', margin: '0', fontWeight: 'bold', minHeight: '50px', display: 'flex', alignItems: 'center' }}>
                         {songInfo.title || '—'}
                     </p>
@@ -235,7 +256,7 @@ const LeaderDisplay = () => {
                 <div style={{ marginBottom: '5px' }}>
                     <label style={{ fontWeight: 'bold', display: 'block', fontSize: '12px', textTransform: 'uppercase', marginBottom: '8px', color: '#666' }}>
                         {/* Artist */}
-                        </label>
+                    </label>
                     <p style={{ fontSize: '24px', margin: '0', fontWeight: 'bold', minHeight: '40px', display: 'flex', alignItems: 'center' }}>
                         {songInfo.artist || '—'}
                     </p>
