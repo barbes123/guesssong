@@ -1,5 +1,6 @@
 
 export type Language = 'en' | 'ru';
+export type InputMode = 'MANUAL' | 'USB_PADS' | 'PHONE_HUB';
 
 export interface Player {
   id: number;
@@ -7,6 +8,8 @@ export interface Player {
   score: number;
   stars: number; // New: Stars for Round 6
   hubId?: string;
+  padsId?: string;
+  manualId?: string;
 }
 
 export interface Song {
@@ -73,14 +76,16 @@ export interface GameState {
       pointMap: { [categoryId: string]: number[] };
       activationCounts: { [noteId: string]: number };
       persistentPoints?: { [noteId: string]: number };
-      results: { [noteId: string]: 'correct' | 'wrong' };
+      results: { [noteId: string]: 'correct' | 'wrong' | 'skip' };
       activePlayerIds?: number[];
       currentTurnIndex?: number;
+      r4PlayerProgress?: { [playerId: number]: any };
       // For Round 5
       r5PlayerProgress?: { [playerId: number]: any };
       usedRows?: Set<number>;
     };
   };
+  // inputMode: InputMode;
   // Add round set selections
   roundSets: Record<number, string>; // roundId -> setId
 }
@@ -91,6 +96,14 @@ export interface BuzzerPopupProps {
   points: number;
   isWarmup: boolean;
   onClose?: () => void;
+}
+
+export interface InputEngine {
+  isConnected: boolean;
+  devices: any[];
+  activeResponder: string | null;
+  setActiveResponder: (id: string | null) => void;
+  arm: () => void;
 }
 
 export type Page = 'setup' | 'start' | 'round' | 'r3_select' | 'r4_select';

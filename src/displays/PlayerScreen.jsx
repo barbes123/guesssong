@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Music, CheckCircle, XCircle, Trophy, Star } from 'lucide-react';
 import { ROUND_DATA, getRoundData } from '../../data/index_data';
 import { translations } from '../../translations';
+
+import { io } from 'socket.io-client';  // ← ДОБАВЬТЕ ЭТУ СТРОКУ!
+import configBuzz from '../../configBuzz.json';  // ← И ЭТУ (если нет)
+
 // import { BuzzerPopupProps } from '../../types';
 
 // const BuzzerPopup = ({ show, playerName, points, isWarmup, onClose }) => {
@@ -65,35 +69,57 @@ import { translations } from '../../translations';
 const PlayerScreen = () => {
   const [state, setState] = useState(null);
 
+  // useEffect(() => {
+  //   const syncState = () => {
+  //     const stored = localStorage.getItem('musicQuizPlayerState');
+  //     if (stored) {
+  //       try {
+  //         const parsedState = JSON.parse(stored);
+  //         setState(parsedState);
+
+  //         // DEBUG: Log if popup state is being received
+  //         if (parsedState.showBuzzerPopup) {
+  //           console.log('📥 [PlayerScreen] Received buzzer popup state:', {
+  //             show: parsedState.showBuzzerPopup,
+  //             playerName: parsedState.buzzerPlayerName,
+  //             points: parsedState.buzzerPoints,
+  //             isWarmup: parsedState.isWarmup,
+  //             timestamp: new Date().toISOString()
+  //           });
+  //         }
+  //       } catch (e) {
+  //         console.error("Failed to parse game state", e);
+  //       }
+  //     }
+  //   };
+
+  //   syncState();
+  //   const interval = setInterval(syncState, 300);
+  //   return () => clearInterval(interval);
+  // }, []);
   useEffect(() => {
-    const syncState = () => {
-      const stored = localStorage.getItem('musicQuizPlayerState');
-      if (stored) {
-        try {
-          const parsedState = JSON.parse(stored);
-          setState(parsedState);
+    const socket = io(configBuzz.SOCKET_URL);
 
-          // DEBUG: Log if popup state is being received
-          if (parsedState.showBuzzerPopup) {
-            console.log('📥 [PlayerScreen] Received buzzer popup state:', {
-              show: parsedState.showBuzzerPopup,
-              playerName: parsedState.buzzerPlayerName,
-              points: parsedState.buzzerPoints,
-              isWarmup: parsedState.isWarmup,
-              timestamp: new Date().toISOString()
-            });
-          }
-        } catch (e) {
-          console.error("Failed to parse game state", e);
-        }
-      }
+    // Получаем данные через сокет
+    socket.on('gameStateLink', (data) => {
+      console.log('📥 [PlayerScreen] Received state via socket:', {
+        currentPage: data?.currentPage,
+        hasPlayers: data?.players?.length > 0,
+        timestamp: new Date().toISOString()
+      });
+      setState(data);
+    });
+
+    // При подключении запрашиваем текущее состояние
+    socket.on('connect', () => {
+      console.log('✅ [PlayerScreen] Socket connected to', configBuzz.SOCKET_URL);
+      socket.emit('requestGameState');  // ← Нужно добавить на сервере!
+    });
+
+    return () => {
+      socket.disconnect();
     };
-
-    syncState();
-    const interval = setInterval(syncState, 300);
-    return () => clearInterval(interval);
   }, []);
-
 
   const BuzzerPopup = ({ show, playerName, points, isWarmup, onClose }) => {
     if (!show) return null;

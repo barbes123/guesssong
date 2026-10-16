@@ -90,7 +90,7 @@ def print_summary_table(results):
     
     return passed, failed
 
-def run_check(round_num, version, base_dir="../public/music"):
+def run_check(round_num, version, base_dir="../music"):
     """
     Run the audio file checker for a specific round and version
     
@@ -213,7 +213,7 @@ def main():
     # Configuration
     rounds = [1, 2, 3, 4]
     versions = ["_default", "_v2", "_v3", "_v4"]
-    base_dir = "../public/music"  # Adjust this if your path is different
+    base_dir = "../music"  # Adjust this if your path is different
     
     print_header("BATCH AUDIO FILE CHECKER")
     print(f"Start time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

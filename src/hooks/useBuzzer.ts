@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import configBuzz from '../../configBuzz.json';
 
+const PHONES_SOCKET_URL = (configBuzz as any).PHONES_SOCKET_URL || 'http://localhost:3001';
+
 export const useBuzzer = (stopSong: (fullyClear?: boolean) => void) => {
     const socketRef = useRef<Socket | null>(null);
 
@@ -13,8 +15,8 @@ export const useBuzzer = (stopSong: (fullyClear?: boolean) => void) => {
 
     // Initialize Socket
     if (!socketRef.current) {
-        socketRef.current = io(configBuzz.SOCKET_URL, {
-            autoConnect: true,
+        socketRef.current = io(PHONES_SOCKET_URL, {
+            autoConnect: false,
             reconnection: true
         });
     }
@@ -29,6 +31,14 @@ export const useBuzzer = (stopSong: (fullyClear?: boolean) => void) => {
         setIsBuzzerConnected(false);
         setHubPlayers([]);
     }, [socket]);
+
+    const handleToggleBuzz = useCallback(() => {
+        if (isBuzzerConnected) {
+            handleForceDisconnect();
+        } else {
+            handleConnect();
+        }
+    }, [isBuzzerConnected, handleConnect, handleForceDisconnect]);
 
     /**
      * armBuzzers
@@ -48,6 +58,13 @@ export const useBuzzer = (stopSong: (fullyClear?: boolean) => void) => {
         }, 150);
     }, [socket]);
 
+    const disarmBuzzers = useCallback(() => {
+        setActiveResponder(null);
+        if (socket?.connected) {
+            socket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+        }
+    }, [socket]);
+
     useEffect(() => {
         if (!socket) return;
 
@@ -55,7 +72,7 @@ export const useBuzzer = (stopSong: (fullyClear?: boolean) => void) => {
         const registerAsHost = () => {
             console.log("👑 Game App: Attempting to register as Master Host...");
             socket.emit('register', {
-                name: 'MasterHost', 
+                name: 'MasterHost',
                 role: 'host',
                 code: '' // IMPORTANT: If your server uses a code, it must go here
             });
@@ -64,11 +81,15 @@ export const useBuzzer = (stopSong: (fullyClear?: boolean) => void) => {
         // --- LISTENER LOGIC ---
         const handleRegistered = (data: { success: boolean; error?: string }) => {
             if (data.success) {
-                // GREEN LOG if successful
                 console.log("%c✅ HOST CONNECTED: Game App has control.", "color: #00ff00; font-weight: bold; background: #002200; padding: 2px 5px;");
-                setIsBuzzerConnected(true);
+
+                // Use functional state update to inspect the current hubPlayers array
+                setHubPlayers(currentHubPlayers => {
+                    // setIsBuzzerConnected(currentHubPlayers.length > 0);
+                    setIsBuzzerConnected(true);
+                    return currentHubPlayers; // return unmodified
+                });
             } else {
-                // RED LOG if failed
                 console.log(`%c❌ NOT HOST: ${data.error || 'Check Gate Code'}`, "color: #ff0000; font-weight: bold; background: #220000; padding: 2px 5px;");
                 setIsBuzzerConnected(false);
             }
@@ -120,15 +141,21 @@ export const useBuzzer = (stopSong: (fullyClear?: boolean) => void) => {
     }, [socket, stopSong, buzzerMapping, activeResponder]);
 
     return {
-        isBuzzerConnected,
-        hubPlayers,
+        isConnected: isBuzzerConnected,
+        devices: hubPlayers,
         activeResponder,
         setActiveResponder,
+        arm: armBuzzers,
+        disarm: disarmBuzzers,
+        
+
+
+        // Low-level & specific controls
         buzzerMapping,
         setBuzzerMapping,
         handleConnect,
         handleForceDisconnect,
-        armBuzzers,
+        handleToggleBuzz,
         socket
     };
 };

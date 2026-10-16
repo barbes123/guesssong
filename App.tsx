@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { translations } from './translations';
-import { Player, GameState, Page, Language } from './types';
+import { Player, GameState, Page, Language, InputMode } from './types';
 import { ROUND_DATA, getRoundData, getAvailableSets } from './data/index_data';
 import { SCREEN_BGM, SFX, INITIAL_POINTS, shuffle } from './data/constants_main';
 import SettingsOverlay from './components/SettingsOverlay';
@@ -12,19 +12,23 @@ import RoundSetSelector from './components/RoundSetSelector';
 import SetupView from './src/screens/SetupView';
 import StartView from './src/screens/StartView';
 import RoundStandard from './src/screens/RoundStandard';
-import RoundDuel from './src/screens/RoundDuel'; // (Adjust path if necessary)
-import RoundSprint from './src/screens/RoundSprint'; // (Adjust path if needed)
+import RoundDuel from './src/screens/RoundDuel';
+import RoundSprint from './src/screens/RoundSprint';
 import MusicTimeline from './components/MusicTimeline'; // The file you just created
 
 import PlayerScreen from './src/displays/PlayerScreen'; // Adjust path if needed
 import LeaderDisplay from './src/displays/LeaderDisplay'; // Leader display for host notes
-import { useBuzzer } from './src/hooks/useBuzzer';
+
+// import { useBuzzer } from './src/hooks/useBuzzer';
+// import { usePads } from './src/hooks/usePads';
+import { useGameEngine } from './src/hooks/useGameEngine';
+
 import { saveScoreSnapshot, downloadFinalLog } from './src/utils/logger';
 import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, PartyPopper, RotateCcw, PlayCircle, HelpCircle, CheckCircle, XCircle, Zap, Timer, SkipForward } from 'lucide-react';
 import PasswordGuard from './components/PasswordGuard';
 /////////// Buzz---------------------------
-import configBuzz from './configBuzz.json';
-import { io } from 'socket.io-client';
+// import configBuzz from './configBuzz.json';
+// import { io } from 'socket.io-client';
 import './index.css'
 // const socket = io(configBuzz.SOCKET_URL);
 // ----------------------------------------
@@ -37,19 +41,19 @@ const App: React.FC = () => {
 
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-  // 🛡️ The Security Gate: Block network users from the "Main" root
-  // If they aren't on localhost and haven't typed /display or /leader, kick them out.
-  if (!isLocal && !isPlayerScreen && !isLeaderScreen) {
-    return (
-      <div className="h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-700 font-black p-10 text-center">
-        <div className="text-8xl mb-4">🚫</div>
-        <h1 className="text-4xl uppercase tracking-tighter">Access Denied</h1>
-        <p className="text-sm mt-4 text-slate-800 font-bold uppercase tracking-widest">
-          Access is not authorized
-        </p>
-      </div>
-    );
-  }
+  // // 🛡️ The Security Gate: Block network users from the "Main" root
+  // // If they aren't on localhost and haven't typed /display or /leader, kick them out.
+  // if (!isLocal && !isPlayerScreen && !isLeaderScreen) {
+  //   return (
+  //     <div className="h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-700 font-black p-10 text-center">
+  //       <div className="text-8xl mb-4">🚫</div>
+  //       <h1 className="text-4xl uppercase tracking-tighter">Access Denied</h1>
+  //       <p className="text-sm mt-4 text-slate-800 font-bold uppercase tracking-widest">
+  //         Access is not authorized
+  //       </p>
+  //     </div>
+  //   );
+  // }  
 
   useEffect(() => {
     if (isLeaderScreen) {
@@ -61,6 +65,9 @@ const App: React.FC = () => {
     }
   }, [isLeaderScreen, isPlayerScreen]);
 
+
+
+
   // --------------------------------
   const [gameState, setGameState] = useState<GameState>({
     players: [{ id: 0, name: '', score: 0, stars: 0 }],
@@ -71,7 +78,8 @@ const App: React.FC = () => {
     gameStarted: false,
     activeRoundId: null,
     roundProgress: {},
-    roundSets: { 1: 'default', 2: 'default', 3: 'default', 4: 'default' } // Updated: Only 4 rounds
+    roundSets: { 1: 'default', 2: 'default', 3: 'default', 4: 'default' }, // Updated: Only 4 rounds
+    // inputMode: 'MANUAL', // Options: 'MANUAL' | 'USB_PADS' | 'PHONE_HUB'
   });
 
   const [currentPage, setCurrentPage] = useState<Page>('setup');
@@ -129,6 +137,14 @@ const App: React.FC = () => {
   const [buzzerPlayerName, setBuzzerPlayerName] = useState('');
   const [buzzerPoints, setBuzzerPoints] = useState(0);
   const [isWarmup, setIsWarmup] = useState(false);
+
+
+
+  // Checking Initializing PHONES or PADS
+
+  // Inside App.tsx
+
+
 
   if (isLeaderScreen) {
     return <LeaderDisplay />;
@@ -225,36 +241,31 @@ const App: React.FC = () => {
     }
   }, [gameState.activeRoundId, r4IsActiveSession]);
 
+  const engine = useGameEngine(gameState, setGameState, stopSong);
+
   const {
     activeResponder,
     setActiveResponder,
     isBuzzerConnected,
-    hubPlayers,
-    handleConnect,
-    handleForceDisconnect,
-    setBuzzerMapping,
+    isPadsConnected,
+    usbPorts,
+    availableHubPlayers,
+    buzzerSocket,
+    padsSocket,
+    handleArm,
+    handleDisarm,
     armBuzzers,
-    socket: buzzerSocket,
-  } = useBuzzer(stopSong);
-
-  // useEffect(() => { //was this one
-  //   const syncInterval = setInterval(() => {
-  //     // This sends the data from your Laptop to the Server Bridge
-  //     if (stateToShareRef.current && isBuzzerConnected) {
-  //       // 'buzzerSocket' is the variable you got from your useBuzzer hook
-  //       const stateData = stateToShareRef.current;
-  //       console.log('🚀 [App.tsx] Emitting updateGameState:', {
-  //         hasSong: !!stateData.currentSong,
-  //         songTitle: stateData.currentSong?.title || 'none',
-  //         socketConnected: buzzerSocket?.connected,
-  //         eventName: 'updateGameState'
-  //       });
-  //       buzzerSocket.emit('updateGameState', stateData);
-  //     }
-  //   }, 500);
-
-  //   return () => clearInterval(syncInterval);
-  // }, [isBuzzerConnected, buzzerSocket]);
+    inputMode,
+    // disarmBuzzers,//commented 20261014
+    setInputMode,
+    updatePlayer,
+    addPlayer,
+    removePlayer,
+    handleCheckConnection,
+    handleForceDisconnect,
+    handleTogglePads,
+    handleToggleBuzz,
+  } = engine;
 
   useEffect(() => {
     const syncInterval = setInterval(() => {
@@ -296,22 +307,25 @@ const App: React.FC = () => {
     const validRounds = [0, 1, 2];
     const currentRoundId = gameState.activeRoundId;
 
-
-    //     if (currentRoundId === 4 && activeResponder) {
-    //   const activePlayer = gameState.players[gameState.currentPlayerIndex];
-    //   if (activePlayer.hubId !== activeResponder) {
-    //     // Wrong player buzzed – ignore
-    //     console.log("Ignoring buzz from non‑active player in Round 4");
-    //     setActiveResponder(null);
-    //     return;
-    //   }
-    // }
-
     if (!activeResponder || currentRoundId === null || currentRoundId === undefined || !validRounds.includes(currentRoundId) || !activeNote) {
       return;
     }
 
-    const buzzingPlayer = gameState.players.find(p => p.hubId === activeResponder);
+    // const buzzingPlayer = gameState.players.find(p => p.hubId === activeResponder);
+    // if (!buzzingPlayer) return;
+
+    const buzzingPlayer = gameState.players.find(p => {
+      if (inputMode === 'USB_PADS') {
+        return String(p.padsId) === String(activeResponder);
+      }
+
+      if (inputMode === 'PHONE_HUB') {
+        return String(p.hubId) === String(activeResponder);
+      }
+
+      return false;
+    });
+
     if (!buzzingPlayer) return;
 
     // Calculate points
@@ -391,7 +405,10 @@ const App: React.FC = () => {
     const activeId = gameState.activeRoundId;
 
     // We create a "Serialized" version of progress to fix the Set -> Array issue
-    const serializedRoundProgress = { ...gameState.roundProgress };
+    // const serializedRoundProgress = { ...gameState.roundProgress };
+    const serializedRoundProgress: Record<string, any> = {
+      ...gameState.roundProgress
+    };
 
     // NOTE: activeId may be 0 (warm-up). Use explicit null check.
     if (activeId !== null && Object.prototype.hasOwnProperty.call(serializedRoundProgress, activeId)) {
@@ -452,7 +469,8 @@ const App: React.FC = () => {
     if (activeNote && activeId !== null) {
       const selectedSetId = gameState.roundSets[activeId] || 'default';
       const roundData = getRoundData(activeId, selectedSetId) || [];
-      const category = roundData.find(c => c.id === activeNote.categoryId);
+      // const category = roundData.find(c => c.id === activeNote.categoryId);
+      const category = roundData.find((c: any) => c.id === activeNote.categoryId);
       if (category) {
         // Determine the correct song index based on round type
         let songIndex = activeNote.noteIndex;
@@ -492,7 +510,8 @@ const App: React.FC = () => {
 
       const selectedSetId = gameState.roundSets[activeId] || 'default';
       const roundData = getRoundData(activeId, selectedSetId) || [];
-      const category = roundData.find(c => c.id === activeNote.categoryId);
+      const category = roundData.find((c: any) => c.id === activeNote.categoryId);
+      // const category = roundData.find(c => c.id === activeNote.categoryId);
 
       if (category) {
         return {
@@ -714,92 +733,92 @@ const App: React.FC = () => {
     }));
   };
 
-  const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: number) => {
-    const actualName = typeof nameOrEvent === 'string' ? nameOrEvent : '';
+  // const handleAddPlayer = (nameOrEvent?: any, socketId?: string, slotNumber?: number) => {
+  //   const actualName = typeof nameOrEvent === 'string' ? nameOrEvent : '';
 
-    if (socketId && slotNumber) {
-      setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: slotNumber }));
-    }
+  //   if (socketId && slotNumber) {
+  //     setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: slotNumber }));
+  //   }
 
-    setGameState(prev => {
-      // 1. Identify which slot we are targeting (1, 2, or 3)
-      let targetId: number;
+  //   setGameState(prev => {
+  //     // 1. Identify which slot we are targeting (1, 2, or 3)
+  //     let targetId: number;
 
-      if (slotNumber) {
-        targetId = slotNumber;
-      } else {
-        // If manual "Add Player" was clicked, find the first slot without a name
-        const emptySlot = [1, 2, 3].find(id => {
-          const p = prev.players.find(player => player.id === id);
-          return !p || !p.name;
-        });
-        targetId = emptySlot || 0;
-      }
+  //     if (slotNumber) {
+  //       targetId = slotNumber;
+  //     } else {
+  //       // If manual "Add Player" was clicked, find the first slot without a name
+  //       const emptySlot = [1, 2, 3].find(id => {
+  //         const p = prev.players.find(player => player.id === id);
+  //         return !p || !p.name;
+  //       });
+  //       targetId = emptySlot || 0;
+  //     }
 
-      if (targetId === 0 || targetId > 3) return prev;
+  //     if (targetId === 0 || targetId > 3) return prev;
 
-      // 2. For buzz mode: ensure we have slots 1, 2, and 3 represented
-      // For manual mode: only update the target slot
-      if (socketId) {
-        // BUZZ MODE: Create/update all 3 slots
-        const slots = [1, 2, 3];
-        const updatedPlayers = slots.map(id => {
-          const existing = prev.players.find(p => p.id === id);
+  //     // 2. For buzz mode: ensure we have slots 1, 2, and 3 represented
+  //     // For manual mode: only update the target slot
+  //     if (socketId) {
+  //       // BUZZ MODE: Create/update all 3 slots
+  //       const slots = [1, 2, 3];
+  //       const updatedPlayers = slots.map(id => {
+  //         const existing = prev.players.find(p => p.id === id);
 
-          if (id === targetId) {
-            return {
-              id: id,
-              name: actualName,
-              score: existing ? existing.score : 0,
-              stars: existing ? existing.stars : 0,
-              hubId: socketId,
-            };
-          }
+  //         if (id === targetId) {
+  //           return {
+  //             id: id,
+  //             name: actualName,
+  //             score: existing ? existing.score : 0,
+  //             stars: existing ? existing.stars : 0,
+  //             hubId: socketId,
+  //           };
+  //         }
 
-          // If another slot has the same phone, clear it
-          if (existing && existing.hubId === socketId) {
-            return { id: id, name: '', score: 0, stars: 0, hubId: '' };
-          }
+  //         // If another slot has the same phone, clear it
+  //         if (existing && existing.hubId === socketId) {
+  //           return { id: id, name: '', score: 0, stars: 0, hubId: '' };
+  //         }
 
-          // Keep existing or empty
-          return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
-        });
+  //         // Keep existing or empty
+  //         return existing || { id: id, name: '', score: 0, stars: 0, hubId: '' };
+  //       });
 
-        // setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
-        return {
-          ...prev,
-          players: updatedPlayers
-        };
-      } else {
-        // MANUAL MODE: Ensure all 3 slots exist, but only add names when user clicks "Add Player"
-        if (prev.players.length >= 3) return prev;
-        const nextId = prev.players.length + 1;
-        const newPlayer = {
-          id: nextId,
-          name: actualName || '', // Start with empty name
-          score: 0,
-          stars: 0,
-          hubId: '',
-        };
+  //       // setBuzzerMapping(prevMap => ({ ...prevMap, [socketId]: targetId }));
+  //       return {
+  //         ...prev,
+  //         players: updatedPlayers
+  //       };
+  //     } else {
+  //       // MANUAL MODE: Ensure all 3 slots exist, but only add names when user clicks "Add Player"
+  //       if (prev.players.length >= 3) return prev;
+  //       const nextId = prev.players.length + 1;
+  //       const newPlayer = {
+  //         id: nextId,
+  //         name: actualName || '', // Start with empty name
+  //         score: 0,
+  //         stars: 0,
+  //         hubId: '',
+  //       };
 
-        return {
-          ...prev,
-          players: [...prev.players, newPlayer]
-        };
+  //       return {
+  //         ...prev,
+  //         players: [...prev.players, newPlayer]
+  //       };
 
-        // return {
-        //   ...prev,
-        //   players: updatedPlayers
-        // };
-      }
-    });
-  };
-  const handleRemovePlayer = (id: number) => {
-    setGameState(prev => ({
-      ...prev,
-      players: prev.players.filter(p => p.id !== id)
-    }));
-  };
+  //       // return {
+  //       //   ...prev,
+  //       //   players: updatedPlayers
+  //       // };
+  //     }
+  //   });
+  // };
+  // const handleRemovePlayer = (id: number) => {
+  //   setGameState(prev => ({
+  //     ...prev,
+  //     players: prev.players.filter(p => p.id !== id)
+  //   }));
+  // };
 
   const showModal = (
     title: string,
@@ -828,6 +847,7 @@ const App: React.FC = () => {
       t.finishRound,
       t.confirmFinish,
       () => {
+        handleDisarm();
         stopSong(); // Stop any music playing
         playSFX(SFX.scoreboard);
         setShowScoreboard(true); // Show the scores to everyone
@@ -1055,7 +1075,7 @@ const App: React.FC = () => {
       const selectedSetId0 = gameState.roundSets[0] || 'default';
       const roundData0 = getRoundData(0, selectedSetId0) || [];
 
-      roundData0.forEach((cat) => {
+      roundData0.forEach((cat: any) => {
         // Shuffling points is fine, even for warmup!
         pointMap0[cat.id] = shuffle(INITIAL_POINTS);
       });
@@ -1116,7 +1136,7 @@ const App: React.FC = () => {
     for (let i = 20; i <= 40; i++) pointPool.push(i);
     const shuffledPool = shuffle(pointPool);
 
-    roundData.forEach((cat, idx) => {
+    roundData.forEach((cat: any, idx: number) => {
       if (roundId === 1) {
         // Round 1: Song challenge (shuffle points)
         pointMap[cat.id] = shuffle(INITIAL_POINTS);
@@ -1337,7 +1357,7 @@ const App: React.FC = () => {
       }
 
 
-      const category = roundData.find(c => c.id === activeNote.categoryId);
+      const category = roundData.find((c: any) => c.id === activeNote.categoryId);
       const song = category?.songs[songIndex];
 
 
@@ -1486,24 +1506,7 @@ const App: React.FC = () => {
             });
           }, 1000);
         }
-        // else if (isSprintRound && r4IsActiveSession) {
-        //   countdownIntervalRef.current = window.setInterval(() => {
-        //     setTimeLeft(prev => {
-        //       if (prev === undefined) return prev;
-        //       if (prev > 0) return prev - 1;
 
-        //       window.clearInterval(countdownIntervalRef.current!);
-        //       countdownIntervalRef.current = null;
-
-        //       if (isSprintRound && r4IsActiveSession) {
-        //         stopSong(false);
-        //         playSFX(SFX.wrong); // Play wrong sound once when time is up
-        //       }
-        //       else handleAudioControl('stop');
-        //       return 0;
-        //     });
-        //   }, 1000);
-        // }
         else if (isFinalRound && selectedDuration !== null && !isR3Finalized) {
           countdownIntervalRef.current = window.setInterval(() => {
             setTimeLeft(prev => {
@@ -1573,7 +1576,8 @@ const App: React.FC = () => {
 
         const roundsThatUseBuzzers = [0, 1, 2, 4];
 
-        if (isBuzzerConnected && !isRevealMode && roundsThatUseBuzzers.includes(roundId)) {
+        // if (isBuzzerConnected && !isRevealMode && roundsThatUseBuzzers.includes(roundId)) {
+        if ((isBuzzerConnected || isPadsConnected) && !isRevealMode && roundsThatUseBuzzers.includes(roundId)) {
           // Special handling for round 4 – skip generic arming (arming is done via onArmSprintPlayer)
           if (roundId === 4) {
             console.log("⏭️ Round 4: Skipping generic ARM – arming handled separately.");
@@ -1583,11 +1587,13 @@ const App: React.FC = () => {
 
           // For other rounds, do the normal DISARM + ARM sequence
           console.log("🛠️ Sending DISARM (IDLE)");
-          buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+          buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });//20261014
+          // handleDisarm();//20261014
 
           setTimeout(() => {
             console.log("🛠️ Sending ARM (BATTLE)");
-            armBuzzers();
+            // armBuzzers();
+            handleArm();
             startPlayback();
           }, 150);
         } else {
@@ -1606,9 +1612,10 @@ const App: React.FC = () => {
       initiateSequence(); // Sequence triggered here
     } else {
       // Start of your 'stop' leg - Added DISARM here
-      if (isBuzzerConnected) {
-        buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
-      }
+      // if (isBuzzerConnected) {
+      //   buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+      // }
+      handleDisarm();
 
       if (isSprintRound && r4IsActiveSession) {
         if (songRef.current) songRef.current.pause();
@@ -1657,22 +1664,119 @@ const App: React.FC = () => {
   //   }
   // };
 
+  // const handleArmSprintPlayer = () => {
+  //   const currentSlot = gameState.players[gameState.currentPlayerIndex];
+  //   if (buzzerSocket && currentSlot && currentSlot.hubId) {
+  //     // 1. First unlock any previous lock
+  //     buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+
+  //     // 2. Small delay then arm the specific player
+  //     setTimeout(() => {
+  //       console.log(`[ARMING] Sending Hardware ID to Server: ${currentSlot.hubId}`);
+  //       buzzerSocket.emit('gameAction', {
+  //         type: 'ARM_SPECIFIC',
+  //         data: { playerId: currentSlot.hubId }
+  //       });
+  //     }, 100);
+
+  //     // 3. Optional: sync display
+  //     buzzerSocket.emit('updateGameState', {
+  //       currentPage: 'round-sprint',
+  //       activeResponder: currentSlot.name,
+  //       isSprintActive: true
+  //     });
+  //   }
+  // };
+
+
+  // const handleArmSprintPlayer = () => {
+  //   const currentSlot = gameState.players[gameState.currentPlayerIndex];
+
+  //   console.log('[SPRINT] Selected player:', currentSlot);
+  //   console.log('[SPRINT] Pad server socket connected:', buzzerSocket?.connected);
+
+  //   if (!buzzerSocket || !currentSlot) {
+  //     console.error('[SPRINT] Cannot arm: socket or player is missing.');
+  //     return;
+  //   }
+
+  //   // Clear any previous selection.
+  //   buzzerSocket.emit('gameAction', {
+  //     type: 'SET_STATE',
+  //     data: { state: 'IDLE' }
+  //   });
+
+  //   // USB pad server identifies players by their configured name or ID.
+  //   setTimeout(() => {
+  //     console.log('[SPRINT] Sending ARM_SPECIFIC for:', currentSlot.name);
+
+  //     buzzerSocket.emit('gameAction', {
+  //       type: 'ARM_SPECIFIC',
+  //       data: { playerId: currentSlot.name }
+  //     });
+  //   }, 100);
+
+  //   buzzerSocket.emit('updateGameState', {
+  //     currentPage: 'round-sprint',
+  //     activeResponder: currentSlot.name,
+  //     isSprintActive: true
+  //   });
+  // };
+
   const handleArmSprintPlayer = () => {
     const currentSlot = gameState.players[gameState.currentPlayerIndex];
-    if (buzzerSocket && currentSlot && currentSlot.hubId) {
-      // 1. First unlock any previous lock
-      buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
 
-      // 2. Small delay then arm the specific player
+    if (!currentSlot) return;
+
+    if (inputMode === 'USB_PADS') {
+      if (!padsSocket?.connected || !currentSlot.padsId) {
+        console.error('[SPRINT] USB pad not connected or player has no padsId', currentSlot);
+        return;
+      }
+
+      padsSocket.emit('gameAction', {
+        type: 'SET_STATE',
+        data: { state: 'IDLE' }
+      });
+
       setTimeout(() => {
-        console.log(`[ARMING] Sending Hardware ID to Server: ${currentSlot.hubId}`);
+        console.log(`[SPRINT] Arming USB pad for ${currentSlot.name}: ${currentSlot.padsId}`);
+
+        padsSocket.emit('gameAction', {
+          type: 'ARM_SPECIFIC',
+          data: { playerId: currentSlot.padsId }
+        });
+      }, 100);
+
+      padsSocket.emit('updateGameState', {
+        currentPage: 'round-sprint',
+        activeResponder: currentSlot.name,
+        isSprintActive: true
+      });
+
+      return;
+    }
+
+    if (inputMode === 'PHONE_HUB') {
+      if (!buzzerSocket?.connected || !currentSlot.hubId) {
+        console.error('[SPRINT] Phone hub not connected or player has no hubId', currentSlot);
+        return;
+      }
+
+      buzzerSocket.emit('gameAction', {
+        type: 'SET_STATE',
+        data: { state: 'IDLE' }
+      });
+
+      setTimeout(() => {
+        console.log(`[SPRINT] Arming phone for ${currentSlot.name}: ${currentSlot.hubId}`);
+
         buzzerSocket.emit('gameAction', {
           type: 'ARM_SPECIFIC',
           data: { playerId: currentSlot.hubId }
         });
       }, 100);
 
-      // 3. Optional: sync display
       buzzerSocket.emit('updateGameState', {
         currentPage: 'round-sprint',
         activeResponder: currentSlot.name,
@@ -1683,6 +1787,14 @@ const App: React.FC = () => {
 
   // UPDATED handleFinalizeTurn function
   const handleFinalizeTurn = (status: 'correct' | 'wrong' | 'skip', isTimeOut = false) => {
+    console.log("🎯 handleFinalizeTurn CALLED", {
+      status,
+      inputMode,
+      activeResponder,
+      currentPlayerIndex: gameState.currentPlayerIndex
+    });
+
+
     const roundId = gameState.activeRoundId!;
 
     if (!activeNote || activeNote.isReveal) return;
@@ -1769,11 +1881,12 @@ const App: React.FC = () => {
           }
         }));
 
-        // DDDDDDDDDDDDDDDDD
-        setActiveResponder(null);
-        if (buzzerSocket) {
-          buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
-        }
+        // setActiveResponder(null);
+        // handleDisarm();
+        // if (buzzerSocket) {
+        //   buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+        // }
+        handleDisarm();
 
         // Clean up
         stopSong(true);
@@ -1866,10 +1979,52 @@ const App: React.FC = () => {
     // ROUNDS 1 & 2: STANDARD LOGIC
     // =========================================================
 
-    const buzzerIdx = gameState.players.findIndex(p => p.hubId === activeResponder);
+    // const buzzerIdx = gameState.players.findIndex(p => p.hubId === activeResponder);
+    // const targetPlayerIndex = (activeResponder && buzzerIdx !== -1)
+    //   ? buzzerIdx
+    //   : gameState.currentPlayerIndex;
+
+    const buzzerIdx = gameState.players.findIndex(p => {
+      if (inputMode === 'USB_PADS') {
+        return String(p.padsId) === String(activeResponder);
+      }
+
+      if (inputMode === 'PHONE_HUB') {
+        return String(p.hubId) === String(activeResponder);
+      }
+
+      return false;
+    });
+
+    console.log("🔎 PLAYER ID MAPPING", {
+      inputMode,
+      activeResponder,
+      players: gameState.players.map(p => ({
+        id: p.id,
+        name: p.name,
+        padsId: p.padsId,
+        hubId: p.hubId
+      })),
+      buzzerIdx
+    });
+
     const targetPlayerIndex = (activeResponder && buzzerIdx !== -1)
       ? buzzerIdx
       : gameState.currentPlayerIndex;
+
+    console.log("DEBUG scoring:", {
+      inputMode,
+      activeResponder,
+      players: gameState.players.map(p => ({
+        id: p.id,
+        name: p.name,
+        hubId: p.hubId,
+        padsId: p.padsId
+      })),
+      buzzerIdx,
+      currentPlayerIndex: gameState.currentPlayerIndex,
+      targetPlayerIndex
+    });
 
 
     showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
@@ -2353,7 +2508,7 @@ const App: React.FC = () => {
           onNextTurnNav={handleNextTurnNav}
           onStopSong={stopSong}
           onFinishRound={handleFinishRoundManual} // 🟢 
-          onShowRoundSummary={() => setShowScoreboard(true)}
+        // onShowRoundSummary={() => setShowScoreboard(true)}
         />
       );
     }
@@ -2384,7 +2539,8 @@ const App: React.FC = () => {
         onSeek={handleSeek}
         formatTime={formatTime}
         onFinishRound={handleFinishRoundManual}
-        onShowRoundSummary={() => setShowScoreboard(true)}
+        inputMode={inputMode}
+      // onShowRoundSummary={() => setShowScoreboard(true)}
       />
     );
   };
@@ -2786,7 +2942,7 @@ const App: React.FC = () => {
           isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4}
           isBuzzerConnected={isBuzzerConnected} // <--- PLACE IT HERE
         />
-        {currentPage === 'setup' && (
+        {/* {currentPage === 'setup' && (
           <SetupView
             players={gameState.players}
             t={t}
@@ -2796,14 +2952,91 @@ const App: React.FC = () => {
             onStartGame={handleStartGameFromSetup}
             isPlayerWindowOpen={playerWindow && !playerWindow.closed}
             onTogglePlayerWindow={handleOpenPlayerWindow}
-            isBuzzerConnected={isBuzzerConnected}
-            // onCheckConnection={() => { socket.connect(); }}
-            onCheckConnection={handleConnect} // Whatever your connection function is named
-            onForceDisconnect={handleForceDisconnect} // Pass the new kill switch here
-            availableHubPlayers={hubPlayers}
+
+            // --- Phone Engine Facts ---
+            isBuzzerConnected={phoneEngine.isConnected}
+            availableHubPlayers={phoneEngine.devices}
+            onCheckConnection={phoneEngine.handleConnect}
+            onForceDisconnect={phoneEngine.handleForceDisconnect}
+
+            // --- USB Pads Engine Facts ---
+            isPadsConnected={padsEngine.isConnected}
+            usbPorts={padsEngine.devices}
+
+            // --- Polymorphic Input Mode & Active Responder ---
+            inputMode={gameState.inputMode}
+            onModeChange={(newMode) => {
+              setGameState(prev => ({ ...prev, inputMode: newMode }));
+            }}
             activeResponder={activeResponder}
           />
+        )} */}
+
+        {/* {currentPage === 'setup' && (
+          <SetupView
+            // --- Player Roster Props ---
+            players={gameState.players}
+            t={t}
+            onUpdatePlayer={updatePlayer}
+            onAddPlayer={addPlayer}
+            onRemovePlayer={removePlayer}
+            onStartGame={handleStartGameFromSetup}
+
+            // --- Window Controls ---
+            isPlayerWindowOpen={!!(playerWindow && !playerWindow.closed)}
+
+            onTogglePlayerWindow={handleOpenPlayerWindow}
+
+            // --- Hardware Engine Facts & Actions ---
+            isBuzzerConnected={isBuzzerConnected}
+            availableHubPlayers={availableHubPlayers}
+            onCheckConnection={handleCheckConnection}
+            onForceDisconnect={handleForceDisconnect}
+
+            // --- USB Pads Engine Facts ---
+            isPadsConnected={isPadsConnected}
+            usbPorts={usbPorts}
+
+            // --- Polymorphic Input Mode & Active Responder ---
+            inputMode={gameState.inputMode}
+            onModeChange={setInputMode}
+            activeResponder={activeResponder}
+          />
+        )} */}
+
+        {currentPage === 'setup' && (
+          <SetupView
+            players={gameState.players}
+            t={t}
+            onUpdatePlayer={updatePlayer}
+            onAddPlayer={addPlayer}
+            onRemovePlayer={removePlayer}
+            onStartGame={handleStartGameFromSetup}
+
+            isPlayerWindowOpen={Boolean(playerWindow && !playerWindow.closed)}
+            onTogglePlayerWindow={handleOpenPlayerWindow}
+
+            // Input mode selection
+            // inputMode={inputMode}
+            // inputMode={inputMode}
+            // onModeChange={setInputMode}
+
+
+            // Phone Hub facts required by SetupViewProps
+            isBuzzerConnected={isBuzzerConnected}
+            isPadsConnected={isPadsConnected}
+            usbPorts={usbPorts}
+            availableHubPlayers={availableHubPlayers}
+            onCheckConnection={handleCheckConnection}
+            onForceDisconnect={handleForceDisconnect}
+            activeResponder={activeResponder}
+            onTogglePads={handleTogglePads}
+            onToggleBuzz={handleToggleBuzz}
+            isBuzzAttempted={engine.isBuzzAttempted}
+            isPadsAttempted={engine.isPadsAttempted}
+          />
         )}
+
 
 
 
@@ -2855,13 +3088,13 @@ const App: React.FC = () => {
                 </button>
               </div>
               {/* {gameState.activeRoundId === 4 ? (
-                <div className="flex gap-6 mt-14">
-                  <button onClick={() => setShowScoreboard(false)} className="flex-1 py-8 bg-slate-800 text-white font-black text-2xl rounded-[2rem] uppercase shadow-xl hover:bg-slate-700">{t.cancel || "Cancel"}</button>
-                  <button onClick={() => { setShowScoreboard(false); navigateTo('start'); }} className="flex-1 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl hover:bg-indigo-500">{t.continue || "Continue"}</button>
-                </div>
-              ) : (
-                <button onClick={() => setShowScoreboard(false)} className="w-full mt-14 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl">{t.close}</button>
-              )} */}
+                  <div className="flex gap-6 mt-14">
+                    <button onClick={() => setShowScoreboard(false)} className="flex-1 py-8 bg-slate-800 text-white font-black text-2xl rounded-[2rem] uppercase shadow-xl hover:bg-slate-700">{t.cancel || "Cancel"}</button>
+                    <button onClick={() => { setShowScoreboard(false); navigateTo('start'); }} className="flex-1 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl hover:bg-indigo-500">{t.continue || "Continue"}</button>
+                  </div>
+                ) : (
+                  <button onClick={() => setShowScoreboard(false)} className="w-full mt-14 py-8 bg-indigo-600 text-white font-black text-2xl rounded-[2rem] uppercase shadow-2xl">{t.close}</button>
+                )} */}
             </div>
           </div>
         )}
