@@ -1003,3 +1003,53 @@
   color: #cbd5e1 !important;
   opacity: 0.8 !important;
 }
+
+@property --category-flash-progress {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 0%;
+}
+
+.player-category-label {
+  --category-flash-progress: 0%;
+  isolation: isolate;
+  border-color: color-mix(in srgb, rgba(51, 65, 85, 0.5), #fde047 var(--category-flash-progress));
+  animation: player-category-flash 4s linear infinite;
+  animation-delay: var(--category-flash-delay, 0s);
+}
+
+.player-category-label.is-selected {
+  --category-flash-progress: 100%;
+  animation: none;
+}
+
+.player-category-label.is-paused {
+  --category-flash-progress: 0%;
+  animation: none;
+}
+
+.player-category-label::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 58%, #d97706 100%);
+  opacity: var(--category-flash-progress);
+  pointer-events: none;
+  box-shadow: inset 0 0 28px rgba(255, 255, 255, 0.28), 0 0 32px rgba(245, 158, 11, 0.45);
+}
+
+.player-category-label__overlay {
+  z-index: 0;
+}
+
+.player-category-label__text {
+  color: color-mix(in srgb, #fff calc(100% - var(--category-flash-progress)), #0f172a var(--category-flash-progress));
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+@keyframes player-category-flash {
+  0%, 24.9% { --category-flash-progress: 100%; }
+  25%, 100% { --category-flash-progress: 0%; }
+}

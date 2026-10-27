@@ -127,6 +127,24 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       <div className="w-full h-px bg-slate-800" />
 
       {/* 🟢 NEW ROW: FINISH ROUND (Full Width) */}
+
+      <button
+        type="button"
+        // onClick={(e) => {
+        //   e.stopPropagation();
+        //   onFinishRound?.();
+        // }}
+        className="w-full mt-2 flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-900 hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-900/10 group"
+      >
+        <Trophy size={16} className="group-hover:animate-bounce" />
+        <span className="text-[8px] font-black uppercase tracking-widest">
+          {/* {t.finishRound || "Finish Round"} */}
+          {"Start Selection"}
+        </span>
+      </button>
+
+
+
       <button
         type="button"
         onClick={(e) => {

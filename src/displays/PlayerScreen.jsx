@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Music, CheckCircle, XCircle, Trophy, Star } from 'lucide-react';
 import { ROUND_DATA, getRoundData } from '../../data/index_data';
 import { translations } from '../../translations';
+import './PlayerScreen.css';
 
 import { io } from 'socket.io-client';
 import configBuzz from '../../configBuzz.json';  // ← И ЭТУ (если нет)
@@ -68,6 +69,8 @@ import configBuzz from '../../configBuzz.json';  // ← И ЭТУ (если не
 
 const PlayerScreen = () => {
   const [state, setState] = useState(null);
+  const [flashRestartKey, setFlashRestartKey] = useState(0);
+  const previousRoundResultsRef = useRef({ roundId: null, results: {} });
 
   // useEffect(() => {
   //   const syncState = () => {
@@ -129,6 +132,29 @@ const PlayerScreen = () => {
       socket.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    const roundId = state?.activeRoundId;
+    if (![0, 1, 2].includes(roundId)) {
+      previousRoundResultsRef.current = { roundId, results: {} };
+      return;
+    }
+
+    const results = state?.roundProgress?.[roundId]?.results || {};
+    const previous = previousRoundResultsRef.current;
+
+    if (previous.roundId !== roundId) {
+      previousRoundResultsRef.current = { roundId, results };
+      return;
+    }
+
+    const hasNewAnswer = Object.entries(results).some(([noteId, result]) =>
+      (result === 'correct' || result === 'wrong') && previous.results[noteId] !== result
+    );
+
+    previousRoundResultsRef.current = { roundId, results };
+    if (hasNewAnswer) setFlashRestartKey(key => key + 1);
+  }, [state]);
 
   const BuzzerPopup = ({ show, playerName, points, isWarmup, onClose }) => {
     if (!show) return null;
@@ -212,6 +238,24 @@ const PlayerScreen = () => {
   } = state;
 
   const t = translations[language] || translations['en'];
+
+  const renderCategoryLabel = (category, index) => {
+    const isSelectedCategory = activeNote?.categoryId === category.id;
+    const isSelectionActive = Boolean(activeNote);
+
+    return (
+      <div
+        key={`${activeRoundId}-${category.id}-${flashRestartKey}`}
+        className={`player-category-label w-80 bg-gradient-to-b from-slate-800 to-slate-900 rounded-3xl flex items-center justify-center p-6 border shadow-lg relative overflow-hidden group ${isSelectedCategory ? 'is-selected' : isSelectionActive ? 'is-paused' : ''}`}
+        style={{ '--category-flash-delay': `${index * 1 - 4}s` }}
+      >
+        <div className="player-category-label__overlay absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <span className="player-category-label__text text-2xl font-black uppercase text-center leading-tight tracking-tight relative z-10 drop-shadow-md">
+          {language === 'ru' ? category.name.ru : category.name.en}
+        </span>
+      </div>
+    );
+  };
 
   // --- Render Helpers ---
 
@@ -872,15 +916,10 @@ const PlayerScreen = () => {
           {renderHeader(currentId, title)}
           <div className="max-w-[1800px] mx-auto w-full">
             <div className="flex flex-col gap-6">
-              {categories.slice(0, 4).map((cat) => (
-                <div key={cat.id} className="flex gap-6 h-32">
+              {categories.slice(0, 4).map((cat, index) => (
+                <div key={`${currentId}-${cat.id}`} className="flex gap-6 h-32">
                   {/* Category Label */}
-                  <div className="w-80 bg-gradient-to-b from-slate-800 to-slate-900 rounded-3xl flex items-center justify-center p-6 border border-slate-700/50 shadow-lg relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10 drop-shadow-md">
-                      {language === 'ru' ? cat.name.ru : cat.name.en}
-                    </span>
-                  </div>
+                  {renderCategoryLabel(cat, index)}
 
                   {/* Notes Grid */}
                   <div className="flex-1 grid grid-cols-4 gap-4">
@@ -979,7 +1018,7 @@ const PlayerScreen = () => {
 
           <div className="max-w-[1800px] mx-auto w-full">
             <div className="flex flex-col gap-6">
-              {categories.slice(0, 4).map((cat) => {
+              {categories.slice(0, 4).map((cat, index) => {
                 const activationCount = progress.activationCounts?.[cat.id] || 0;
                 const isCategoryActive = activeNote?.categoryId === cat.id;
 
@@ -1023,14 +1062,9 @@ const PlayerScreen = () => {
                 }
 
                 return (
-                  <div key={cat.id} className="flex gap-6 h-32">
+                  <div key={`2-${cat.id}`} className="flex gap-6 h-32">
                     {/* Category Label (Glassmorphic) */}
-                    <div className="w-80 bg-gradient-to-b from-slate-800 to-slate-900 rounded-3xl flex items-center justify-center p-6 border border-slate-700/50 shadow-lg relative overflow-hidden group">
-                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <span className="text-2xl font-black text-white uppercase text-center leading-tight tracking-tight relative z-10 drop-shadow-md">
-                        {language === 'ru' ? cat.name.ru : cat.name.en}
-                      </span>
-                    </div>
+                    {renderCategoryLabel(cat, index)}
 
                     <div className="flex-1 grid grid-cols-5 gap-4">
 
