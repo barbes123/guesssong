@@ -219,10 +219,9 @@ export const SetupView: React.FC<SetupViewProps> = ({
               {Array.from({ length: 3 }, (_, index) => {
                 const slotNumber = index + 1;
 
-                // Manual player = occupies this slot id with NO hardware IDs attached
-                // const manualPlayer = localPlayers.find(p => p.id === slotNumber && !p.hubId && !p.padsId) || null;
-                const manualPlayer = localPlayers.find(p => p.id === slotNumber && !p.hubId && !p.padsId) || null;
-                const isEmpty = !manualPlayer || manualPlayer.name === '';
+                const manualPlayer = localPlayers.find(
+                  p => p.id === slotNumber && !p.hubId && !p.padsId && p.name.trim() !== ''
+                ) || null;
 
                 return (
                   <div key={slotNumber} className="flex gap-4 items-end">
@@ -283,7 +282,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
               })}
             </div>
 
-            {localPlayers.filter(p => !p.hubId && !p.padsId).length < 3 && (
+            {localPlayers.filter(p => !p.hubId && !p.padsId && p.name.trim() !== '').length < 3 && (
               <button
                 type="button"
                 disabled={isBuzzerConnected || isPadsConnected}
