@@ -72,7 +72,7 @@ const App: React.FC = () => {
 
   // --------------------------------
   const [gameState, setGameState] = useState<GameState>({
-    players: [{ id: 0, name: '', score: 0, stars: 0 }],
+    players: [],
     currentPlayerIndex: 0,
     currentRound: 0,
     isMusicEnabled: true,
