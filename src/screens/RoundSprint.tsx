@@ -83,7 +83,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
   onStopSong,
   onShowRoundSummary,
   onFinishRound,
-  onArmSprintPlayer
+  onArmSprintPlayer,
 }) => {
   const roundId = 4;
   const progress = gameState.roundProgress[roundId];

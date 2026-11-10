@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
+import { Maximize, Minimize } from 'lucide-react';
 import configBuzz from '../../configBuzz.json';
 
 const LeaderDisplay = () => {
@@ -9,10 +10,38 @@ const LeaderDisplay = () => {
     const [categoryInfo, setCategoryInfo] = useState({ name: '', description: '' });
     const [error, setError] = useState('');
     const [socketConnected, setSocketConnected] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [fullscreenError, setFullscreenError] = useState(false);
 
 
     // Video reference for the "Stay Awake" hack
     const videoRef = useRef(null);
+
+    useEffect(() => {
+        const syncFullscreenState = () => setIsFullscreen(Boolean(document.fullscreenElement));
+
+        document.addEventListener('fullscreenchange', syncFullscreenState);
+        syncFullscreenState();
+
+        return () => {
+            document.removeEventListener('fullscreenchange', syncFullscreenState);
+        };
+    }, []);
+
+    const toggleFullscreen = async () => {
+        setFullscreenError(false);
+
+        try {
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+            } else {
+                await document.documentElement.requestFullscreen();
+            }
+        } catch (fullscreenException) {
+            console.error('Failed to toggle LeaderDisplay fullscreen mode', fullscreenException);
+            setFullscreenError(true);
+        }
+    };
 
     // Helper function to get display text (handles both string and object formats)
     const getDisplayText = (obj) => {
@@ -137,30 +166,27 @@ const LeaderDisplay = () => {
     // --- RENDER LOGIN ---
     if (!isAuthenticated) {
         return (
-            <div style={{ backgroundColor: '#fff', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif' }}>
-
-                {/* style={{ backgroundColor: '#fff', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'sans-serif' }} */}
+            <div className="flex h-screen items-center justify-center bg-slate-950 font-sans">
                 <video ref={videoRef} loop muted playsInline style={{ display: 'none' }}>
                     <source src="/video/silent.mp4" type="video/mp4" />
                 </video>
 
-                <div style={{ backgroundColor: '#f5f5f5', padding: '40px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', maxWidth: '400px', width: '90%' }}>
-                    <h1 style={{ textAlign: 'center', marginBottom: '30px', fontSize: '28px', fontWeight: 'bold' }}>Leader Display</h1>
+                <div className="bg-slate-900 p-10 rounded-3xl border border-slate-800 shadow-2xl text-center">
+                    <h1 className="text-white text-2xl font-bold mb-6">🔒 Leader Access</h1>
                     <form onSubmit={handleLoginSubmit}>
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>Password</label>
-                            <input
-                                type="password"
-                                value={passwordInput}
-                                onChange={(e) => setPasswordInput(e.target.value)}
-                                style={{ width: '100%', padding: '12px', fontSize: '16px', border: '2px solid #ddd', borderRadius: '6px', boxSizing: 'border-box' }}
-                                placeholder="Enter password"
-                            />
-                        </div>
-                        {error && <div style={{ color: '#d32f2f', marginBottom: '15px', fontSize: '14px', textAlign: 'center' }}>{error}</div>}
+                        <input
+                            type="password"
+                            value={passwordInput}
+                            onChange={(e) => setPasswordInput(e.target.value)}
+                            autoFocus
+                            className="bg-slate-800 text-white p-4 rounded-xl block mb-4 w-64 border-2 border-transparent focus:border-indigo-500 outline-none text-center"
+                            placeholder="Enter Password"
+                            aria-label="Password"
+                        />
+                        {error && <div role="alert" className="text-rose-400 text-sm text-center mb-4">{error}</div>}
                         <button
                             type="submit"
-                            style={{ width: '100%', padding: '12px', backgroundColor: '#1976d2', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+                            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl transition-all"
                         >
                             Login & Keep Screen On
                         </button>
@@ -195,9 +221,42 @@ const LeaderDisplay = () => {
             <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
 
                 <div style={{ marginBottom: '15px', borderBottom: '3px solid #000', paddingBottom: '15px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
                     <h1 style={{ fontSize: '24px', textTransform: 'uppercase', fontWeight: 'bold', margin: '0' }}>
                         Now Playing
                     </h1>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            {fullscreenError && (
+                                <div role="alert" style={{ maxWidth: 'min(240px, 55vw)', color: '#b91c1c', fontSize: '12px', textAlign: 'right' }}>
+                                    Unable to change fullscreen mode. Please try again.
+                                </div>
+                            )}
+                            <button
+                                type="button"
+                                onClick={toggleFullscreen}
+                                aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                                aria-pressed={isFullscreen}
+                                title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flex: '0 0 44px',
+                                    width: '44px',
+                                    height: '44px',
+                                    padding: 0,
+                                    border: '1px solid rgba(148, 163, 184, 0.5)',
+                                    borderRadius: '50%',
+                                    background: 'rgba(15, 23, 42, 0.8)',
+                                    color: '#e2e8f0',
+                                    cursor: 'pointer',
+                                    backdropFilter: 'blur(8px)'
+                                }}
+                            >
+                                {isFullscreen ? <Minimize size={22} aria-hidden="true" /> : <Maximize size={22} aria-hidden="true" />}
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Category Section - NEW */}

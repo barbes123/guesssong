@@ -1,0 +1,1102 @@
+/* Retro musical game-show theme. Scoped to PlayerScreen so the rest of the app is untouched. */
+.retro-show {
+  --retro-bg: #160914;
+  --retro-bg-deep: #0c0610;
+  --retro-red: #c91532;
+  --retro-red-dark: #780b22;
+  --retro-gold: #ffcc27;
+  --retro-orange: #ff9d00;
+  --retro-pink: #f28ad9;
+  --retro-cream: #fff0b4;
+  min-height: 100vh;
+  color: var(--retro-cream);
+  /* background:
+    radial-gradient(circle at 8% 15%, rgba(205, 20, 49, .25) 0 2px, transparent 4px),
+    radial-gradient(circle at 92% 82%, rgba(205, 20, 49, .22) 0 3px, transparent 5px),
+    radial-gradient(ellipse at 50% 45%, #2b1021 0%, var(--retro-bg) 58%, var(--retro-bg-deep) 100%); */
+  background:
+    linear-gradient(rgba(15, 3, 14, 0.8), rgba(15, 3, 14, 0.8)),
+    url("/zastavka.png") center / cover no-repeat;
+  isolation: isolate;
+  position: relative;
+}
+
+.retro-show::before,
+.retro-show::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  width: 240px;
+  height: 100vh;
+  top: 0;
+  opacity: .38;
+  background-image: radial-gradient(circle, #a51a35 0 13px, #4b1025 14px, transparent 17px);
+  background-size: 42px 42px;
+  filter: drop-shadow(0 0 8px rgba(255, 43, 67, .45));
+}
+
+.retro-show::before {
+  left: -65px;
+}
+
+.retro-show::after {
+  right: -65px;
+}
+
+.retro-show :is(.bg-slate-950, .bg-slate-950\/95, .bg-slate-950\/80) {
+  background-color: transparent !important;
+}
+
+.retro-show .text-white {
+  color: #fff3cf !important;
+}
+
+.retro-show .text-slate-400,
+.retro-show .text-slate-500 {
+  color: #c58b91 !important;
+}
+
+.retro-show .text-indigo-400,
+.retro-show .text-indigo-500 {
+  color: #ffd34a !important;
+}
+
+.retro-show .text-yellow-500,
+.retro-show .text-yellow-400 {
+  color: #ffe04b !important;
+}
+
+/* Header: illuminated show title and round badge. */
+.retro-show .player-fullscreen-control button {
+  color: #ffe38a;
+  background: linear-gradient(#8c122b, #3b0b1d);
+  border: 2px solid #e7a72b;
+  box-shadow: 0 0 15px rgba(255, 180, 25, .35), inset 0 1px rgba(255, 255, 255, .25);
+  border-radius: 14px;
+}
+
+.retro-show h2,
+.retro-show h3,
+.retro-show h1 {
+  text-shadow: 0 2px 2px #390713, 0 0 12px rgba(255, 190, 55, .15);
+}
+
+.retro-show .player-fullscreen-error {
+  color: #ffe7a1;
+}
+
+/* Category marquee: orange face, red casing and rows of warm bulbs. */
+.retro-show .retro-category {
+  width: min(32%, 390px) !important;
+  min-width: 240px;
+  flex: 0 0 min(32%, 390px);
+  min-height: 112px;
+  padding: 14px 22px !important;
+  border: 7px solid #e72a38 !important;
+  border-radius: 34px !important;
+  background: linear-gradient(180deg, #ffc52d 0%, #ff9d00 55%, #e87900 100%) !important;
+  box-shadow: 0 0 0 2px #ffbd25, 0 0 18px rgba(255, 179, 25, .55), inset 0 5px 8px rgba(255, 255, 255, .55), inset 0 -8px 10px rgba(138, 35, 0, .22) !important;
+}
+
+.retro-show .retro-category::before {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 36px;
+  pointer-events: none;
+  background: radial-gradient(circle, #fff06a 0 3px, #ffb51b 4px, transparent 6px) 0 0 / 22px 22px;
+  filter: drop-shadow(0 0 4px #ffdd35);
+  opacity: .95;
+}
+
+.retro-show .retro-category__overlay {
+  display: none;
+}
+
+.retro-show .retro-category .player-category-label__text,
+.retro-show .retro-category span {
+  color: #790d13 !important;
+  font-size: clamp(1.2rem, 2vw, 2rem) !important;
+  line-height: 1.08;
+  text-shadow: 0 1px rgba(255, 255, 255, .35);
+}
+
+.retro-show .retro-category.is-selected {
+  filter: brightness(1.15);
+  box-shadow: 0 0 0 2px #fff07a, 0 0 34px rgba(255, 215, 54, .9), inset 0 5px 8px rgba(255, 255, 255, .65) !important;
+}
+
+.retro-show .retro-category.is-paused {
+  filter: saturate(.72) brightness(.82);
+}
+
+/* Before a category is chosen, its marquee bulbs run and the panel gently pulses.
+   Once a category is active, the existing is-selected / is-paused states take over. */
+.retro-show .retro-category:not(.is-selected):not(.is-paused) {
+  animation: retro-marquee-glow 1.7s ease-in-out infinite;
+  animation-delay: var(--category-flash-delay, 0s);
+}
+
+.retro-show .retro-category:not(.is-selected):not(.is-paused)::before {
+  animation: retro-bulbs-running 1.15s linear infinite;
+  animation-delay: var(--category-flash-delay, 0s);
+}
+
+.retro-show .retro-category.is-selected::before,
+.retro-show .retro-category.is-paused::before {
+  animation: none;
+}
+
+@keyframes retro-bulbs-running {
+  from {
+    background-position: 0 0;
+    filter: drop-shadow(0 0 3px #ffdd35);
+  }
+
+  to {
+    background-position: 22px 0;
+    filter: drop-shadow(0 0 8px #fff06a);
+  }
+}
+
+@keyframes retro-marquee-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px #ffbd25, 0 0 13px rgba(255, 179, 25, .38), inset 0 5px 8px rgba(255, 255, 255, .5), inset 0 -8px 10px rgba(138, 35, 0, .22);
+  }
+
+  50% {
+    box-shadow: 0 0 0 3px #fff06a, 0 0 30px rgba(255, 205, 35, .8), inset 0 5px 10px rgba(255, 255, 255, .7), inset 0 -8px 10px rgba(138, 35, 0, .22);
+  }
+}
+
+/* Musical staff behind the cells. The cells themselves are single musical notes:
+   oval note-head + upright stem + flag (rather than rounded rectangular buttons). */
+.retro-show .retro-category+.flex-1.grid,
+.retro-show .flex-1.grid.grid-cols-4,
+.retro-show .flex-1.grid.grid-cols-5 {
+  position: relative;
+  align-items: center;
+  gap: clamp(10px, 1.1vw, 20px) !important;
+  padding: 8px 10px;
+  background: repeating-linear-gradient(to bottom,
+      transparent 0, transparent 17px,
+      var(--retro-pink) 18px, var(--retro-pink) 22px);
+  background-position: center;
+  background-size: 100% 88px;
+  background-repeat: no-repeat;
+}
+
+/* Round 1 / Round 2: use the supplied SVG as the complete musical-note artwork.
+   The clickable React tile remains the same; only its visual is replaced. */
+.retro-show .retro-note-tile:not(.retro-note-activator):not(.retro-sprint-note) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 112px;
+  overflow: visible !important;
+  isolation: isolate;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #fff1bd !important;
+  transform: none;
+  transition: filter .2s ease, transform .2s ease;
+}
+
+.retro-show .retro-note-art {
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 50%;
+  width: 112%;
+  height: 148%;
+  max-width: none;
+  max-height: none;
+  object-fit: fill;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .45));
+  transition: filter .22s ease, transform .22s ease;
+}
+
+.retro-show .retro-note-points {
+  z-index: 2;
+  color: #fff5ce !important;
+  font-size: clamp(1.35rem, 2.1vw, 2.4rem);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 2px 4px #65091d, 0 0 8px rgba(255, 225, 110, .55);
+  margin-top: 14px;
+  pointer-events: none;
+}
+
+/* Playing: preserve the red SVG but illuminate it strongly. */
+.retro-show .retro-note-tile[data-note-state="playing"] .retro-note-art {
+  filter: brightness(1.28) saturate(1.15) drop-shadow(0 0 8px rgba(255, 226, 83, .95)) drop-shadow(0 0 18px rgba(255, 174, 28, .8));
+  transform: translate(-50%, -50%) scale(1.07);
+}
+
+/* Selected but not currently playing. */
+.retro-show .retro-note-tile[data-note-state="active"] .retro-note-art {
+  filter: brightness(1.18) drop-shadow(0 0 7px rgba(255, 218, 73, .85));
+}
+
+/* Correct answer: warm golden illumination. */
+.retro-show .retro-note-tile[data-note-state="correct"] .retro-note-art {
+  filter: sepia(.42) saturate(1.45) brightness(1.18) drop-shadow(0 0 9px rgba(255, 220, 67, .9));
+}
+
+/* Wrong answer: retain the note shape, but dim its lighting. */
+.retro-show .retro-note-tile[data-note-state="wrong"] .retro-note-art {
+  filter: saturate(.58) brightness(.68) drop-shadow(0 0 3px rgba(255, 70, 70, .35));
+}
+
+/* Used without a correctness result. */
+.retro-show .retro-note-tile[data-note-state="used"] .retro-note-art {
+  filter: saturate(.65) brightness(.72);
+}
+
+/* Round 2 category score/activator: same SVG note silhouette as song cells. */
+.retro-show .retro-note-score {
+  position: relative;
+  min-width: 0;
+  min-height: 112px;
+  overflow: visible !important;
+  isolation: isolate;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.retro-show .retro-note-score .retro-note-points {
+  margin-top: 14px;
+  font-size: clamp(1.2rem, 1.9vw, 2.15rem);
+}
+
+.retro-show .retro-note-score[data-note-state="playing"] .retro-note-art {
+  filter: brightness(1.28) saturate(1.15) drop-shadow(0 0 8px rgba(255, 226, 83, .95)) drop-shadow(0 0 18px rgba(255, 174, 28, .8));
+  transform: translate(-50%, -50%) scale(1.07);
+}
+
+.retro-show .retro-note-score[data-note-state="active"] .retro-note-art {
+  filter: brightness(1.18) drop-shadow(0 0 7px rgba(255, 218, 73, .85));
+}
+
+.retro-show .retro-note-score[data-note-state="used"] .retro-note-art {
+  filter: saturate(.65) brightness(.72);
+}
+
+.retro-show .retro-note-activator {
+  border-radius: 24px !important;
+}
+
+/* Keep Sprint as a square tile grid, but use the same retro note colours. */
+
+/* Player score panels / footer. */
+.retro-show .mt-12.pb-8>.flex>div,
+.retro-show .mt-8.pb-8>.flex>div {
+  border: 2px solid #a52a3b !important;
+  border-radius: 22px !important;
+  background: linear-gradient(145deg, rgba(92, 12, 34, .94), rgba(30, 8, 23, .96)) !important;
+  box-shadow: inset 0 1px rgba(255, 255, 255, .08), 0 0 12px rgba(186, 28, 54, .2) !important;
+}
+
+.retro-show .mt-12.pb-8>.flex>div[class*="border-indigo"],
+.retro-show .mt-12.pb-8>.flex>div[class*="border-yellow"] {
+  border-color: #ffd33e !important;
+  box-shadow: 0 0 22px rgba(255, 190, 35, .42), inset 0 0 18px rgba(255, 175, 25, .12) !important;
+}
+
+/* Other game screens: scoreboards, duel, sprint, player selection and victory. */
+.retro-show [class*="bg-slate-900"],
+.retro-show [class*="bg-slate-800"] {
+  background-color: rgba(55, 12, 34, .88) !important;
+}
+
+.retro-show [class*="border-slate-800"],
+.retro-show [class*="border-slate-700"] {
+  border-color: rgba(204, 91, 92, .48) !important;
+}
+
+.retro-show [class*="border-indigo-500"],
+.retro-show [class*="border-indigo-400"] {
+  border-color: #ffc83d !important;
+}
+
+.retro-show [class*="shadow-\[0_0_"],
+.retro-show [class*="shadow-2xl"] {
+  filter: drop-shadow(0 0 7px rgba(255, 170, 32, .12));
+}
+
+.retro-show [class*="text-emerald-400"] {
+  color: #ffe36b !important;
+}
+
+.retro-show [class*="text-rose-400"],
+.retro-show [class*="text-rose-500"] {
+  color: #ff9b83 !important;
+}
+
+.retro-show .player-fullscreen-control {
+  z-index: 30;
+}
+
+@media (max-width: 900px) {
+  .retro-show .retro-category {
+    min-width: 170px;
+    width: 30% !important;
+    flex-basis: 30%;
+    padding: 10px !important;
+  }
+
+  .retro-show .retro-category .player-category-label__text {
+    font-size: 1rem !important;
+  }
+
+  .retro-show .retro-note-tile {
+    min-height: 58px;
+  }
+
+  .retro-show .retro-note-art {
+    width: 120%;
+    height: 145%;
+  }
+
+  .retro-show .retro-note-tile {
+    min-height: 88px;
+  }
+
+  .retro-show .mt-12.pb-8>.flex {
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .retro-show *,
+  .retro-show *::before,
+  .retro-show *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+
+/* ROUND 4 SPRINT — same single-row musical staff layout as Round 1. */
+.retro-show .retro-sprint-staff {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(8px, 1.4vw, 24px);
+  min-height: 190px;
+  padding: 18px 12px 10px;
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent 17px, var(--retro-pink) 18px, var(--retro-pink) 22px);
+  background-position: center;
+  background-size: 100% 88px;
+  background-repeat: no-repeat;
+}
+
+.retro-show .retro-sprint-staff .retro-sprint-note {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 150px;
+  overflow: visible !important;
+  isolation: isolate;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: default;
+  transition: transform .2s ease, filter .2s ease;
+}
+
+.retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="playing"] .retro-note-art {
+  filter: brightness(1.28) saturate(1.15) drop-shadow(0 0 8px rgba(255, 226, 83, .95)) drop-shadow(0 0 18px rgba(255, 174, 28, .8));
+  transform: translate(-50%, -50%) scale(1.07);
+}
+
+.retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="active"] .retro-note-art {
+  filter: brightness(1.18) drop-shadow(0 0 7px rgba(255, 218, 73, .85));
+}
+
+.retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="correct"] .retro-note-art {
+  filter: sepia(.42) saturate(1.45) brightness(1.18) drop-shadow(0 0 9px rgba(255, 220, 67, .9));
+}
+
+.retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="wrong"] .retro-note-art {
+  filter: saturate(.58) brightness(.68) drop-shadow(0 0 3px rgba(255, 70, 70, .35));
+}
+
+.retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="used"] .retro-note-art {
+  filter: saturate(.65) brightness(.72);
+}
+
+@media (max-width: 900px) {
+  .retro-show .retro-sprint-staff {
+    min-height: 130px;
+    gap: 4px;
+    padding-inline: 4px;
+  }
+
+  .retro-show .retro-sprint-staff .retro-sprint-note {
+    min-height: 105px;
+  }
+}
+
+/* Unified round heading: illuminated number plaque + marquee title. */
+.retro-show .w-full.max-w-\[1800px\].mx-auto.mb-8.flex.items-center.justify-between {
+  position: relative;
+  padding: 12px 18px 18px;
+  margin-bottom: 26px;
+  border-bottom: 4px solid #e72a38;
+  background: linear-gradient(90deg, rgba(105, 10, 34, .78), rgba(35, 7, 26, .18) 72%, transparent);
+  box-shadow: 0 5px 0 rgba(255, 190, 35, .18);
+}
+
+.retro-show .w-full.max-w-\[1800px\].mx-auto.mb-8.flex.items-center.justify-between>div:first-child>div:first-child {
+  width: 78px !important;
+  height: 78px !important;
+  flex: 0 0 78px;
+  border: 5px solid #ed3341 !important;
+  border-radius: 50% !important;
+  color: #7a1018 !important;
+  background: radial-gradient(circle at 35% 25%, #fff4a5, #ffc52e 58%, #e88700) !important;
+  box-shadow: 0 0 0 3px #ffcc35, 0 0 22px rgba(255, 190, 30, .7), inset 0 3px 7px rgba(255, 255, 255, .8) !important;
+  text-shadow: 0 2px rgba(255, 255, 255, .4) !important;
+}
+
+.retro-show .w-full.max-w-\[1800px\].mx-auto.mb-8.flex.items-center.justify-between h2 {
+  color: #ffdc61 !important;
+  font-size: clamp(2rem, 4vw, 3.5rem) !important;
+  letter-spacing: .09em;
+  line-height: 1;
+  text-shadow: 0 3px 0 #8c1024, 0 0 12px rgba(255, 190, 35, .65), 0 0 28px rgba(255, 60, 75, .3) !important;
+}
+
+/* Make all note labels larger and consistently centered. */
+.retro-show .retro-note-points {
+  font-size: clamp(1.8rem, 2.7vw, 3rem) !important;
+  margin-top: 12px;
+  transform: scale(1.06);
+}
+
+.retro-show .retro-note-score .retro-note-points {
+  font-size: clamp(1.65rem, 2.4vw, 2.7rem) !important;
+}
+
+/* Round 3 duration choices now use the same note-and-staff language as Rounds 1, 2 and 4. */
+.retro-show .retro-round3-staff {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(78px, 1fr));
+  align-items: center;
+  justify-items: center;
+  gap: clamp(12px, 2vw, 30px);
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 20px 14px;
+  background: repeating-linear-gradient(to bottom,
+      transparent 0, transparent 17px,
+      var(--retro-pink) 18px, var(--retro-pink) 22px);
+  background-position: center;
+  background-size: 100% 88px;
+  background-repeat: no-repeat;
+}
+
+.retro-show .retro-round3-note {
+  width: 100%;
+  min-height: 132px;
+  cursor: default;
+}
+
+.retro-show .retro-round3-note .retro-note-art {
+  width: 118%;
+  height: 158%;
+}
+
+.retro-show .retro-round3-number {
+  font-size: clamp(2rem, 3.2vw, 3.4rem) !important;
+  margin-top: 14px;
+}
+
+.retro-show .retro-round3-note[data-note-state="active"] .retro-note-art,
+.retro-show .retro-round3-note[data-note-state="playing"] .retro-note-art {
+  filter: brightness(1.25) saturate(1.2) drop-shadow(0 0 9px rgba(255, 226, 83, .95)) drop-shadow(0 0 19px rgba(255, 174, 28, .85));
+}
+
+.retro-show .retro-round3-note[data-note-state="active"] .retro-note-points,
+.retro-show .retro-round3-note[data-note-state="playing"] .retro-note-points {
+  color: #fff8d5 !important;
+}
+
+.retro-show .retro-sprint-number {
+  font-size: clamp(1.8rem, 2.6vw, 2.8rem) !important;
+  margin-top: 14px;
+}
+
+@media (max-width: 700px) {
+  .retro-show .retro-round3-staff {
+    gap: 4px;
+    padding-inline: 0;
+  }
+
+  .retro-show .retro-round3-note {
+    min-height: 100px;
+  }
+
+  .retro-show .w-full.max-w-\[1800px\].mx-auto.mb-8.flex.items-center.justify-between>div:first-child>div:first-child {
+    width: 60px !important;
+    height: 60px !important;
+    flex-basis: 60px;
+    font-size: 2.4rem !important;
+  }
+}
+
+/* Buzzer popup: a glowing retro TV-show marquee with the musical note as the points badge. */
+.retro-buzzer-overlay {
+  isolation: auto;
+  overflow-y: auto;
+  padding: 28px 0;
+  background: transparent;
+  backdrop-filter: none;
+  background: rgba(15, 3, 14, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.retro-show.retro-buzzer-overlay::before,
+.retro-show.retro-buzzer-overlay::after {
+  opacity: .22;
+}
+
+.retro-buzzer-glow {
+  position: fixed;
+  width: min(78vw, 760px);
+  height: min(70vh, 560px);
+  border-radius: 50%;
+  background: rgba(255, 174, 24, .22);
+  filter: blur(90px);
+  pointer-events: none;
+}
+
+.retro-buzzer-card {
+  max-width: 680px;
+  padding: 9px;
+  border: 3px solid #ffcf3e;
+  border-radius: 34px;
+  background: linear-gradient(145deg, #ffdf66 0%, #b91d32 8%, #4a0b20 48%, #9c1529 92%, #ffbd31 100%);
+  box-shadow: 0 0 0 3px #7e1025, 0 0 28px rgba(255, 184, 35, .55), 0 0 70px rgba(230, 35, 63, .28), inset 0 2px 5px rgba(255, 255, 255, .4);
+  overflow: hidden;
+}
+
+.retro-buzzer-lights {
+  position: absolute;
+  inset: 5px;
+  border-radius: 25px;
+  pointer-events: none;
+  background: radial-gradient(circle, #fff3a0 0 2px, #ffb51e 3px, transparent 5px) 0 0 / 22px 22px;
+  opacity: .85;
+  filter: drop-shadow(0 0 4px #ffcf36);
+  mask-image: linear-gradient(#000, #000);
+}
+
+.retro-buzzer-content {
+  margin: 9px;
+  padding: clamp(24px, 4vw, 42px);
+  border-radius: 23px;
+  background: linear-gradient(180deg, rgba(39, 8, 25, .97), rgba(15, 5, 17, .98));
+  box-shadow: inset 0 0 25px rgba(255, 65, 73, .12), inset 0 2px rgba(255, 255, 255, .12);
+}
+
+.retro-buzzer-trophy-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 12px;
+  color: #ffe45c;
+  filter: drop-shadow(0 0 9px rgba(255, 199, 45, .7));
+}
+
+.retro-buzzer-heading {
+  margin: 0 auto 25px;
+  padding: 12px 16px 15px;
+  border-top: 2px solid rgba(255, 207, 62, .75);
+  border-bottom: 2px solid rgba(255, 207, 62, .75);
+  background: linear-gradient(90deg, transparent, rgba(193, 22, 48, .35), transparent);
+}
+
+.retro-buzzer-kicker {
+  display: block;
+  margin-bottom: 7px;
+  color: #ffcc4a;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .28em;
+}
+
+.retro-buzzer-heading h2 {
+  margin: 0;
+  color: #ffe36b !important;
+  font-size: clamp(1.55rem, 4vw, 2.55rem) !important;
+  font-weight: 1000;
+  letter-spacing: .1em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 #8e1026, 0 0 10px rgba(255, 208, 55, .8), 0 0 25px rgba(255, 62, 72, .45) !important;
+}
+
+.retro-buzzer-player-panel {
+  padding: 18px 16px 20px;
+  margin-bottom: 17px;
+  border: 1px solid rgba(255, 207, 62, .42);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 196, 48, .11), rgba(155, 17, 42, .16));
+  box-shadow: inset 0 1px rgba(255, 255, 255, .1), 0 5px 16px rgba(0, 0, 0, .2);
+}
+
+.retro-buzzer-label,
+.retro-buzzer-points-label {
+  color: #e6a9a2;
+  font-size: .75rem;
+  font-weight: 900;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+
+.retro-buzzer-player-name {
+  margin-top: 6px;
+  color: #fff3cf;
+  font-size: clamp(2rem, 5vw, 3.3rem);
+  font-weight: 1000;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-shadow: 0 2px 0 #711023, 0 0 14px rgba(255, 255, 255, .18);
+}
+
+.retro-buzzer-points-wrap {
+  margin: 5px auto 12px;
+}
+
+.retro-buzzer-points-label {
+  margin-bottom: 0;
+}
+
+.retro-buzzer-note {
+  position: relative;
+  width: min(100%, 300px);
+  height: 176px;
+  margin: -5px auto -12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+}
+
+.retro-buzzer-note img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: -1;
+  filter: drop-shadow(0 0 12px rgba(255, 54, 63, .65));
+}
+
+.retro-buzzer-note span {
+  margin: 15px 32px 0 0;
+  color: #fff1a0;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 1000;
+  line-height: 1;
+  text-shadow: 0 3px 0 #76101d, 0 0 12px rgba(255, 229, 87, .75);
+}
+
+.retro-buzzer-status {
+  margin-top: 12px;
+  color: #f2c4b7;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  animation: retro-buzzer-pulse 1.7s ease-in-out infinite;
+}
+
+.retro-buzzer-status::before,
+.retro-buzzer-status::after {
+  content: " ♪ ";
+  color: #ffcf43;
+}
+
+.retro-buzzer-warmup {
+  display: inline-block;
+  padding: 10px 18px;
+  border: 1px solid rgba(255, 211, 73, .55);
+  border-radius: 999px;
+  background: rgba(255, 195, 38, .12);
+  color: #ffe36b;
+}
+
+@keyframes retro-buzzer-pulse {
+
+  0%,
+  100% {
+    opacity: .72;
+  }
+
+  50% {
+    opacity: 1;
+    text-shadow: 0 0 12px rgba(255, 205, 70, .5);
+  }
+}
+
+@media (max-width: 520px) {
+  .retro-buzzer-card {
+    margin-block: 12px;
+    border-radius: 25px;
+  }
+
+  .retro-buzzer-content {
+    padding: 22px 15px;
+  }
+
+  .retro-buzzer-note {
+    height: 145px;
+  }
+
+  .retro-buzzer-player-panel {
+    padding: 14px 10px 16px;
+  }
+}
+
+/* Keep the full-screen buzzer scene inside the viewport: no page scrollbar. */
+html:has(.retro-buzzer-overlay),
+body:has(.retro-buzzer-overlay) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+.retro-buzzer-overlay {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden !important;
+  padding: 0;
+  overscroll-behavior: none;
+}
+
+/* .retro-show.retro-buzzer-overlay::before {
+  left: 0;
+  width: 125px;
+  max-width: 12vw;
+}
+
+.retro-show.retro-buzzer-overlay::after {
+  right: 0;
+  width: 125px;
+  max-width: 12vw;
+} */
+
+.retro-buzzer-card {
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+}
+
+/* Retro musical-show scoreboard */
+.retro-show.retro-scoreboard-overlay {
+  isolation: isolate;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding: clamp(12px, 3vh, 28px) 14px;
+  background: radial-gradient(ellipse at center, rgba(73, 12, 34, .97), rgba(10, 4, 13, .99) 74%);
+  backdrop-filter: blur(10px);
+}
+
+
+
+/* Image layer */
+.retro-show.retro-scoreboard-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /* background: url("/zastavka.png") center / cover no-repeat; */
+  opacity: 0.55;
+  /* Image visibility */
+  pointer-events: none;
+}
+
+/* Dark overlay */
+.retro-show.retro-scoreboard-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(15, 3, 14, 0.35);
+  pointer-events: none;
+}
+
+/* Remove the old glow */
+.retro-show .retro-scoreboard-glow {
+  display: none !important;
+}
+
+.retro-show.retro-scoreboard-overlay::before,
+.retro-show.retro-scoreboard-overlay::after {
+  opacity: .22;
+}
+
+.retro-scoreboard-glow {
+  position: absolute;
+  width: min(90vw, 900px);
+  height: min(85vh, 720px);
+  border-radius: 50%;
+  background: rgba(255, 151, 25, .18);
+  filter: blur(100px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.retro-scoreboard-card {
+  position: relative;
+  width: min(100%, 1040px);
+  max-height: 100%;
+  padding: 8px;
+  border: 3px solid #ffcf3e;
+  border-radius: 30px;
+  background: linear-gradient(145deg, #ffdf66 0%, #b91d32 8%, #4a0b20 48%, #9c1529 92%, #ffbd31 100%);
+  box-shadow: 0 0 0 3px #7e1025, 0 0 28px rgba(255, 184, 35, .5), 0 0 70px rgba(230, 35, 63, .25), inset 0 2px 5px rgba(255, 255, 255, .4);
+  overflow: hidden;
+}
+
+.retro-scoreboard-lights {
+  position: absolute;
+  inset: 4px;
+  border-radius: 22px;
+  pointer-events: none;
+  background: radial-gradient(circle, #fff3a0 0 2px, #ffb51e 3px, transparent 5px) 0 0 / 22px 22px;
+  opacity: .85;
+  filter: drop-shadow(0 0 4px #ffcf36);
+}
+
+.retro-scoreboard-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 58px);
+  min-height: 0;
+  margin: 8px;
+  padding: clamp(18px, 3vh, 30px) clamp(14px, 3vw, 34px) 14px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(39, 8, 25, .97), rgba(15, 5, 17, .98));
+  box-shadow: inset 0 0 25px rgba(255, 65, 73, .12), inset 0 2px rgba(255, 255, 255, .12);
+}
+
+.retro-scoreboard-header {
+  text-align: center;
+  flex: 0 0 auto;
+  color: #ffe45c;
+}
+
+.retro-scoreboard-trophy {
+  margin: 0 auto 6px;
+  filter: drop-shadow(0 0 9px rgba(255, 199, 45, .7));
+}
+
+.retro-scoreboard-kicker {
+  color: #ffcf43;
+  font-size: .65rem;
+  font-weight: 1000;
+  letter-spacing: .3em;
+}
+
+.retro-scoreboard-header h3 {
+  margin: 4px 0 10px;
+  color: #ffe7a0;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  font-weight: 1000;
+  line-height: 1;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(255, 190, 52, .6), 0 3px 0 #791329;
+}
+
+.retro-scoreboard-staff {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  max-width: 600px;
+  margin: 0 auto 16px;
+  height: 23px;
+  color: #ffcf43;
+  font-size: 1.1rem;
+  border-block: 1px solid rgba(255, 207, 67, .55);
+  background: repeating-linear-gradient(to bottom, transparent 0 4px, rgba(255, 207, 67, .16) 4px 5px);
+}
+
+.retro-scoreboard-list {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px 7px 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.retro-scoreboard-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 94px;
+  padding: 12px clamp(12px, 2vw, 24px);
+  border: 1px solid rgba(255, 190, 63, .3);
+  border-radius: 17px;
+  background: linear-gradient(100deg, rgba(93, 20, 42, .72), rgba(34, 8, 27, .82));
+  box-shadow: inset 0 1px rgba(255, 255, 255, .08), 0 5px 14px rgba(0, 0, 0, .2);
+}
+
+.retro-scoreboard-row.is-leader {
+  border-color: rgba(255, 220, 91, .9);
+  background: linear-gradient(100deg, rgba(132, 45, 35, .78), rgba(70, 13, 35, .9));
+  box-shadow: 0 0 18px rgba(255, 188, 48, .16), inset 0 1px rgba(255, 255, 255, .13);
+}
+
+.retro-scoreboard-player {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2vw, 22px);
+  min-width: 0;
+}
+
+.retro-scoreboard-rank {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border: 2px solid rgba(255, 207, 67, .6);
+  border-radius: 50%;
+  color: #ffe7a0;
+  font-size: 1.5rem;
+  font-weight: 1000;
+  text-shadow: 0 0 9px rgba(255, 207, 67, .55);
+  background: rgba(255, 190, 48, .1);
+}
+
+.retro-scoreboard-row.is-leader .retro-scoreboard-rank {
+  background: #ffca45;
+  color: #5c1027;
+  box-shadow: 0 0 14px rgba(255, 207, 67, .5);
+}
+
+.retro-scoreboard-player-info {
+  min-width: 0;
+}
+
+.retro-scoreboard-player-name {
+  color: #fff3d5;
+  font-size: clamp(1.1rem, 2.8vw, 1.8rem);
+  font-weight: 950;
+  overflow-wrap: anywhere;
+  text-shadow: 0 2px 0 #711023;
+}
+
+.retro-scoreboard-stars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: #ffd64f;
+  font-size: .75rem;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.retro-scoreboard-score-note {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 clamp(100px, 15vw, 150px);
+  height: 84px;
+  isolation: isolate;
+}
+
+.retro-scoreboard-score-note img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(255, 54, 63, .55));
+}
+
+.retro-scoreboard-score-note span {
+  margin: 9px 15px 0 0;
+  color: #fff1a0;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 1000;
+  line-height: 1;
+  text-shadow: 0 2px 0 #76101d, 0 0 10px rgba(255, 229, 87, .7);
+  font-variant-numeric: tabular-nums;
+}
+
+.retro-scoreboard-footer {
+  flex: 0 0 auto;
+  padding-top: 10px;
+  text-align: center;
+  color: #e9bca9;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .25em;
+}
+
+@media (max-width: 520px) {
+  .retro-scoreboard-card {
+    border-radius: 22px;
+  }
+
+  .retro-scoreboard-content {
+    margin: 6px;
+    padding: 15px 9px 10px;
+  }
+
+  .retro-scoreboard-row {
+    min-height: 78px;
+  }
+
+  .retro-scoreboard-rank {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+  }
+
+  .retro-scoreboard-score-note {
+    flex-basis: 88px;
+    height: 66px;
+  }
+
+  .retro-scoreboard-stars {
+    font-size: .62rem;
+  }
+}

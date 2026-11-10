@@ -98,6 +98,7 @@ const App: React.FC = () => {
   } | null>(null);
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [showVictory, setShowVictory] = useState(false);
+  const [isScreensaverActive, setIsScreensaverActive] = useState(false);
   const [volume, setVolume] = useState(0.7);
 
 
@@ -139,6 +140,7 @@ const App: React.FC = () => {
   const [buzzerPlayerName, setBuzzerPlayerName] = useState('');
   const [buzzerPoints, setBuzzerPoints] = useState(0);
   const [isWarmup, setIsWarmup] = useState(false);
+  const lastBuzzerPopupResponderRef = useRef<string | null>(null);
 
 
 
@@ -172,27 +174,26 @@ const App: React.FC = () => {
   }, [gameState.isMusicEnabled]);
 
   const playSFX = useCallback((url: string) => {
-    if (!isMusicEnabledRef.current) return;
     if (sfxRef.current) {
       sfxRef.current.pause();
       sfxRef.current = null;
     }
     const audio = new Audio(url);
     sfxRef.current = audio;
-    audio.volume = volume;
+    audio.volume = isMusicEnabledRef.current ? volume : 0;
     audio.play().catch(e => console.log("SFX block", e));
   }, [volume]);
 
   const handleVolumeChange = useCallback((newVolume: number) => {
     setVolume(newVolume);
     if (songRef.current) {
-      songRef.current.volume = newVolume;
+      songRef.current.volume = isMusicEnabledRef.current ? newVolume : 0;
     }
     if (bgmRef.current) {
-      bgmRef.current.volume = newVolume;
+      bgmRef.current.volume = isMusicEnabledRef.current ? newVolume : 0;
     }
     if (sfxRef.current) {
-      sfxRef.current.volume = newVolume;
+      sfxRef.current.volume = isMusicEnabledRef.current ? newVolume : 0;
     }
   }, []);
 
@@ -400,7 +401,16 @@ const App: React.FC = () => {
     const validRounds = [0, 1, 2];
     const currentRoundId = gameState.activeRoundId;
 
-    if (!activeResponder || currentRoundId === null || currentRoundId === undefined || !validRounds.includes(currentRoundId) || !activeNote) {
+    if (!activeResponder) {
+      lastBuzzerPopupResponderRef.current = null;
+      return;
+    }
+
+    if (lastBuzzerPopupResponderRef.current === activeResponder) {
+      return;
+    }
+
+    if (currentRoundId === null || currentRoundId === undefined || !validRounds.includes(currentRoundId) || !activeNote) {
       return;
     }
 
@@ -420,6 +430,7 @@ const App: React.FC = () => {
     });
 
     if (!buzzingPlayer) return;
+    lastBuzzerPopupResponderRef.current = activeResponder;
 
     // Calculate points
     let points = 0;
@@ -459,7 +470,6 @@ const App: React.FC = () => {
 
 
   const triggerBGM = useCallback((page: Page, roundId: number | null) => {
-    if (!gameState.isMusicEnabled) return;
     stopBGM();
 
     let audioSrc = "";
@@ -478,10 +488,10 @@ const App: React.FC = () => {
       const audio = new Audio(audioSrc);
       bgmRef.current = audio;
       audio.loop = loop;
-      audio.volume = volume;
+      audio.volume = isMusicEnabledRef.current ? volume : 0;
       audio.play().catch(e => console.log("BGM block", e));
     }
-  }, [gameState.isMusicEnabled, stopBGM]);
+  }, [stopBGM, volume]);
 
   useEffect(() => {
     triggerBGM(currentPage, gameState.activeRoundId);
@@ -645,6 +655,7 @@ const App: React.FC = () => {
       language: gameState.language,
       currentSong: currentSong,
       showBuzzerPopup: showBuzzerPopup,
+      showScreensaver: isScreensaverActive,
       buzzerPlayerName: buzzerPlayerName,
       buzzerPoints: buzzerPoints,
       isWarmup: isWarmup,
@@ -682,6 +693,7 @@ const App: React.FC = () => {
     r4SelectedPlayerId,
     activeResponder,
     showBuzzerPopup,
+    isScreensaverActive,
     buzzerPlayerName,
     buzzerPoints,
     isWarmup
@@ -726,20 +738,11 @@ const App: React.FC = () => {
 
   const toggleMusic = () => {
     const next = !gameState.isMusicEnabled;
-
-    if (!next) {
-      isMusicEnabledRef.current = false;
-      stopSong();
-      stopBGM();
-      if (sfxRef.current) {
-        sfxRef.current.pause();
-        sfxRef.current = null;
-      }
-    } else {
-      // Delay enabling SFX ref slightly to prevent the unmute button click sound
-      setTimeout(() => { isMusicEnabledRef.current = true; }, 500);
-      // BGM will be triggered by the useEffect when state updates
-    }
+    isMusicEnabledRef.current = next;
+    const outputVolume = next ? volume : 0;
+    if (songRef.current) songRef.current.volume = outputVolume;
+    if (bgmRef.current) bgmRef.current.volume = outputVolume;
+    if (sfxRef.current) sfxRef.current.volume = outputVolume;
     setGameState(prev => ({ ...prev, isMusicEnabled: next }));
   };
 
@@ -1446,11 +1449,11 @@ const App: React.FC = () => {
 
       if (!songRef.current) {
         songRef.current = new Audio(audioUrlToPlay);
-        songRef.current.volume = volume;
+        songRef.current.volume = isMusicEnabledRef.current ? volume : 0;
       } else if (songRef.current.src !== audioUrlToPlay) {
         songRef.current.pause();
         songRef.current = new Audio(audioUrlToPlay);
-        songRef.current.volume = volume;
+        songRef.current.volume = isMusicEnabledRef.current ? volume : 0;
       }
 
       songRef.current.onloadedmetadata = () => {
@@ -1668,89 +1671,7 @@ const App: React.FC = () => {
       }
       playSFX(SFX.stop);
     }
-  };
-
-  // Place this in App.tsx
-  // const handleArmSprintPlayer = () => {
-  //   const currentSlot = gameState.players[gameState.currentPlayerIndex];
-  //   console.log("DEBUG: Current Player Index:", gameState.currentPlayerIndex);
-  //   console.log("DEBUG: Current Player Data:", currentSlot)
-
-  //   if (buzzerSocket && currentSlot && currentSlot.hubId) {
-  //     // 1. Tell the server to lock the hardware (the phone)
-  //     console.log(`[ARMING] Sending Hardware ID to Server: ${currentSlot.hubId}`);
-  //     buzzerSocket.emit('gameAction', {
-  //       type: 'ARM_SPECIFIC',
-  //       data: { playerId: currentSlot.hubId }
-  //     });
-
-  //     // 2. Optional: Sync your display to show WHO is sprinting
-  //     buzzerSocket.emit('updateGameState', {
-  //       currentPage: 'round-sprint',
-  //       activeResponder: currentSlot.name, // Highlights them on the big screen
-  //       isSprintActive: true
-  //     });
-  //   }
-  // };
-
-  // const handleArmSprintPlayer = () => {
-  //   const currentSlot = gameState.players[gameState.currentPlayerIndex];
-  //   if (buzzerSocket && currentSlot && currentSlot.hubId) {
-  //     // 1. First unlock any previous lock
-  //     buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
-
-  //     // 2. Small delay then arm the specific player
-  //     setTimeout(() => {
-  //       console.log(`[ARMING] Sending Hardware ID to Server: ${currentSlot.hubId}`);
-  //       buzzerSocket.emit('gameAction', {
-  //         type: 'ARM_SPECIFIC',
-  //         data: { playerId: currentSlot.hubId }
-  //       });
-  //     }, 100);
-
-  //     // 3. Optional: sync display
-  //     buzzerSocket.emit('updateGameState', {
-  //       currentPage: 'round-sprint',
-  //       activeResponder: currentSlot.name,
-  //       isSprintActive: true
-  //     });
-  //   }
-  // };
-
-
-  // const handleArmSprintPlayer = () => {
-  //   const currentSlot = gameState.players[gameState.currentPlayerIndex];
-
-  //   console.log('[SPRINT] Selected player:', currentSlot);
-  //   console.log('[SPRINT] Pad server socket connected:', buzzerSocket?.connected);
-
-  //   if (!buzzerSocket || !currentSlot) {
-  //     console.error('[SPRINT] Cannot arm: socket or player is missing.');
-  //     return;
-  //   }
-
-  //   // Clear any previous selection.
-  //   buzzerSocket.emit('gameAction', {
-  //     type: 'SET_STATE',
-  //     data: { state: 'IDLE' }
-  //   });
-
-  //   // USB pad server identifies players by their configured name or ID.
-  //   setTimeout(() => {
-  //     console.log('[SPRINT] Sending ARM_SPECIFIC for:', currentSlot.name);
-
-  //     buzzerSocket.emit('gameAction', {
-  //       type: 'ARM_SPECIFIC',
-  //       data: { playerId: currentSlot.name }
-  //     });
-  //   }, 100);
-
-  //   buzzerSocket.emit('updateGameState', {
-  //     currentPage: 'round-sprint',
-  //     activeResponder: currentSlot.name,
-  //     isSprintActive: true
-  //   });
-  // };
+  }; 
 
   const handleArmSprintPlayer = () => {
     const currentSlot = gameState.players[gameState.currentPlayerIndex];
@@ -2793,11 +2714,11 @@ const App: React.FC = () => {
     const thirdPlace = sortedPlayers[2];
 
     useEffect(() => {
-      if (showVictory && gameState.isMusicEnabled) {
+      if (showVictory) {
         playSFX(SFX.scoreboard);
         stopBGM();
       }
-    }, [showVictory, gameState.isMusicEnabled]);
+    }, [showVictory]);
 
     const handleClose = () => {
       if (sfxRef.current) {
@@ -2825,7 +2746,7 @@ const App: React.FC = () => {
           <PartyPopper
             size={120}
             className="text-indigo-500 mx-auto mb-10 animate-bounce cursor-pointer"
-            onClick={() => gameState.isMusicEnabled && playSFX(SFX.select)}
+            onClick={() => playSFX(SFX.select)}
           />
 
           <h1 className="text-[6rem] font-black text-white mb-4 uppercase tracking-tighter leading-none">
@@ -2945,10 +2866,6 @@ const App: React.FC = () => {
     );
   };
 
-
-  // console.log("PARENT HUB STATE:", hubPlayers);
-  // Final return statement
-
   return (
     <PasswordGuard>
 
@@ -2962,6 +2879,8 @@ const App: React.FC = () => {
           onMusicToggle={toggleMusic}
           isFullscreen={isFullscreen}
           onFullscreenToggle={toggleFullscreen}
+          isScreensaverActive={isScreensaverActive}
+          onToggleScreensaver={() => setIsScreensaverActive(active => !active)}
           onGoHome={() => navigateTo('setup')}
           onGoStart={() => navigateTo('start')}
           onReset={() => showModal(t.reset, t.confirmReset, resetGameAction)}

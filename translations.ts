@@ -27,6 +27,8 @@ export const translations = {
     wrong: "Wrong",
     start: "Start",
     stop: "Stop",
+    startScreensaver: "Start Screensaver",
+    stopScreensaver: "Stop Screensaver",
     points: "Points",
     stars: "Stars",
     hint: "Hint",
@@ -79,6 +81,9 @@ export const translations = {
     selectDataset: "Select Dataset",
     confirm: "Confirm",
     cancel: "Cancel",
+    enterFullscreen: "Enter fullscreen",
+    exitFullscreen: "Exit fullscreen",
+    fullscreenError: "Unable to change fullscreen mode. Please try again.",
     melodyGuess: "MELODY GUESS",
     songChallenge: "SONG CHALLENGE",
     playbackProgress: "Playback Progress",
@@ -126,6 +131,8 @@ export const translations = {
     wrong: "Неверно",
     start: "Старт",
     stop: "Стоп",
+    startScreensaver: "Включить заставку",
+    stopScreensaver: "Выключить заставку",
     points: "баллов",
     pointsToGain: "Можете заработать",
     stars: "Звезды",
@@ -170,6 +177,9 @@ export const translations = {
     selectDataset: "Выберите набор данных",
     confirm: "Подтвердить",
     cancel: "Отменить",
+    enterFullscreen: "Включить полноэкранный режим",
+    exitFullscreen: "Выйти из полноэкранного режима",
+    fullscreenError: "Не удалось изменить полноэкранный режим. Попробуйте ещё раз.",
     round5Progress: "РАУНД 5 ПРОГРЕСС",
     sessionPoints: "Очки за сессию",
     tenPerCorrect: "+10 за правильную песню",
@@ -201,4 +211,3 @@ export const translations = {
     }
   }
 };
-

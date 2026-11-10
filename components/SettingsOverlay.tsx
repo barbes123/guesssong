@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff } from 'lucide-react';
+import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff, MonitorPlay, MonitorPause } from 'lucide-react';
 import { Language } from '../types';
 
 interface SettingsOverlayProps {
@@ -10,6 +10,8 @@ interface SettingsOverlayProps {
   onMusicToggle: () => void;
   isFullscreen: boolean;
   onFullscreenToggle: () => void;
+  isScreensaverActive: boolean;
+  onToggleScreensaver: () => void;
   onGoHome: () => void;
   onGoStart: () => void;
   onReset: () => void;
@@ -27,6 +29,8 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   onMusicToggle,
   isFullscreen,
   onFullscreenToggle,
+  isScreensaverActive,
+  onToggleScreensaver,
   onGoHome,
   onGoStart,
   onReset,
@@ -121,6 +125,20 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
           {isMusicEnabled ? <Music size={24} /> : <VolumeX size={24} />}
         </button>
         <button
+          type="button"
+          onClick={onToggleScreensaver}
+          aria-label={isScreensaverActive ? t.stopScreensaver : t.startScreensaver}
+          aria-pressed={isScreensaverActive}
+          className={`group relative p-3 rounded-full transition-all hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400 ${
+            isScreensaverActive ? 'text-amber-300 bg-amber-900/40' : 'text-slate-300 hover:bg-slate-700'
+          }`}
+        >
+          {isScreensaverActive ? <MonitorPause size={24} /> : <MonitorPlay size={24} />}
+          <span className="pointer-events-none absolute left-1/2 top-full z-[80] mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+            {isScreensaverActive ? t.stopScreensaver : t.startScreensaver}
+          </span>
+        </button>
+        <button
           onClick={onFullscreenToggle}
           className="p-3 hover:bg-slate-700 rounded-full transition-all text-slate-300 hover:scale-110"
         >
@@ -132,4 +150,3 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
 };
 
 export default SettingsOverlay;
-
