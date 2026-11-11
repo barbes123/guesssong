@@ -100,6 +100,8 @@ const App: React.FC = () => {
   const [showVictory, setShowVictory] = useState(false);
   const [isScreensaverActive, setIsScreensaverActive] = useState(false);
   const [volume, setVolume] = useState(0.7);
+  const volumeRef = useRef(volume);
+  volumeRef.current = volume;
 
 
   const [victoryContext, setVictoryContext] = useState<{ roundId: number | null, winnerId: number | null }>({
@@ -488,10 +490,10 @@ const App: React.FC = () => {
       const audio = new Audio(audioSrc);
       bgmRef.current = audio;
       audio.loop = loop;
-      audio.volume = isMusicEnabledRef.current ? volume : 0;
+      audio.volume = isMusicEnabledRef.current ? volumeRef.current : 0;
       audio.play().catch(e => console.log("BGM block", e));
     }
-  }, [stopBGM, volume]);
+  }, [stopBGM]);
 
   useEffect(() => {
     triggerBGM(currentPage, gameState.activeRoundId);
