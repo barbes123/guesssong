@@ -187,6 +187,7 @@ const App: React.FC = () => {
   }, [volume]);
 
   const handleVolumeChange = useCallback((newVolume: number) => {
+    volumeRef.current = newVolume;
     setVolume(newVolume);
     if (songRef.current) {
       songRef.current.volume = isMusicEnabledRef.current ? newVolume : 0;
