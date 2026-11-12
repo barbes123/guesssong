@@ -18,6 +18,7 @@ import MusicTimeline from './components/MusicTimeline';
 
 import PlayerScreen from './src/displays/PlayerScreen';
 import LeaderDisplay from './src/displays/LeaderDisplay'; // Leader display for host notes
+import AiDisplay from './src/displays/AiDisplay'; // Leader display for host notes
 
 // import { useBuzzer } from './src/hooks/useBuzzer';
 // import { usePads } from './src/hooks/usePads';
@@ -40,6 +41,7 @@ const App: React.FC = () => {
   const path = window.location.pathname.toLowerCase();
   const isPlayerScreen = path.includes('display');
   const isLeaderScreen = path.includes('leader');
+  const isAiScreen = path.includes('ai');
 
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -59,13 +61,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (isLeaderScreen) {
-      document.title = "GS Leader";
+      document.title = "Leader";
     } else if (isPlayerScreen) {
       document.title = "GS Display";
-    } else {
+    } else if (isAiScreen){
+      document.title = "AI"
+    }else{
       document.title = "GS Main";
     }
-  }, [isLeaderScreen, isPlayerScreen]);
+  }, [isLeaderScreen, isPlayerScreen, isAiScreen]);
 
 
 
@@ -158,6 +162,10 @@ const App: React.FC = () => {
 
   if (isPlayerScreen) {
     return <PlayerScreen />;
+  }
+
+  if (isAiScreen) {
+    return <AiDisplay />;
   }
 
   const sortedPlayersScoreboard = [...gameState.players].sort((a, b) => {
@@ -602,6 +610,7 @@ const App: React.FC = () => {
         const songData = category.songs[songIndex];
         if (songData) {
           currentSong = {
+            id: songData.id,
             title: songData.title,
             artist: songData.artist,
             notes: songData.notes || ""
@@ -668,6 +677,7 @@ const App: React.FC = () => {
     // DEBUG: Log what we're about to emit
     if (currentSong) {
       console.log('📦 [App.tsx] Packing song data:', {
+        id:currentSong.id,
         title: currentSong.title,
         artist: currentSong.artist,
         notes: currentSong.notes ? currentSong.notes.substring(0, 50) + '...' : '(none)',
