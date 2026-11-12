@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff, MonitorPlay, MonitorPause } from 'lucide-react';
+import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff, Plug, Unplug, MonitorPlay, MonitorPause } from 'lucide-react';
 import { Language } from '../types';
 
 interface SettingsOverlayProps {
@@ -16,10 +16,11 @@ interface SettingsOverlayProps {
   onGoStart: () => void;
   onReset: () => void;
   volume?: number;
-  onVolumeChange?: (volume: number) => void;  
+  onVolumeChange?: (volume: number) => void;
   t: any;
   isLocked?: boolean;
   isBuzzerConnected: boolean;
+  isPadsConnected: boolean;
 }
 
 const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
@@ -36,10 +37,11 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   onReset,
   volume = 0.7,
   // onVolumeChange = () => {},
-  onVolumeChange = (_v: number) => {},
+  onVolumeChange = (_v: number) => { },
   t,
   isLocked = false,
-  isBuzzerConnected
+  isBuzzerConnected,
+  isPadsConnected
 }) => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val4vol = parseFloat(e.target.value);
@@ -51,16 +53,28 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
     <div className="fixed top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50">
       <div className="bg-slate-800/95 backdrop-blur-xl rounded-full shadow-2xl border border-slate-700/50 p-2 flex items-center gap-2">
 
-      {/* --- BUZZER CONNECTION STATUS --- */}
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${
-          isBuzzerConnected 
-            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-            : 'bg-rose-500/20 text-rose-500 border border-rose-500/40 animate-pulse'
-        }`}>
-          {isBuzzerConnected ? <Wifi size={16} /> : <WifiOff size={16} />}
-          <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
-            {isBuzzerConnected ? 'Linked' : 'Offline'}
-          </span>
+        {/* --- BUZZER CONNECTION STATUS --- */}       
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${isBuzzerConnected
+              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              : (isPadsConnected ? 'bg-gray-500/10 text-gray-400 border border-gray-500/20' : 'bg-rose-500/20 text-rose-500 border border-rose-500/40 animate-pulse')
+            }`}>
+            {isBuzzerConnected ? <Wifi size={16} /> : <WifiOff size={16} />}
+            <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
+              Phones
+            </span>
+          </div>
+
+          <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${isPadsConnected
+              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+              : (isBuzzerConnected ? 'bg-gray-500/10 text-gray-400 border border-gray-500/20' : 'bg-rose-500/20 text-rose-500 border border-rose-500/40 animate-pulse')
+            }`}>
+            {isPadsConnected ? <Plug size={16} /> : <Unplug size={16} />}
+            <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">
+              Pads
+            </span>
+          </div>
         </div>
 
         <div className="w-px h-8 bg-slate-700 mx-1" />
@@ -129,9 +143,8 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
           onClick={onToggleScreensaver}
           aria-label={isScreensaverActive ? t.stopScreensaver : t.startScreensaver}
           aria-pressed={isScreensaverActive}
-          className={`group relative p-3 rounded-full transition-all hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400 ${
-            isScreensaverActive ? 'text-amber-300 bg-amber-900/40' : 'text-slate-300 hover:bg-slate-700'
-          }`}
+          className={`group relative p-3 rounded-full transition-all hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400 ${isScreensaverActive ? 'text-amber-300 bg-amber-900/40' : 'text-slate-300 hover:bg-slate-700'
+            }`}
         >
           {isScreensaverActive ? <MonitorPause size={24} /> : <MonitorPlay size={24} />}
           <span className="pointer-events-none absolute left-1/2 top-full z-[80] mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">

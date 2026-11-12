@@ -2901,7 +2901,8 @@ const App: React.FC = () => {
           onVolumeChange={handleVolumeChange}
           t={t}
           isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4}
-          isBuzzerConnected={isBuzzerConnected} // <--- PLACE IT HERE
+          isBuzzerConnected={isBuzzerConnected}
+          isPadsConnected={isPadsConnected} 
         />
         {/* {currentPage === 'setup' && (
           <SetupView
