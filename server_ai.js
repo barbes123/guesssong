@@ -49,7 +49,7 @@ const openai = new OpenAI({
 const lyricsDir = path.join(process.cwd(), "public", "lyrics");
 
 async function getSongLyrics(songId) {
-  if (!/^[a-zA-Z0-9_-]+$/.test(songId)) {
+  if (!/^[a-zA-Z0-9_\-.,!?()' ]+$/.test(songId)) {
     throw new Error("Invalid song ID");
   }
 
