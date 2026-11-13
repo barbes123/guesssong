@@ -59,7 +59,6 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
   const [requestHistory, setRequestHistory] = useState<RequestAttempt[]>([]);
 
   const moduleRef = useRef<HTMLElement | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const activeRequestRef = useRef<AbortController | null>(null);
   const songContextKeyRef = useRef(songContextKey);
   const previousSongContextKeyRef = useRef(songContextKey);
@@ -94,7 +93,6 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
     setOutputHtml('');
     setIsWaitingForSong(false);
     setUserPrompt('');
-    if (textareaRef.current) textareaRef.current.style.height = 'auto';
   }, [songContextKey]);
 
   const handleGiftRequest = async (event: FormEvent<HTMLFormElement>) => {
@@ -172,41 +170,47 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
 
   const categoryName = getDisplayText(currentCategory?.name);
   const categoryDescription = getDisplayText(currentCategory?.description);
+  const remainingCharacters = 256 - userPrompt.length;
 
   return (
     <main
       ref={moduleRef}
-      className="w-full min-w-0 bg-slate-850 p-3 font-sans text-white"
+      className="w-full min-w-0 bg-slate-850 p-2 font-sans text-white"
     >
-      <header className="mb-3 flex items-center justify-between gap-2 border-b border-slate-700 pb-3">
+      {/* <header className="mb-3 flex items-center justify-between gap-2 border-b border-slate-700 pb-3">
         <div className="min-w-0">
           <h2 className="truncate text-lg font-bold">{t.aiModuleTitle}</h2>
         </div> 
-      </header>
+      </header> */}
 
       {error && <p role="alert" className="mb-2 text-xs text-rose-400">{error}</p>}
 
       <section className="rounded-xl border border-slate-700 bg-slate-900 p-3 shadow-lg">
         <form onSubmit={handleGiftRequest}>
-          <label htmlFor="ai-user-input" className="mb-2 block text-xs font-semibold text-slate-200">
-            {t.aiGuessLabel}
-          </label>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <label htmlFor="ai-user-input" className="text-xs font-semibold text-slate-200">
+              {t.aiGuessLabel}
+            </label>
+            <span className="text-xs text-slate-400" aria-live="polite">
+              {t.aiCharactersRemaining
+                .replace('{remaining}', String(remainingCharacters))
+                .replace('{max}', '256')}
+            </span>
+          </div>
           <textarea
-            ref={textareaRef}
             id="ai-user-input"
             value={userPrompt}
+            maxLength={256}
             onChange={(event) => {
               console.info('[AIModule diagnostic] input change', {
                 length: event.target.value.length,
                 songContextKey,
               });
               setUserPrompt(event.target.value);
-              event.target.style.height = 'auto';
-              event.target.style.height = `${event.target.scrollHeight}px`;
             }}
-            rows={2}
+            rows={3}
             placeholder={t.aiInputPlaceholder}
-            className="block max-h-36 w-full resize-y overflow-y-auto rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+            className="block h-24 w-full resize-none overflow-y-auto rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
           />
           <button
             type="submit"
@@ -220,7 +224,7 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
         <div
           aria-live="polite"
           aria-busy={isLoading}
-          className="prose prose-invert mt-3 max-h-64 max-w-none overflow-y-auto rounded-lg border border-slate-700 bg-slate-950/70 p-3 text-sm text-slate-100 empty:hidden"
+          className="prose prose-invert mt-3 h-[8.8rem] max-w-none overflow-y-auto rounded-lg border border-slate-700 bg-slate-950/70 p-3 text-sm text-slate-100"
         >
           {isWaitingForSong
             ? t.aiWaitingForSongInfo
