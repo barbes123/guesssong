@@ -2921,6 +2921,7 @@ const App: React.FC = () => {
           isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4}
           isBuzzerConnected={isBuzzerConnected}
           isPadsConnected={isPadsConnected} 
+          isGameStarted={gameState.activeRoundId !== null}
           isAIModuleOpen={isAIModuleOpen}
           isAIModuleEnabled={isAIModuleEnabled}
           onToggleAIModule={() => setIsAIModuleOpen(open => !open)}

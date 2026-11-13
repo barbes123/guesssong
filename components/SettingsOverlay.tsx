@@ -21,6 +21,7 @@ interface SettingsOverlayProps {
   isLocked?: boolean;
   isBuzzerConnected: boolean;
   isPadsConnected: boolean;
+  isGameStarted: boolean;
   isAIModuleOpen: boolean;
   isAIModuleEnabled: boolean;
   onToggleAIModule: () => void;
@@ -45,10 +46,13 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   isLocked = false,
   isBuzzerConnected,
   isPadsConnected,
+  isGameStarted,
   isAIModuleOpen,
   isAIModuleEnabled,
   onToggleAIModule
 }) => {
+  const grayDisconnectedIndicators = isGameStarted && !isBuzzerConnected && !isPadsConnected;
+
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val4vol = parseFloat(e.target.value);
     onVolumeChange(val4vol);
@@ -62,7 +66,9 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
         {/* --- BUZZER CONNECTION STATUS --- */}       
 
         <div className="grid grid-cols-2 gap-2">
-          <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${isBuzzerConnected
+          <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${grayDisconnectedIndicators
+              ? 'bg-gray-500/10 text-gray-400 border border-gray-500/20'
+              : isBuzzerConnected
               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
               : (isPadsConnected ? 'bg-gray-500/10 text-gray-400 border border-gray-500/20' : 'bg-rose-500/20 text-rose-500 border border-rose-500/40 animate-pulse')
             }`}>
@@ -72,7 +78,9 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
             </span>
           </div>
 
-          <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${isPadsConnected
+          <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${grayDisconnectedIndicators
+              ? 'bg-gray-500/10 text-gray-400 border border-gray-500/20'
+              : isPadsConnected
               ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
               : (isBuzzerConnected ? 'bg-gray-500/10 text-gray-400 border border-gray-500/20' : 'bg-rose-500/20 text-rose-500 border border-rose-500/40 animate-pulse')
             }`}>
