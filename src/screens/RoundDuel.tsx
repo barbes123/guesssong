@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, HelpCircle, Star } from 'lucide-react';
 import PlayerBoard from '../../components/PlayerBoard';
 import ControlPanel from '../../components/ControlPanel';
 import MusicTimeline from '../../components/MusicTimeline';
+import AIModule from '../../components/AIModule';
 import { getRoundData } from '../../data/index_data';
 import { GameState } from '../../types';
 import { SFX } from '../../data/constants_main';
@@ -16,6 +17,7 @@ interface RoundDuelProps {
   t: any;
   selectedDuration: number | null;
   isR3Finalized: boolean;
+  isAIModuleOpen: boolean;
   onNavigate: (page: any, roundId: number | null) => void;
   onInitializeRound: (roundId: number) => void;
   onUpdatePlayer: (id: number, name: string, score: number, stars?: number) => void;
@@ -42,6 +44,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
   t,
   selectedDuration,
   isR3Finalized,
+  isAIModuleOpen,
   onNavigate,
   onInitializeRound,
   onUpdatePlayer,
@@ -234,6 +237,12 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
             formatTime={formatTime}
             t={t}
           />
+
+          {isAIModuleOpen && (
+            <div className="bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-xl border border-slate-800 p-3 w-full flex flex-col gap-2 animate-in slide-in-from-right duration-500">
+              <AIModule />
+            </div>
+          )}
 
           {modal?.isOpen && modal.position === 'inline' && (
             <div className="w-full bg-slate-800 rounded-2xl p-4 border-2 border-indigo-500 shadow-2xl animate-in fade-in slide-in-from-top duration-300">

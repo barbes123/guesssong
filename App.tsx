@@ -103,6 +103,7 @@ const App: React.FC = () => {
   const [showScoreboard, setShowScoreboard] = useState(false);
   const [showVictory, setShowVictory] = useState(false);
   const [isScreensaverActive, setIsScreensaverActive] = useState(false);
+  const [isAIModuleOpen, setIsAIModuleOpen] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const volumeRef = useRef(volume);
   volumeRef.current = volume;
@@ -2184,6 +2185,7 @@ const App: React.FC = () => {
     if (isSprintRound) {
       return (
         <RoundSprint
+          isAIModuleOpen={isAIModuleOpen}
           gameState={gameState}
           isPlaying={isPlaying}
           timeLeft={timeLeft}
@@ -2438,6 +2440,7 @@ const App: React.FC = () => {
     if (isFinalRound) {
       return (
         <RoundDuel
+          isAIModuleOpen={isAIModuleOpen}
           gameState={gameState}
           isPlaying={isPlaying}
           timeLeft={timeLeft}
@@ -2477,6 +2480,7 @@ const App: React.FC = () => {
     }
     return (
       <RoundStandard
+        isAIModuleOpen={isAIModuleOpen}
         activeResponder={activeResponder}
         gameState={gameState}
         players={gameState.players}
@@ -2903,6 +2907,8 @@ const App: React.FC = () => {
           isLocked={!!activeNote && gameState.activeRoundId !== 3 && gameState.activeRoundId !== 4}
           isBuzzerConnected={isBuzzerConnected}
           isPadsConnected={isPadsConnected} 
+          isAIModuleOpen={isAIModuleOpen}
+          onToggleAIModule={() => setIsAIModuleOpen(open => !open)}
         />
         {/* {currentPage === 'setup' && (
           <SetupView

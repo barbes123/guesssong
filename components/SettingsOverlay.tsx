@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff, Plug, Unplug, MonitorPlay, MonitorPause } from 'lucide-react';
+import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff, Plug, Unplug, MonitorPlay, MonitorPause, Sparkles } from 'lucide-react';
 import { Language } from '../types';
 
 interface SettingsOverlayProps {
@@ -21,6 +21,8 @@ interface SettingsOverlayProps {
   isLocked?: boolean;
   isBuzzerConnected: boolean;
   isPadsConnected: boolean;
+  isAIModuleOpen: boolean;
+  onToggleAIModule: () => void;
 }
 
 const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
@@ -41,7 +43,9 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   t,
   isLocked = false,
   isBuzzerConnected,
-  isPadsConnected
+  isPadsConnected,
+  isAIModuleOpen,
+  onToggleAIModule
 }) => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val4vol = parseFloat(e.target.value);
@@ -137,6 +141,16 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
           className={`p-3 rounded-full transition-all hover:scale-110 ${isMusicEnabled ? 'text-indigo-400 bg-indigo-900/40' : 'text-slate-500 bg-slate-900/40'}`}
         >
           {isMusicEnabled ? <Music size={24} /> : <VolumeX size={24} />}
+        </button>
+        <button
+          type="button"
+          onClick={onToggleAIModule}
+          aria-label="AI module"
+          aria-pressed={isAIModuleOpen}
+          title="AI module"
+          className={`p-3 rounded-full transition-all hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400 ${isAIModuleOpen ? 'text-indigo-300 bg-indigo-900/50' : 'text-slate-300 hover:bg-slate-700'}`}
+        >
+          <Sparkles size={24} />
         </button>
         <button
           type="button"

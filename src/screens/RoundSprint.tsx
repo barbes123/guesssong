@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Music as MusicIcon, CheckCircle, XCircle, Ti
 import PlayerBoard from '../../components/PlayerBoard'; // Adjust path
 import ControlPanel from '../../components/ControlPanel'; // Adjust path
 import MusicTimeline from '../../components/MusicTimeline'; // Adjust path
+import AIModule from '../../components/AIModule';
 import ConfirmationModal from '../../components/ConfirmationModal'; // Adjust path
 import { getRoundData } from '../../data/index_data'; // Adjust path
 import { SFX } from '../../data/constants_main'; // Adjust path
@@ -23,6 +24,7 @@ interface RoundSprintProps {
   showTimerSettings: boolean;
   timerDuration: number;
   activeNote: { categoryId: string; noteIndex: number; isReveal?: boolean } | null;
+  isAIModuleOpen: boolean;
   // Actions
   onNavigate: (page: any, roundId: number | null) => void;
   onInitializeRound: (roundId: number) => void;
@@ -62,6 +64,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
   showTimerSettings,
   timerDuration,
   activeNote,
+  isAIModuleOpen,
   onNavigate,
   onInitializeRound,
   onUpdatePlayer,
@@ -334,6 +337,12 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             formatTime={formatTime}
             t={t}
           />
+
+          {isAIModuleOpen && (
+            <div className="bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-xl border border-slate-800 p-3 w-full flex flex-col gap-2 animate-in slide-in-from-right duration-500">
+              <AIModule />
+            </div>
+          )}
 
           {modal?.isOpen && modal.position === 'inline' && (
             <div className="w-full bg-slate-800 rounded-2xl p-5 border-2 border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.3)] animate-in fade-in slide-in-from-top duration-300">

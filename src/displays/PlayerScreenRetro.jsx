@@ -186,7 +186,7 @@ const PlayerScreenContent = () => {
     // При подключении запрашиваем текущее состояние
     socket.on('connect', () => {
       console.log('✅ [PlayerScreen] Socket connected to', configBuzz.SOCKET_URL);
-      socket.emit('requestGameState');  // ← Нужно добавить на сервере!
+      socket.emit('');  // ← Нужно добавить на сервере!
     });
 
     return () => {
