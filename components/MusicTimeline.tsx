@@ -27,7 +27,8 @@ const MusicTimeline: React.FC<MusicTimelineProps> = ({
   return (
     <div className="w-full bg-slate-800 rounded-3xl p-6 border-2 border-indigo-400 shadow-[0_0_30px_rgba(99,102,241,0.2)] animate-in slide-in-from-top duration-300">
       <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2 block text-center">
-        {isReveal ? t.fullVersionSeek : t.playbackProgress}
+        {t.playbackProgress}
+        {/* {isReveal ? t.fullVersionSeek : t.playbackProgress} */}
       </span>
       <input 
         type="range" 
