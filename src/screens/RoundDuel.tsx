@@ -247,7 +247,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
 
           {isAIModuleOpen && (
             <div className="bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-xl border border-slate-800 p-3 w-full flex flex-col gap-2 animate-in slide-in-from-right duration-500">
-              <AIModule currentSong={currentSong} currentCategory={currentCategory} songContextKey={songContextKey} />
+              <AIModule currentSong={currentSong} currentCategory={currentCategory} songContextKey={songContextKey} t={t} />
             </div>
           )}
 

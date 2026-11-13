@@ -29,6 +29,7 @@ export interface AIModuleProps {
   currentSong: AiSong | null;
   currentCategory: AiCategory | null;
   songContextKey: string;
+  t: any;
 }
 
 const AI_SERVER_URL = `http://${configBuzz.AI_IP}:${configBuzz.AI_PORT}`;
@@ -47,12 +48,13 @@ const escapeHtml = (value: string): string => value.replace(/[&<>"']/g, (char) =
   "'": '&#39;',
 } as Record<string, string>)[char] || char);
 
-const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songContextKey }) => {
+const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songContextKey, t }) => {
   const [error, setError] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [userPrompt, setUserPrompt] = useState('');
   const [outputHtml, setOutputHtml] = useState('');
+  const [isWaitingForSong, setIsWaitingForSong] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [requestHistory, setRequestHistory] = useState<RequestAttempt[]>([]);
 
@@ -60,7 +62,13 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const activeRequestRef = useRef<AbortController | null>(null);
   const songContextKeyRef = useRef(songContextKey);
+  const previousSongContextKeyRef = useRef(songContextKey);
   songContextKeyRef.current = songContextKey;
+
+  useEffect(() => {
+    console.info('[AIModule diagnostic] mounted');
+    return () => console.info('[AIModule diagnostic] unmounted');
+  }, []);
 
   useEffect(() => {
     const syncFullscreenState = () => {
@@ -74,11 +82,17 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
 
   // A new note is a new guessing session, even if it happens to reuse a song ID.
   useEffect(() => {
+    console.info('[AIModule diagnostic] songContextKey reset', {
+      previous: previousSongContextKeyRef.current,
+      next: songContextKey,
+    });
+    previousSongContextKeyRef.current = songContextKey;
     activeRequestRef.current?.abort();
     activeRequestRef.current = null;
     setIsLoading(false);
     setRequestHistory([]);
     setOutputHtml('');
+    setIsWaitingForSong(false);
     setUserPrompt('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
   }, [songContextKey]);
@@ -89,10 +103,11 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
     if (!prompt || isLoading) return;
 
     if (!currentSong?.id) {
-      setOutputHtml(DOMPurify.sanitize('<p>Waiting for song information from the Main App...</p>'));
+      setIsWaitingForSong(true);
       return;
     }
 
+    setIsWaitingForSong(false);
     const requestContextKey = songContextKey;
     const requestController = new AbortController();
     activeRequestRef.current?.abort();
@@ -161,11 +176,11 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
   return (
     <main
       ref={moduleRef}
-      className="w-full min-w-0 bg-slate-950 p-3 font-sans text-white"
+      className="w-full min-w-0 bg-slate-850 p-3 font-sans text-white"
     >
       <header className="mb-3 flex items-center justify-between gap-2 border-b border-slate-700 pb-3">
         <div className="min-w-0">
-          <h2 className="truncate text-lg font-bold">AI Song Guess</h2>
+          <h2 className="truncate text-lg font-bold">{t.aiModuleTitle}</h2>
         </div> 
       </header>
 
@@ -174,19 +189,23 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
       <section className="rounded-xl border border-slate-700 bg-slate-900 p-3 shadow-lg">
         <form onSubmit={handleGiftRequest}>
           <label htmlFor="ai-user-input" className="mb-2 block text-xs font-semibold text-slate-200">
-            Your guess or message
+            {t.aiGuessLabel}
           </label>
           <textarea
             ref={textareaRef}
             id="ai-user-input"
             value={userPrompt}
             onChange={(event) => {
+              console.info('[AIModule diagnostic] input change', {
+                length: event.target.value.length,
+                songContextKey,
+              });
               setUserPrompt(event.target.value);
               event.target.style.height = 'auto';
               event.target.style.height = `${event.target.scrollHeight}px`;
             }}
             rows={2}
-            placeholder="Type your answer here..."
+            placeholder={t.aiInputPlaceholder}
             className="block max-h-36 w-full resize-y overflow-y-auto rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
           />
           <button
@@ -194,7 +213,7 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
             disabled={isLoading || !userPrompt.trim()}
             className="mt-2 flex w-full items-center justify-center rounded-lg bg-indigo-600 px-3 py-3 text-sm font-bold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isLoading ? 'Thinking...' : 'Send answer'}
+            {isLoading ? t.aiThinking : t.aiSendAnswer}
           </button>
         </form>
 
@@ -202,13 +221,16 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
           aria-live="polite"
           aria-busy={isLoading}
           className="prose prose-invert mt-3 max-h-64 max-w-none overflow-y-auto rounded-lg border border-slate-700 bg-slate-950/70 p-3 text-sm text-slate-100 empty:hidden"
-          dangerouslySetInnerHTML={{ __html: outputHtml }}
-        />
+        >
+          {isWaitingForSong
+            ? t.aiWaitingForSongInfo
+            : outputHtml && <div dangerouslySetInnerHTML={{ __html: outputHtml }} />}
+        </div>
       </section>
 
       <footer className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] font-semibold">
         <span className={currentSong?.id ? 'text-emerald-400' : 'text-rose-400'}>
-          {currentSong?.id ? '● SONG READY' : '○ WAITING FOR SONG'}
+          {currentSong?.id ? t.aiSongReady : t.aiWaitingForSong}
         </span>        
       </footer>
     </main>

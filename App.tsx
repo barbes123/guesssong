@@ -3020,7 +3020,7 @@ const App: React.FC = () => {
           />
         )}
 
-        {currentPage === 'round' && <RoundView />}
+        {currentPage === 'round' && RoundView()}
         {currentPage === 'r3_select' && <R3SelectView />} {/* Changed from r6_select */}
         {currentPage === 'r4_select' && <R4SelectView />}
         {modal && modal.position === 'center' && <ConfirmationModal isOpen={modal.isOpen} title={modal.title} message={modal.message} onConfirm={modal.onConfirm} onCancel={() => setModal(null)} confirmLabel={modal.confirmLabel} cancelLabel={modal.cancelLabel} position={modal.position} />}
