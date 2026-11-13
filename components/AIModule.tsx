@@ -30,6 +30,7 @@ export interface AIModuleProps {
   currentCategory: AiCategory | null;
   songContextKey: string;
   t: any;
+  onAIFinalizeTurn: (status: 'correct' | 'wrong' | 'skip') => void;
 }
 
 const AI_SERVER_URL = `http://${configBuzz.AI_IP}:${configBuzz.AI_PORT}`;
@@ -48,20 +49,85 @@ const escapeHtml = (value: string): string => value.replace(/[&<>"']/g, (char) =
   "'": '&#39;',
 } as Record<string, string>)[char] || char);
 
-const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songContextKey, t }) => {
+interface RevealedSong {
+  song: AiSong;
+  category: AiCategory | null;
+}
+
+const AISongReveal: React.FC<{ currentSong: AiSong; currentCategory: AiCategory | null; t: any }> = ({
+  currentSong,
+  currentCategory,
+  t,
+}) => {
+  const categoryName = getDisplayText(currentCategory?.name);
+  const categoryDescription = getDisplayText(currentCategory?.description);
+
+  return (
+    <section className="m-0 rounded-lg border-0 bg-transparent p-0 shadow-none">
+      <div className="mb-3">
+        <p className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">
+          {t.aiSongCategory}
+        </p>
+        <h2 className="text-base font-bold text-slate-100">
+          {categoryName || '—'}
+        </h2>
+        {categoryDescription && (
+          <p className="mt-1 whitespace-pre-line text-sm text-slate-300">
+            {categoryDescription}
+          </p>
+        )}
+      </div>
+
+      <div className="grid gap-3 border-t border-slate-700 pt-3 sm:grid-cols-2">
+        <div>
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">
+            {t.aiSongId} - {currentSong.id || ' n/a '}
+          </p>
+          <p className="text-lg font-semibold text-slate-100">
+            {currentSong.title || '—'}
+          </p>
+        </div>
+        <div>
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">
+            {t.aiSongArtist}
+          </p>
+          <p className="text-lg font-semibold text-slate-100">
+            {currentSong.artist || '—'}
+          </p>
+        </div>
+        {currentSong.notes && (
+          <div className="sm:col-span-2">
+            <p className="mb-1 text-xs font-bold uppercase tracking-wider text-slate-400">
+              {t.aiSongNotes}
+            </p>
+            <p className="whitespace-pre-line text-sm text-slate-200">
+              {currentSong.notes}
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songContextKey, t, onAIFinalizeTurn }) => {
   const [error, setError] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [userPrompt, setUserPrompt] = useState('');
   const [outputHtml, setOutputHtml] = useState('');
+  const [revealedSong, setRevealedSong] = useState<RevealedSong | null>(null);
   const [isWaitingForSong, setIsWaitingForSong] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [requestHistory, setRequestHistory] = useState<RequestAttempt[]>([]);
 
   const moduleRef = useRef<HTMLElement | null>(null);
   const activeRequestRef = useRef<AbortController | null>(null);
+  const actionedRequestsRef = useRef(new WeakSet<AbortController>());
+  const onAIFinalizeTurnRef = useRef(onAIFinalizeTurn);
   const songContextKeyRef = useRef(songContextKey);
-  const previousSongContextKeyRef = useRef(songContextKey);
+  const lastActiveSongContextKeyRef = useRef(songContextKey);
+  onAIFinalizeTurnRef.current = onAIFinalizeTurn;
   songContextKeyRef.current = songContextKey;
 
   useEffect(() => {
@@ -79,18 +145,29 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
     return () => document.removeEventListener('fullscreenchange', syncFullscreenState);
   }, []);
 
-  // A new note is a new guessing session, even if it happens to reuse a song ID.
+  // Finalizing a turn temporarily clears the active note. Keep the completed AI
+  // session until a different, non-empty song context is selected.
   useEffect(() => {
+    if (!songContextKey) {
+      activeRequestRef.current?.abort();
+      activeRequestRef.current = null;
+      setIsLoading(false);
+      return;
+    }
+
+    if (lastActiveSongContextKeyRef.current === songContextKey) return;
+
     console.info('[AIModule diagnostic] songContextKey reset', {
-      previous: previousSongContextKeyRef.current,
+      previous: lastActiveSongContextKeyRef.current,
       next: songContextKey,
     });
-    previousSongContextKeyRef.current = songContextKey;
+    lastActiveSongContextKeyRef.current = songContextKey;
     activeRequestRef.current?.abort();
     activeRequestRef.current = null;
     setIsLoading(false);
     setRequestHistory([]);
     setOutputHtml('');
+    setRevealedSong(null);
     setIsWaitingForSong(false);
     setUserPrompt('');
   }, [songContextKey]);
@@ -98,9 +175,11 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
   const handleGiftRequest = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const prompt = userPrompt.trim();
-    if (!prompt || isLoading) return;
+    if (!prompt || isLoading || activeRequestRef.current) return;
 
-    if (!currentSong?.id) {
+    const requestSong = currentSong;
+    const requestCategory = currentCategory;
+    if (!requestSong?.id) {
       setIsWaitingForSong(true);
       return;
     }
@@ -117,7 +196,7 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
         headers: { 'Content-Type': 'application/json' },
         signal: requestController.signal,
         body: JSON.stringify({
-          songId: currentSong.id,
+          songId: requestSong.id,
           userPrompt: prompt,
           requestHistory,
         }),
@@ -140,18 +219,34 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
 
       const songGuess = JSON.parse(data.giftSuggestions);
       const evaluation = songGuess.evaluation;
-      const message = songGuess.message || '';
-      const html = await marked.parse(message);
-      if (songContextKeyRef.current !== requestContextKey) return;
-      setOutputHtml(DOMPurify.sanitize(html));
-
-      if (evaluation === 'CORRECT') {
-        setRequestHistory([]);
+      const message = typeof songGuess.message === 'string' ? songGuess.message : '';
+      const html = evaluation === 'INCORRECT' ? '' : await marked.parse(message);
+      if (
+        requestController.signal.aborted ||
+        activeRequestRef.current !== requestController ||
+        songContextKeyRef.current !== requestContextKey
+      ) return;
+      if (evaluation === 'INCORRECT') {
+        setRevealedSong({
+          song: { ...requestSong },
+          category: requestCategory ? { ...requestCategory } : null,
+        });
       } else {
-        setRequestHistory((previousHistory) => [
-          ...previousHistory,
-          { userPrompt: prompt, evaluation, message },
-        ].slice(-3));
+        setRevealedSong(null);
+        setOutputHtml(DOMPurify.sanitize(html));
+      }
+
+      setRequestHistory((previousHistory) => [
+        ...previousHistory,
+        { userPrompt: prompt, evaluation: typeof evaluation === 'string' ? evaluation : '', message },
+      ].slice(-3));
+
+      if (
+        (evaluation === 'CORRECT' || evaluation === 'INCORRECT') &&
+        !actionedRequestsRef.current.has(requestController)
+      ) {
+        actionedRequestsRef.current.add(requestController);
+        onAIFinalizeTurnRef.current(evaluation === 'CORRECT' ? 'correct' : 'wrong');
       }
     } catch (requestError) {
       if (requestController.signal.aborted || songContextKeyRef.current !== requestContextKey) return;
@@ -159,6 +254,7 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
       const message = requestError instanceof Error
         ? requestError.message
         : "Sorry, I can't access what I need right now.";
+      setRevealedSong(null);
       setOutputHtml(DOMPurify.sanitize(`<p>${escapeHtml(message)}</p>`));
     } finally {
       if (activeRequestRef.current === requestController) {
@@ -170,7 +266,7 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
 
   const categoryName = getDisplayText(currentCategory?.name);
   const categoryDescription = getDisplayText(currentCategory?.description);
-  const remainingCharacters = 256 - userPrompt.length;
+  const remainingCharacters = 512 - userPrompt.length;
 
   return (
     <main
@@ -194,13 +290,13 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
             <span className="text-xs text-slate-400" aria-live="polite">
               {t.aiCharactersRemaining
                 .replace('{remaining}', String(remainingCharacters))
-                .replace('{max}', '256')}
+                .replace('{max}', '512')}
             </span>
           </div>
           <textarea
             id="ai-user-input"
             value={userPrompt}
-            maxLength={256}
+            maxLength={512}
             onChange={(event) => {
               console.info('[AIModule diagnostic] input change', {
                 length: event.target.value.length,
@@ -228,7 +324,9 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
         >
           {isWaitingForSong
             ? t.aiWaitingForSongInfo
-            : outputHtml && <div dangerouslySetInnerHTML={{ __html: outputHtml }} />}
+            : revealedSong
+              ? <AISongReveal currentSong={revealedSong.song} currentCategory={revealedSong.category} t={t} />
+              : outputHtml && <div dangerouslySetInnerHTML={{ __html: outputHtml }} />}
         </div>
       </section>
 

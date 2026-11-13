@@ -30,6 +30,7 @@ interface RoundDuelProps {
   onSetCurrentPlayer: (index: number) => void;
   onAudioControl: (action: 'start' | 'stop') => void;
   onFinalizeTurn: (status: 'correct' | 'wrong' | 'skip') => void;
+  onAIFinalizeTurn: (status: 'correct' | 'wrong' | 'skip') => void;
   onSeek: (e: React.ChangeEvent<HTMLInputElement>) => void;
   formatTime: (seconds: number | undefined) => string;
   onSetSelectedDuration: (duration: number | null) => void;
@@ -60,6 +61,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
   onSetCurrentPlayer,
   onAudioControl,
   onFinalizeTurn,
+  onAIFinalizeTurn,
   onSeek,
   formatTime,
   onSetSelectedDuration,
@@ -245,11 +247,9 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
             t={t}
           />
 
-          {isAIModuleOpen && (
-            <div className="bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-xl border border-slate-800 p-3 w-full flex flex-col gap-2 animate-in slide-in-from-right duration-500">
-              <AIModule currentSong={currentSong} currentCategory={currentCategory} songContextKey={songContextKey} t={t} />
-            </div>
-          )}
+          <div className={`bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-xl border border-slate-800 p-3 w-full flex flex-col gap-2 ${isAIModuleOpen ? 'animate-in slide-in-from-right duration-500' : 'hidden'}`}>
+            <AIModule currentSong={currentSong} currentCategory={currentCategory} songContextKey={songContextKey} t={t} onAIFinalizeTurn={onAIFinalizeTurn} />
+          </div>
 
           {modal?.isOpen && modal.position === 'inline' && (
             <div className="w-full bg-slate-800 rounded-2xl p-4 border-2 border-indigo-500 shadow-2xl animate-in fade-in slide-in-from-top duration-300">
