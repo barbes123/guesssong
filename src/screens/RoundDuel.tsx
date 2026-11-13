@@ -234,7 +234,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
             timeLeft={timeLeft} 
             onFinishRound={onFinishRound}
             t={t} 
-            disabledActions={isR3Finalized || !!isSongUsed} 
+            disabledActions={isAIModuleOpen || isR3Finalized || !!isSongUsed} 
             isStartDisabled={!isR3Finalized && selectedDuration === null} 
           />
           

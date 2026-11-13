@@ -427,7 +427,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
             timeLeft={timeLeft}
             onFinishRound={onFinishRound}
             t={t}
-            disabledActions={!activeNote || activeNote.isReveal || progress.usedNotes.has(`${activeNote.categoryId}-${activeNote.noteIndex}`)}
+            disabledActions={isAIModuleOpen || !activeNote || activeNote.isReveal || progress.usedNotes.has(`${activeNote.categoryId}-${activeNote.noteIndex}`)}
             isStartDisabled={!activeNote}
           />
 

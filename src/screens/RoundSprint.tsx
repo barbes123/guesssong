@@ -335,7 +335,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             timeLeft={timeLeft}
             onFinishRound={onFinishRound}
             t={t}
-            disabledActions={shouldDisableActions}
+            disabledActions={isAIModuleOpen || shouldDisableActions}
             isStartDisabled={!activeNote || (isTimeOver && !isSongFinished)}
           />
           <MusicTimeline
