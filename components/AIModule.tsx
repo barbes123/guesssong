@@ -83,19 +83,6 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
   }, [songContextKey]);
 
-  // const toggleFullscreen = async () => {
-  //   try {
-  //     if (document.fullscreenElement) {
-  //       await document.exitFullscreen();
-  //     } else {
-  //       await moduleRef.current?.requestFullscreen();
-  //     }
-  //   } catch (fullscreenException) {
-  //     console.error('Failed to toggle AI module fullscreen mode', fullscreenException);
-  //     setError('Unable to change fullscreen mode. Please try again.');
-  //   }
-  // };
-
   const handleGiftRequest = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const prompt = userPrompt.trim();
@@ -222,8 +209,7 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
       <footer className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] font-semibold">
         <span className={currentSong?.id ? 'text-emerald-400' : 'text-rose-400'}>
           {currentSong?.id ? '● SONG READY' : '○ WAITING FOR SONG'}
-        </span>
-        {/* {currentSong?.id && <span className="truncate text-slate-500">Song ID: {currentSong.id}</span>} */}
+        </span>        
       </footer>
     </main>
   );
