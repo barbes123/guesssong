@@ -9,6 +9,15 @@ import { readFileSync } from 'fs';
 
 const systemPrompt = readFileSync('./ai/system_prompt.txt', 'utf8');
 const configBuzz = JSON.parse(readFileSync('./configBuzz.json', 'utf8'));
+const validEvaluations = new Set(['CORRECT', 'INCORRECT', 'PARTIAL', 'CLOSE']);
+const aiErrorMessage = 'Something is wrong with AI. Try a bit later.';
+
+const makeAIErrorResponse = () => ({
+  giftSuggestions: JSON.stringify({
+    evaluation: 'AI_ERR',
+    message: aiErrorMessage,
+  }),
+});
 
 const app = express();
 app.use(express.json());
@@ -111,16 +120,38 @@ app.post("/api/gift", async (req, res) => {
       messages,
     });
 
-    // TODO: Step 4 — extract content and send back as JSON
-    const giftSuggestions = response.choices[0].message.content
-    console.log(giftSuggestions)
+    const giftSuggestions = response?.choices?.[0]?.message?.content;
+    if (typeof giftSuggestions !== 'string' || !giftSuggestions.trim()) {
+      console.error('AI model returned a missing or empty response:', response);
+      return res.json(makeAIErrorResponse());
+    }
+
+    let parsedResponse;
+    try {
+      parsedResponse = JSON.parse(giftSuggestions);
+    } catch (error) {
+      console.error('AI model returned invalid JSON:', error);
+      return res.json(makeAIErrorResponse());
+    }
+
+    if (
+      !parsedResponse ||
+      typeof parsedResponse !== 'object' ||
+      Array.isArray(parsedResponse) ||
+      !validEvaluations.has(parsedResponse.evaluation) ||
+      typeof parsedResponse.message !== 'string' ||
+      !parsedResponse.message.trim()
+    ) {
+      console.error('AI model returned an unusable JSON response:', parsedResponse);
+      return res.json(makeAIErrorResponse());
+    }
+
+    console.log(giftSuggestions);
 
     res.json({ giftSuggestions });
   } catch (e) {
-    console.error(e)
-    res.status(500).json({
-      message: `It's not you, it's us. 
-    Something went wrong on the server` })
+    console.error('AI model request failed:', e);
+    res.json(makeAIErrorResponse());
   }
 });
 
