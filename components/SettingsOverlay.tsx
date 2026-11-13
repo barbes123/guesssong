@@ -22,6 +22,7 @@ interface SettingsOverlayProps {
   isBuzzerConnected: boolean;
   isPadsConnected: boolean;
   isAIModuleOpen: boolean;
+  isAIModuleEnabled: boolean;
   onToggleAIModule: () => void;
 }
 
@@ -45,6 +46,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   isBuzzerConnected,
   isPadsConnected,
   isAIModuleOpen,
+  isAIModuleEnabled,
   onToggleAIModule
 }) => {
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,10 +147,14 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
         <button
           type="button"
           onClick={onToggleAIModule}
+          disabled={!isAIModuleEnabled}
           aria-label="AI module"
           aria-pressed={isAIModuleOpen}
-          title="AI module"
-          className={`p-3 rounded-full transition-all hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400 ${isAIModuleOpen ? 'text-indigo-300 bg-indigo-900/50' : 'text-slate-300 hover:bg-slate-700'}`}
+          title={isAIModuleEnabled ? 'AI module' : 'AI module unavailable'}
+          className={`p-3 rounded-full transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400 ${!isAIModuleEnabled
+            ? 'text-slate-600 bg-slate-900/40 opacity-50 cursor-not-allowed'
+            : `hover:scale-110 ${isAIModuleOpen ? 'text-indigo-300 bg-indigo-900/50' : 'text-slate-300 hover:bg-slate-700'}`
+            }`}
         >
           <Sparkles size={24} />
         </button>

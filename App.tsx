@@ -108,6 +108,20 @@ const App: React.FC = () => {
   const volumeRef = useRef(volume);
   volumeRef.current = volume;
 
+  const isEligibleAIRound = [1, 2, 3, 4].includes(gameState.activeRoundId ?? -1);
+  const isAIModuleEnabled = currentPage === 'round' && isEligibleAIRound;
+
+  useEffect(() => {
+    const isLeavingEligibleRounds = currentPage === 'setup' || currentPage === 'start';
+    const isOnIneligibleRound = currentPage === 'round'
+      && gameState.activeRoundId !== null
+      && !isEligibleAIRound;
+
+    if (isLeavingEligibleRounds || isOnIneligibleRound) {
+      setIsAIModuleOpen(false);
+    }
+  }, [currentPage, gameState.activeRoundId, isEligibleAIRound]);
+
 
   const [victoryContext, setVictoryContext] = useState<{ roundId: number | null, winnerId: number | null }>({
     roundId: null,
@@ -2185,7 +2199,7 @@ const App: React.FC = () => {
     if (isSprintRound) {
       return (
         <RoundSprint
-          isAIModuleOpen={isAIModuleOpen}
+          isAIModuleOpen={isAIModuleEnabled && isAIModuleOpen}
           gameState={gameState}
           isPlaying={isPlaying}
           timeLeft={timeLeft}
@@ -2440,7 +2454,7 @@ const App: React.FC = () => {
     if (isFinalRound) {
       return (
         <RoundDuel
-          isAIModuleOpen={isAIModuleOpen}
+          isAIModuleOpen={isAIModuleEnabled && isAIModuleOpen}
           gameState={gameState}
           isPlaying={isPlaying}
           timeLeft={timeLeft}
@@ -2480,7 +2494,7 @@ const App: React.FC = () => {
     }
     return (
       <RoundStandard
-        isAIModuleOpen={isAIModuleOpen}
+        isAIModuleOpen={isAIModuleEnabled && isAIModuleOpen}
         activeResponder={activeResponder}
         gameState={gameState}
         players={gameState.players}
@@ -2908,6 +2922,7 @@ const App: React.FC = () => {
           isBuzzerConnected={isBuzzerConnected}
           isPadsConnected={isPadsConnected} 
           isAIModuleOpen={isAIModuleOpen}
+          isAIModuleEnabled={isAIModuleEnabled}
           onToggleAIModule={() => setIsAIModuleOpen(open => !open)}
         />
         {/* {currentPage === 'setup' && (
