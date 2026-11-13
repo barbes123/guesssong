@@ -7,6 +7,7 @@ import { getRoundData } from '../../data/index_data'; // Adjust path
 import { GameState } from '../../types'; // Adjust path
 import MusicTimeline from '../../components/MusicTimeline';
 import AIModule from '../../components/AIModule';
+import type { AiCategory, AiSong } from '../../components/AIModule';
 import { InputMode } from '../../types';
 
 
@@ -24,6 +25,9 @@ interface RoundStandardProps {
   players: any[];
   inputMode: InputMode;
   isAIModuleOpen: boolean;
+  currentSong: AiSong | null;
+  currentCategory: AiCategory | null;
+  songContextKey: string;
   onFinishRound: () => void;
   // Actions
   onNavigate: (page: any, roundId: number | null) => void;
@@ -42,6 +46,9 @@ interface RoundStandardProps {
 const RoundStandard: React.FC<RoundStandardProps> = ({
   inputMode,
   isAIModuleOpen,
+  currentSong,
+  currentCategory,
+  songContextKey,
   gameState,
   activeNote,
   currentRoundPoints,
@@ -434,7 +441,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
 
           {isAIModuleOpen && (
             <div className="bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-xl border border-slate-800 p-3 w-full flex flex-col gap-2 animate-in slide-in-from-right duration-500">
-              <AIModule />
+              <AIModule currentSong={currentSong} currentCategory={currentCategory} songContextKey={songContextKey} />
             </div>
           )}
 

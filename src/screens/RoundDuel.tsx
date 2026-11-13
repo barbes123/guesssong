@@ -4,6 +4,7 @@ import PlayerBoard from '../../components/PlayerBoard';
 import ControlPanel from '../../components/ControlPanel';
 import MusicTimeline from '../../components/MusicTimeline';
 import AIModule from '../../components/AIModule';
+import type { AiCategory, AiSong } from '../../components/AIModule';
 import { getRoundData } from '../../data/index_data';
 import { GameState } from '../../types';
 import { SFX } from '../../data/constants_main';
@@ -18,6 +19,9 @@ interface RoundDuelProps {
   selectedDuration: number | null;
   isR3Finalized: boolean;
   isAIModuleOpen: boolean;
+  currentSong: AiSong | null;
+  currentCategory: AiCategory | null;
+  songContextKey: string;
   onNavigate: (page: any, roundId: number | null) => void;
   onInitializeRound: (roundId: number) => void;
   onUpdatePlayer: (id: number, name: string, score: number, stars?: number) => void;
@@ -45,6 +49,9 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
   selectedDuration,
   isR3Finalized,
   isAIModuleOpen,
+  currentSong,
+  currentCategory,
+  songContextKey,
   onNavigate,
   onInitializeRound,
   onUpdatePlayer,
@@ -240,7 +247,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
 
           {isAIModuleOpen && (
             <div className="bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-xl border border-slate-800 p-3 w-full flex flex-col gap-2 animate-in slide-in-from-right duration-500">
-              <AIModule />
+              <AIModule currentSong={currentSong} currentCategory={currentCategory} songContextKey={songContextKey} />
             </div>
           )}
 

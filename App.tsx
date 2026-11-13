@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { translations } from './translations';
-import { Player, GameState, Page, Language, InputMode } from './types';
+import { Player, GameState, Page, Language, InputMode, Song } from './types';
 import { ROUND_DATA, getRoundData, getAvailableSets } from './data/index_data';
 import { SCREEN_BGM, SFX, INITIAL_POINTS, shuffle } from './data/constants_main';
 import SettingsOverlay from './components/SettingsOverlay';
@@ -29,6 +29,61 @@ import { Music as MusicIcon, ChevronRight, ChevronLeft, Users, Trophy, Star, Par
 import PasswordGuard from './components/PasswordGuard';
 
 import './index.css'
+
+type ActiveNote = { categoryId: string; noteIndex: number; isReveal?: boolean } | null;
+
+const resolveAiContext = (gameState: GameState, activeNote: ActiveNote) => {
+  const activeRoundId = gameState.activeRoundId;
+  if (!activeNote || activeRoundId === null) {
+    return { currentSong: null, currentCategory: null, songContextKey: '' };
+  }
+
+  const selectedSetId = gameState.roundSets[activeRoundId] || 'default';
+  const roundData = getRoundData(activeRoundId, selectedSetId) || [];
+  const category = roundData.find((item: any) => item.id === activeNote.categoryId);
+  const progress = gameState.roundProgress[activeRoundId];
+  let songIndex = activeNote.noteIndex;
+
+  // Round 3 always uses the song for the current duel turn.
+  if (activeRoundId === 3) {
+    songIndex = progress?.currentTurnIndex || 0;
+  }
+
+  // Round 2 reveal buttons are one-based; its points button selects the next song.
+  if (activeRoundId === 2) {
+    if (activeNote.isReveal) {
+      songIndex = activeNote.noteIndex - 1;
+    } else if (activeNote.noteIndex === 0) {
+      songIndex = progress?.activationCounts?.[activeNote.categoryId] || 0;
+    }
+  }
+
+  const songData = category?.songs?.[songIndex];
+  const currentSong: Pick<Song, 'id' | 'title' | 'artist' | 'notes'> | null = songData
+    ? { id: songData.id, title: songData.title, artist: songData.artist, notes: songData.notes || '' }
+    : null;
+  const currentCategory = category
+    ? {
+        id: category.id,
+        name: category.name,
+        description: category.description || { en: '', ru: '' },
+      }
+    : null;
+
+  return {
+    currentSong,
+    currentCategory,
+    songContextKey: [
+      activeRoundId,
+      selectedSetId,
+      activeNote.categoryId,
+      activeNote.noteIndex,
+      activeNote.isReveal ? 'reveal' : 'song',
+      songIndex,
+      currentSong?.id || 'unresolved',
+    ].join(':'),
+  };
+};
 
 //---------------------------
 import configBuzz from './configBuzz.json';
@@ -134,6 +189,7 @@ const App: React.FC = () => {
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeNote, setActiveNote] = useState<{ categoryId: string; noteIndex: number; isReveal?: boolean } | null>(null);
+  const aiContext = resolveAiContext(gameState, activeNote);
   const [currentRoundPoints, setCurrentRoundPoints] = useState<number | undefined>(undefined);
   const [audioProgress, setAudioProgress] = useState({ current: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState<number | undefined>(undefined);
@@ -573,85 +629,7 @@ const App: React.FC = () => {
       };
     }
 
-    // Get current song data
-    // CHANGE: Only update song info when activeNote changes (new song selected with PLAY)
-    // Song info persists even if music is stopped (STOP) or buzzer is pressed
-    // let currentSong: any = null;
-    // if (activeNote && activeId !== null) {
-    //   const selectedSetId = gameState.roundSets[activeId] || 'default';
-    //   const roundData = getRoundData(activeId, selectedSetId) || [];
-    //   const category = roundData.find(c => c.id === activeNote.categoryId);
-    //   if (category) {
-    //     const songData = category.songs[activeNote.noteIndex];
-    //     currentSong = {
-    //       title: songData.title,
-    //       artist: songData.artist,
-    //       // Force the notes string into the object
-    //       notes: songData.notes || ""
-    //     };
-    //   }
-    // }
-    // Get current song data
-    // CHANGE: Only update song info when activeNote changes (new song selected with PLAY)
-    // Song info persists even if music is stopped (STOP) or buzzer is pressed
-    let currentSong: any = null;
-    if (activeNote && activeId !== null) {
-      const selectedSetId = gameState.roundSets[activeId] || 'default';
-      const roundData = getRoundData(activeId, selectedSetId) || [];
-      // const category = roundData.find(c => c.id === activeNote.categoryId);
-      const category = roundData.find((c: any) => c.id === activeNote.categoryId);
-      if (category) {
-        // Determine the correct song index based on round type
-        let songIndex = activeNote.noteIndex;
-        const progress = gameState.roundProgress[activeId];
-
-        // Round 3(melody round) needs special handling
-        if (activeId === 3) {
-          songIndex = progress?.currentTurnIndex || 0;
-        }
-
-        // Round 2 (melody round) needs special handling
-        if (activeId === 2) {
-          if (activeNote.isReveal) {
-            // Reveal buttons (1‑4) → song index = noteIndex - 1
-            songIndex = activeNote.noteIndex - 1;
-          } else if (activeNote.noteIndex === 0) {
-            // Points button (0) → song index = next unrevealed song
-            songIndex = progress?.activationCounts?.[activeNote.categoryId] || 0;
-          }
-        }
-        // For other rounds, noteIndex already matches the song
-
-        const songData = category.songs[songIndex];
-        if (songData) {
-          currentSong = {
-            id: songData.id,
-            title: songData.title,
-            artist: songData.artist,
-            notes: songData.notes || ""
-          };
-        }
-      }
-    }
-
-    const getCurrentCategory = () => {
-      const activeId = gameState.activeRoundId;
-      if (!activeNote || !activeId) return null;
-
-      const selectedSetId = gameState.roundSets[activeId] || 'default';
-      const roundData = getRoundData(activeId, selectedSetId) || [];
-      const category = roundData.find((c: any) => c.id === activeNote.categoryId);
-      // const category = roundData.find(c => c.id === activeNote.categoryId);
-
-      if (category) {
-        return {
-          id: category.id,
-          name: category.name,
-          description: category.description || { ru: '', en: '' }
-        };
-      }
-      return null;
-    };
+    const { currentSong, currentCategory } = aiContext;
 
     stateToShareRef.current = {
       // Force victory page if showVictory is triggered
@@ -686,19 +664,9 @@ const App: React.FC = () => {
       buzzerPlayerName: buzzerPlayerName,
       buzzerPoints: buzzerPoints,
       isWarmup: isWarmup,
-      currentCategory: getCurrentCategory(),
+      currentCategory,
     };
 
-    // DEBUG: Log what we're about to emit
-    if (currentSong) {
-      console.log('📦 [App.tsx] Packing song data:', {
-        id:currentSong.id,
-        title: currentSong.title,
-        artist: currentSong.artist,
-        notes: currentSong.notes ? currentSong.notes.substring(0, 50) + '...' : '(none)',
-        timestamp: new Date().toISOString()
-      });
-    }
   }, [
     currentPage,
     gameState,
@@ -2200,6 +2168,9 @@ const App: React.FC = () => {
       return (
         <RoundSprint
           isAIModuleOpen={isAIModuleEnabled && isAIModuleOpen}
+          currentSong={aiContext.currentSong}
+          currentCategory={aiContext.currentCategory}
+          songContextKey={aiContext.songContextKey}
           gameState={gameState}
           isPlaying={isPlaying}
           timeLeft={timeLeft}
@@ -2455,6 +2426,9 @@ const App: React.FC = () => {
       return (
         <RoundDuel
           isAIModuleOpen={isAIModuleEnabled && isAIModuleOpen}
+          currentSong={aiContext.currentSong}
+          currentCategory={aiContext.currentCategory}
+          songContextKey={aiContext.songContextKey}
           gameState={gameState}
           isPlaying={isPlaying}
           timeLeft={timeLeft}
@@ -2495,6 +2469,9 @@ const App: React.FC = () => {
     return (
       <RoundStandard
         isAIModuleOpen={isAIModuleEnabled && isAIModuleOpen}
+        currentSong={aiContext.currentSong}
+        currentCategory={aiContext.currentCategory}
+        songContextKey={aiContext.songContextKey}
         activeResponder={activeResponder}
         gameState={gameState}
         players={gameState.players}
