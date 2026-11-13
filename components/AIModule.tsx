@@ -48,8 +48,6 @@ const escapeHtml = (value: string): string => value.replace(/[&<>"']/g, (char) =
 } as Record<string, string>)[char] || char);
 
 const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songContextKey }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [passwordInput, setPasswordInput] = useState('');
   const [error, setError] = useState('');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -59,15 +57,10 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
   const [requestHistory, setRequestHistory] = useState<RequestAttempt[]>([]);
 
   const moduleRef = useRef<HTMLElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const activeRequestRef = useRef<AbortController | null>(null);
   const songContextKeyRef = useRef(songContextKey);
   songContextKeyRef.current = songContextKey;
-
-  useEffect(() => {
-    setIsAuthenticated(sessionStorage.getItem('leaderAuthenticated') === 'true');
-  }, []);
 
   useEffect(() => {
     const syncFullscreenState = () => {
@@ -90,33 +83,18 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
   }, [songContextKey]);
 
-  const toggleFullscreen = async () => {
-    try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-      } else {
-        await moduleRef.current?.requestFullscreen();
-      }
-    } catch (fullscreenException) {
-      console.error('Failed to toggle AI module fullscreen mode', fullscreenException);
-      setError('Unable to change fullscreen mode. Please try again.');
-    }
-  };
-
-  const handleLoginSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (passwordInput === configBuzz.LEADER_PASS) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('leaderAuthenticated', 'true');
-      setError('');
-      videoRef.current?.play().catch((playError) => {
-        console.log('Video hack blocked:', playError);
-      });
-    } else {
-      setError('Invalid password');
-      setPasswordInput('');
-    }
-  };
+  // const toggleFullscreen = async () => {
+  //   try {
+  //     if (document.fullscreenElement) {
+  //       await document.exitFullscreen();
+  //     } else {
+  //       await moduleRef.current?.requestFullscreen();
+  //     }
+  //   } catch (fullscreenException) {
+  //     console.error('Failed to toggle AI module fullscreen mode', fullscreenException);
+  //     setError('Unable to change fullscreen mode. Please try again.');
+  //   }
+  // };
 
   const handleGiftRequest = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -193,85 +171,18 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
   const categoryName = getDisplayText(currentCategory?.name);
   const categoryDescription = getDisplayText(currentCategory?.description);
 
-  if (!isAuthenticated) {
-    return (
-      <section className="w-full rounded-xl bg-slate-950 p-3 font-sans text-white">
-        <video ref={videoRef} loop muted playsInline className="hidden">
-          <source src="/video/silent.mp4" type="video/mp4" />
-        </video>
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-4 text-center shadow-xl">
-          <h2 className="mb-3 text-base font-bold">🔒 AI Access</h2>
-          <form onSubmit={handleLoginSubmit}>
-            <input
-              type="password"
-              value={passwordInput}
-              onChange={(event) => setPasswordInput(event.target.value)}
-              autoComplete="current-password"
-              className="mb-3 block w-full rounded-lg border border-slate-700 bg-slate-800 p-3 text-center text-sm text-white outline-none focus:border-indigo-500"
-              placeholder="Enter Password"
-              aria-label="Password"
-            />
-            {error && <p role="alert" className="mb-3 text-xs text-rose-400">{error}</p>}
-            <button type="submit" className="w-full rounded-lg bg-indigo-600 py-3 text-sm font-bold text-white transition hover:bg-indigo-500">
-              Login
-            </button>
-          </form>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <main
       ref={moduleRef}
       className="w-full min-w-0 bg-slate-950 p-3 font-sans text-white"
     >
-      <video ref={videoRef} loop muted playsInline className="hidden">
-        <source src="/video/silent.mp4" type="video/mp4" />
-      </video>
-
       <header className="mb-3 flex items-center justify-between gap-2 border-b border-slate-700 pb-3">
         <div className="min-w-0">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400">Music Quiz</p>
           <h2 className="truncate text-lg font-bold">AI Song Guess</h2>
-        </div>
-        <button
-          type="button"
-          onClick={toggleFullscreen}
-          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          aria-pressed={isFullscreen}
-          title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-600 bg-slate-800 text-slate-100 transition hover:bg-slate-700"
-        >
-          {isFullscreen ? <Minimize size={18} aria-hidden="true" /> : <Maximize size={18} aria-hidden="true" />}
-        </button>
+        </div> 
       </header>
 
       {error && <p role="alert" className="mb-2 text-xs text-rose-400">{error}</p>}
-
-      <section className="mb-3 rounded-xl border border-slate-700 bg-slate-900 p-3 shadow-lg">
-        <div className="mb-2 min-w-0">
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Category</p>
-          <h3 className="truncate text-sm font-bold">{categoryName || '—'}</h3>
-          {categoryDescription && (
-            <p className="mt-1 max-h-16 overflow-y-auto whitespace-pre-line text-xs text-slate-300">
-              {categoryDescription}
-            </p>
-          )}
-        </div>
-        <div className="grid gap-2 border-t border-slate-700 pt-2">
-          <div className="min-w-0">
-            <p className="mb-1 truncate text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Song ID · {currentSong?.id || 'n/a'}
-            </p>
-            <p className="truncate text-sm font-semibold">{currentSong?.title || '—'}</p>
-          </div>
-          <div className="min-w-0">
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Artist</p>
-            <p className="truncate text-sm font-semibold">{currentSong?.artist || '—'}</p>
-          </div>
-        </div>
-      </section>
 
       <section className="rounded-xl border border-slate-700 bg-slate-900 p-3 shadow-lg">
         <form onSubmit={handleGiftRequest}>
@@ -310,9 +221,9 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
 
       <footer className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] font-semibold">
         <span className={currentSong?.id ? 'text-emerald-400' : 'text-rose-400'}>
-          {currentSong?.id ? '● SONG DATA READY' : '○ WAITING FOR SONG DATA'}
+          {currentSong?.id ? '● SONG READY' : '○ WAITING FOR SONG'}
         </span>
-        {currentSong?.id && <span className="truncate text-slate-500">Song ID: {currentSong.id}</span>}
+        {/* {currentSong?.id && <span className="truncate text-slate-500">Song ID: {currentSong.id}</span>} */}
       </footer>
     </main>
   );
