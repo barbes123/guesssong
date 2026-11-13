@@ -16,6 +16,8 @@ def get_version_number(set_name: str) -> int:
         return 3
     elif set_name == 'v4':
         return 4
+    elif set_name == 'v5':
+        return 5
     else:
         return 0
 
@@ -425,6 +427,12 @@ def main():
         print("\nSample songs with numbers:")
         for i, song in enumerate(songs[:15], 1):
             print(f"  {song['song_number']}: {song['title']} ({song['artist']}) [v{song['version_number']}]")
+            
+        all_songs_file = ts_dir / 'all_songs_list.txt'
+        with open(all_songs_file, 'w', encoding='utf-8') as f:
+            for song in songs:
+                f.write(f"  {song['song_number']}: {song['title']} ({song['artist']}) [v{song['version_number']}]\n")
+        print(f"\nAll songs list saved to: {all_songs_file}")    
     
     # Generate output
     output_file = ts_dir / 'song_database.json'

@@ -320,7 +320,7 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
         <div
           aria-live="polite"
           aria-busy={isLoading}
-          className="prose prose-invert mt-3 h-[8.8rem] max-w-none overflow-y-auto rounded-lg border border-slate-700 bg-slate-950/70 p-3 text-sm text-slate-100"
+          className="prose prose-invert mt-3 h-[10.4rem] max-w-none overflow-y-auto rounded-lg border border-slate-700 bg-slate-950/70 p-3 text-sm text-slate-100"
         >
           {isWaitingForSong
             ? t.aiWaitingForSongInfo
@@ -330,11 +330,11 @@ const AIModule: React.FC<AIModuleProps> = ({ currentSong, currentCategory, songC
         </div>
       </section>
 
-      <footer className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] font-semibold">
+      {/* <footer className="mt-2 flex flex-wrap items-center justify-between gap-1 text-[10px] font-semibold">
         <span className={currentSong?.id ? 'text-emerald-400' : 'text-rose-400'}>
           {currentSong?.id ? t.aiSongReady : t.aiWaitingForSong}
         </span>        
-      </footer>
+      </footer> */}
     </main>
   );
 };
