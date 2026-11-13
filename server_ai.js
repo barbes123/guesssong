@@ -54,7 +54,12 @@ async function getSongLyrics(songId) {
   }
 
   const filePath = path.join(lyricsDir, `${songId}.txt`);
-  return await fs.readFile(filePath, "utf-8");
+  try {
+    return await fs.readFile(filePath, "utf-8");
+  } catch (error) {
+    if (error.code === 'ENOENT') return null;
+    throw error;
+  }
 }
 
 app.get("/test", (req, res) => {
@@ -72,6 +77,15 @@ app.post("/api/gift", async (req, res) => {
   console.log("BACK-END:", songId)
 
   const songLyrics = await getSongLyrics(songId)
+
+  if (typeof songLyrics !== 'string' || !songLyrics.trim()) {
+    return res.json({
+      giftSuggestions: JSON.stringify({
+        evaluation: 'NOTLYRICS',
+        message: 'I am not able to evaluate because the song is missing in database',
+      }),
+    });
+  }
 
   console.log(songLyrics)
 
