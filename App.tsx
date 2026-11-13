@@ -1732,7 +1732,7 @@ const App: React.FC = () => {
   };
 
   // UPDATED handleFinalizeTurn function
-  const handleFinalizeTurn = (status: 'correct' | 'wrong' | 'skip', isTimeOut = false) => {
+  const handleFinalizeTurn = (status: 'correct' | 'wrong' | 'skip', isTimeOut = false, skipConfirmation = false) => {
     console.log("🎯 handleFinalizeTurn CALLED", {
       status,
       inputMode,
@@ -1755,11 +1755,10 @@ const App: React.FC = () => {
     // ROUND 4: SPRINT LOGIC (Update state, don't return JSX)
     // =========================================================
     if (isSprintRound) {
-      // Show confirmation modal
       const title = status === 'correct' ? t.correct : status === 'wrong' ? t.wrong : t.skip;
       const message = status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints;
 
-      showModal(title, message, () => {
+      const finalizeSprintTurn = () => {
         // --- This runs after user confirms ---
         const currentPlayer = gameState.players[gameState.currentPlayerIndex];
         const playerId = currentPlayer.id;
@@ -1840,7 +1839,13 @@ const App: React.FC = () => {
         setCurrentRoundPoints(undefined);
         // setTimeLeft(undefined);
         setModal(null); // close confirmation modal
-      }, status === 'correct' ? t.correct : t.noAssign, undefined, 'inline');
+      };
+
+      if (skipConfirmation) {
+        finalizeSprintTurn();
+      } else {
+        showModal(title, message, finalizeSprintTurn, status === 'correct' ? t.correct : t.noAssign, undefined, 'inline');
+      }
 
       return; // important: exit after showing modal
     }
@@ -1849,7 +1854,7 @@ const App: React.FC = () => {
     // ROUND 3: DUEL LOGIC (Update state, don't return JSX)
     // =========================================================
     if (isFinalRound) {
-      showModal(status === 'correct' ? t.correct : t.wrong, t.confirmAction, () => {
+      const finalizeDuelTurn = () => {
         let winnerId: number | null = null;
 
         setGameState(prev => {
@@ -1917,7 +1922,13 @@ const App: React.FC = () => {
         setModal(null);
         playSFX(status === 'correct' ? SFX.correct : SFX.wrong);
 
-      }, undefined, undefined, 'inline');
+      };
+
+      if (skipConfirmation) {
+        finalizeDuelTurn();
+      } else {
+        showModal(status === 'correct' ? t.correct : t.wrong, t.confirmAction, finalizeDuelTurn, undefined, undefined, 'inline');
+      }
       return;
     }
 
@@ -1973,7 +1984,7 @@ const App: React.FC = () => {
     });
 
 
-    showModal(status === 'correct' ? t.correct : t.wrong, status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints, () => {
+    const finalizeStandardTurn = () => {
       // If this is the Warm-up (Round 0), do not award points regardless of correctness
       // const addedPoints = status === 'correct' ? ((roundId === 0) ? 0 : (currentRoundPoints || 0)) : 0;
       const addedPoints = status === 'correct' ? (currentRoundPoints || 0) : 0;
@@ -2052,7 +2063,20 @@ const App: React.FC = () => {
       setCurrentRoundPoints(undefined);
       setTimeLeft(undefined);
       setModal(null);
-    }, status === 'correct' ? t.correct : t.noAssign, undefined, 'inline');
+    };
+
+    if (skipConfirmation) {
+      finalizeStandardTurn();
+    } else {
+      showModal(
+        status === 'correct' ? t.correct : t.wrong,
+        status === 'correct' ? t.confirmAssignPoints : t.confirmNoPoints,
+        finalizeStandardTurn,
+        status === 'correct' ? t.correct : t.noAssign,
+        undefined,
+        'inline'
+      );
+    }
   };
 
   // UPDATED handleNextTurnNav function
@@ -2194,6 +2218,7 @@ const App: React.FC = () => {
           }}
           onAudioControl={handleAudioControl}
           onFinalizeTurn={handleFinalizeTurn}
+          onAIFinalizeTurn={(status) => handleFinalizeTurn(status, false, true)}
           onSeek={handleSeek}
           formatTime={formatTime}
           onNoteClick={handleNoteClick}
@@ -2455,6 +2480,7 @@ const App: React.FC = () => {
           }}
           onAudioControl={handleAudioControl}
           onFinalizeTurn={handleFinalizeTurn}
+          onAIFinalizeTurn={(status) => handleFinalizeTurn(status, false, true)}
           onSeek={handleSeek}
           formatTime={formatTime}
           onSetSelectedDuration={setSelectedDuration}
@@ -2494,6 +2520,7 @@ const App: React.FC = () => {
         })}
         onAudioControl={handleAudioControl}
         onFinalizeTurn={handleFinalizeTurn}
+        onAIFinalizeTurn={(status) => handleFinalizeTurn(status, false, true)}
         onSeek={handleSeek}
         formatTime={formatTime}
         onFinishRound={handleFinishRoundManual}
