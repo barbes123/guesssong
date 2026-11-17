@@ -3,7 +3,7 @@ import { audioUrl } from './audioUtils';
 
 import { romanianCat } from './categories/cat_12'; 
 
-//Made from r2-v2
+//Made from r1-v2: added romanianCat
 
 // ==================== ROUND 1-2 AUDIO FILES ====================
 

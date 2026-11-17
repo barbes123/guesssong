@@ -1,5 +1,7 @@
 import { RoundSet } from '../types';
 import { audioUrl } from './audioUtils';
+import { romanceCat } from './categories/cat_12'; 
+
 
 // ==================== ROUND 2-2 AUDIO FILES ====================
 
@@ -15,18 +17,6 @@ const R4_2_C1B3full = audioUrl('pesenka-shofera_itiv3b', '/music/round2/pesenka-
 
 const R4_2_C1B4minus = audioUrl('vse_mogut_koroli_minus_cloitv', '/music/round2/vse_mogut_koroli_minus_cloitv.mp3');
 const R4_2_C1B4full = audioUrl('vse_mogut_koroli_whymlj', '/music/round2/vse_mogut_koroli_whymlj.mp3');
-
-const R4_2_C2B1minus = audioUrl('ya_vstretil_Vas-minus_xpzsgo', '/music/round2/ya_vstretil_Vas-minus_xpzsgo.mp3');
-const R4_2_C2B1full = audioUrl('ya_vstretil_Vas_mbhwzg', '/music/round2/ya_vstretil_Vas_mbhwzg.mp3');
-
-const R4_2_C2B2minus = audioUrl('ochi-chernye-minus_usug0j', '/music/round2/ochi-chernye-minus_usug0j.mp3');
-const R4_2_C2B2full = audioUrl('ochi-chernye_marugh', '/music/round2/ochi-chernye_marugh.mp3');
-
-const R4_2_C2B3minus = audioUrl('iz-daleka-dolgo-techet-reka-volga-minus_xhz9ay', '/music/round2/iz-daleka-dolgo-techet-reka-volga-minus_xhz9ay_cut.mp3');
-const R4_2_C2B3full = audioUrl('iz-daleka-dolgo-techet-reka-volga_vubrfo', '/music/round2/iz-daleka-dolgo-techet-reka-volga_vubrfo.mp3');
-
-const R4_2_C2B4minus = audioUrl('Gori_moya_zvezda_minus_rjkalc', '/music/round2/Gori_moya_zvezda_minus_rjkalc.mp3');
-const R4_2_C2B4full = audioUrl('Gori_moya_zvezda_oyiiyz', '/music/round2/Gori_moya_zvezda_oyiiyz.mp3');
 
 const R4_2_C3B1minus = audioUrl('', '/music/round2/zvenit-yanvarskaya-vyuga-minus.mp3');
 const R4_2_C3B1full = audioUrl('', '/music/round2/zvenit-yanvarskaya-vyuga.mp3');
@@ -107,48 +97,7 @@ export const round2v2Set: RoundSet = {
         },
       ]
     },
-    {
-      id: 'romances',
-      name: { en: 'Romances', ru: 'Романсы' },
-      description: {
-        ru: 'Для тех, у кого есть хотя бы одна несчастная любовь в багаже. И даже если нет — после этих песен захочется её придумать.',
-        en: 'For those who have at least one unhappy love in their baggage. And even if not — after these songs, you\'ll want to invent one.'
-      },
-      songs: [
-        { 
-          id: 'p1_2_5', 
-          title: 'Я встретил Вас', 
-          artist: 'Иван Козловский', 
-          audioUrl: R4_2_C2B1minus, 
-          audioUrlFull: R4_2_C2B1full,
-          notes: 'Старинный романс на стихи Фёдора Тютчева «Я встретил вас — и всё былое», написанный в 1870 году. В исполнении легендарного тенора Ивана Козловского обрёл особую проникновенность и глубину. Козловский был солистом Большого театра и одним из самых узнаваемых голосов СССР.\n\n«Я встретил вас — и всё былое / В отжившем сердце ожило; / Я вспомнил время золотое — / И сердцу стало так тепло...»'
-        },
-        { 
-          id: 'p1_2_6', 
-          title: 'Очи чёрные', 
-          artist: 'Фёдор Шаляпин', 
-          audioUrl: R4_2_C2B2minus, 
-          audioUrlFull: R4_2_C2B2full,
-          notes: 'Самый известный русский романс в эталонном исполнении великого баса Фёдора Шаляпина. Цыганский романс на стихи Евгения Гребёнки (1843) стал визитной карточкой русской культуры за рубежом. Шаляпин исполнял его на всех своих концертах, и именно в его версии романс обрёл всемирную известность.\n\n«Очи чёрные, очи страстные, / Очи жгучие и прекрасные! / Как люблю я вас, как боюсь я вас, / Знать, увидел вас я в недобрый час!»'
-        },
-        { 
-          id: 'p1_2_7', 
-          title: 'Издалека долго течёт река Волга', 
-          artist: 'Людмила Зыкина', 
-          audioUrl: R4_2_C2B3minus, 
-          audioUrlFull: R4_2_C2B3full,
-          notes: 'Знаменитая песня Марка Фрадкина на стихи Льва Ошанина (1962). В исполнении Людмилы Зыкиной стала символом России и русской души — широкой, глубокой и печальной. Зыкину называли "голосом эпохи", а эту песню — неофициальным гимном великой русской реки.\n\n«Издалека долго течёт река Волга, / Течёт река Волга — конца и края нет. / Среди хлебов спелых, среди снегов белых / Течёт река Волга — а мне семнадцать лет.»'
-        },
-        { 
-          id: 'p1_2_8', 
-          title: 'Гори, гори, моя звезда', 
-          artist: 'Александр Вертинский', 
-          audioUrl: R4_2_C2B4minus, 
-          audioUrlFull: R4_2_C2B4full,
-          notes: 'Старинный русский романс композитора Петра Булахова на стихи Василия Чуевского (1846). В аристократичном, немного надрывном исполнении Вертинского обрёл вторую жизнь и стал одним из символов Серебряного века. Вертинский вернулся из эмиграции в СССР в 1943 году и привёз с собой этот романс в новой аранжировке.\n\n«Гори, гори, моя звезда, / Гори, звезда приветная! / Ты у меня одна заветная, / Другой не будет никогда.»'
-        },
-      ]
-    },
+    romanceCat,   
     {
       id: 'winter',
       name: { en: 'Winter', ru: 'Песни о зиме' },

@@ -1,5 +1,5 @@
-import { RoundSet } from '../types';
-import { audioUrl } from './audioUtils';
+import { RoundSet } from '../../types';
+import { audioUrl } from '../audioUtils';
 
 // ==================== ROUND 3 (DUEL) - DEFAULT SET (Q1–Q5) ====================
 // Uses Round 6 audio assets (legacy) but is presented as Round 3 in the app.

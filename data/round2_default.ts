@@ -1,5 +1,7 @@
 import { RoundSet } from '../types';
 import { audioUrl } from './audioUtils';
+import { tableCat } from './categories/cat_12'; 
+
 
 // ==================== ROUND 2 AUDIO FILES ====================
 
@@ -29,18 +31,6 @@ const R2_1_C2B3full = audioUrl('', '/music/round2/Yurii_Vizbor_-_Dombaiskii_vals
 const R2_1_C2B4minus = audioUrl('Valerij_Kaner_-_A_vse_konchaetsya_minus_ckfder', '/music/round2/Valerij_Kaner_-_A_vse_konchaetsya_minus_ckfder.mp3');
 const R2_1_C2B4full = audioUrl('Valerij_Kaner_-_A_vse_konchaetsya_kehaab', '/music/round2/Valerij_Kaner_-_A_vse_konchaetsya_kehaab.mp3');
 
-// Застольные песни
-const R2_1_C3B1minus = audioUrl('odnazhdy-morem-ya-plyla_minus_vqop94', '/music/round2/odnazhdy-morem-ya-plyla_minus_vqop94_cut.mp3');
-const R2_1_C3B1full = audioUrl('odnazhdy-morem-ya-plyla_b9qk4r', '/music/round2/odnazhdy-morem-ya-plyla_b9qk4r.mp3');
-
-const R2_1_C3B2minus = audioUrl('da_ne_vecher_minus_ql59gq', '/music/round2/da_ne_vecher_minus_ql59gq_cut.mp3');
-const R2_1_C3B2full = audioUrl('da_ne_vecher_kzkx9i', '/music/round2/da_ne_vecher_kzkx9i.mp3');
-
-const R2_1_C3B3minus = audioUrl('Napilas_ya_pyana_minus_i9ifis', '/music/round2/Napilas_ya_pyana_minus_i9ifis.mp3');
-const R2_1_C3B3full = audioUrl('Napilas_ya_pyana_fuxrry', '/music/round2/Napilas_ya_pyana_fuxrry.mp3');
-
-const R2_1_C3B4minus = audioUrl('minus-vot-kto-to-s-gorochki-spustilsya_minus_l7l2tp', '/music/round2/minus-vot-kto-to-s-gorochki-spustilsya_minus_l7l2tp.mp3');
-const R2_1_C3B4full = audioUrl('minus-vot-kto-to-s-gorochki-spustilsya_mid1se', '/music/round2/minus-vot-kto-to-s-gorochki-spustilsya_mid1se.mp3');
 
 // Хиты 80-х
 const R2_1_C4B1minus = audioUrl('deltaplan_minus_v4yvhf', '/music/round2/deltaplan_minus_v4yvhf.mp3');
@@ -152,48 +142,7 @@ export const defaultSet: RoundSet = {
         },
       ]
     },
-    {
-      id: 'table',
-      name: { en: 'Table Songs', ru: 'Застольная' },
-      description: {
-        ru: 'Музыка для момента, когда тарелки уже отодвинуты, а тосты ещё не закончились. Голоса становятся громче, соседи — счастливее.',
-        en: 'Music for that moment when plates have been pushed aside, but toasts are still going. Voices get louder, neighbors get happier.'
-      },
-      songs: [
-        { 
-          id: 'p2_9', 
-          title: 'Однажды морем я плыла', 
-          artist: 'Надежда Кадышева / ансамбль «Золотое кольцо»', 
-          audioUrl: R2_1_C3B1minus, 
-          audioUrlFull: R2_1_C3B1full,
-          notes: 'Русская народная песня в современной обработке, популярная на застольях. Рассказ о девушке, плывущей по морю и вспоминающей о любимом.\n\n«Однажды морем я плыла, / Вдали увидела скалу. / На той скале стоял мой милый, / Махал мне белою рукой.»'
-        },
-        { 
-          id: 'p2_10', 
-          title: 'Да не вечер', 
-          artist: 'Русская народная песня', 
-          audioUrl: R2_1_C3B2minus, 
-          audioUrlFull: R2_1_C3B2full,
-          notes: 'Классическая русская народная песня, часто исполняемая на застольях и праздниках. Имеет глубокие исторические корни и множество вариантов исполнения.\n\n«Да не вечер, да не вечер, / Мне малым-мало спалось, / Мне малым-мало спалось, / Во сне привиделось.»'
-        },
-        { 
-          id: 'p2_11', 
-          title: 'Напилась я пьяна', 
-          artist: 'Русская народная песня', 
-          audioUrl: R2_1_C3B3minus, 
-          audioUrlFull: R2_1_C3B3full,
-          notes: 'Шуточная народная песня, популярная в застольных исполнениях. Весёлый рассказ о девушке, которая выпила лишнего и теперь не может дойти до дома.\n\n«Напилась я пьяна, не дойду до дома, / Напилась я пьяна, не дойду до дома. / Ой, калина, ой, малина, / Не дойду до дома.»'
-        },
-        { 
-          id: 'p2_12', 
-          title: 'Вот кто-то с горочки спустился', 
-          artist: 'Русская народная песня', 
-          audioUrl: R2_1_C3B4minus, 
-          audioUrlFull: R2_1_C3B4full,
-          notes: 'Лирическая русская народная песня с красивой мелодией. Рассказ о девушке, которая ждёт своего любимого, спускающегося с горы.\n\n«Вот кто-то с горочки спустился, / Наверно, милый мой идёт. / На нём защитна гимнастёрка, / Она с ума меня сведёт.»'
-        },
-      ]
-    },
+    tableCat,   
     {
       id: 'hits80',
       name: { en: 'Hits of the 80s', ru: 'Хиты 80-х' },
