@@ -186,7 +186,7 @@ const PlayerScreenContent = () => {
     // При подключении запрашиваем текущее состояние
     socket.on('connect', () => {
       console.log('✅ [PlayerScreen] Socket connected to', configBuzz.SOCKET_URL);
-      socket.emit('');  // ← Нужно добавить на сервере!
+      socket.emit('');
     });
 
     return () => {
@@ -222,7 +222,7 @@ const PlayerScreenContent = () => {
 
     return (
       <div className="retro-buzzer-overlay fixed inset-0 z-[100] flex items-center justify-center animate-in fade-in duration-300">
-      {/* <div className="retro-show retro-buzzer-overlay fixed inset-0 z-[100] flex items-center justify-center animate-in fade-in duration-300"> */}
+        {/* <div className="retro-show retro-buzzer-overlay fixed inset-0 z-[100] flex items-center justify-center animate-in fade-in duration-300"> */}
         <div className="retro-buzzer-glow" aria-hidden="true" />
         <div className="retro-buzzer-card relative w-full mx-4 animate-in zoom-in-95 duration-500">
           <div className="retro-buzzer-lights" aria-hidden="true" />
@@ -687,39 +687,64 @@ const PlayerScreenContent = () => {
         <div className="max-w-[1800px] mx-auto w-full flex gap-8 items-stretch">
 
           {/* ================= LEFT PLAYER (Narrowed, line removed) ================= */}
-          <div
+          {/* <div
             className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isLeftActive
-              ? 'bg-gradient-to-b from-indigo-900/60 to-slate-900 border-indigo-400 shadow-[0_0_40px_rgba(99,102,241,0.3)] scale-105 z-10'
+              ? 'bg-gradient-to-b from-indigo-900/10 to-slate-900 border-indigo-400 shadow-[0_0_40px_rgba(99,102,241,0.3)] scale-105 z-10'
               : 'bg-slate-900/80 border-slate-800 opacity-80'
               }`}
+          > */}
+          <div
+            className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isLeftActive
+              ? 'bg-transparent border-indigo-400 shadow-[0_0_40px_rgba(99,102,241,0.3)] scale-105 z-10'
+              : 'bg-transparent border-slate-800 opacity-80'
+              }`}
           >
-            {/* Reduced from text-6xl to text-4xl to fit narrow container */}
-            <h3 className="text-4xl font-black text-white text-center mb-6 truncate drop-shadow-md">
-              {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
+            <h3 className="min-w-0 text-2xl leading-relaxed font-black text-white text-center drop-shadow-md py-2">
+              <span
+                className={`inline-block max-w-full truncate ${isLeftActive ? 'rounded-md px-2 py-1' : ''}`}
+                style={isLeftActive ? {
+                  backgroundImage: 'linear-gradient(90deg, rgba(255, 226, 83, 0.22), rgba(255, 174, 28, 0.32))',
+                  filter: 'brightness(1.25) saturate(1.2) drop-shadow(0 0 9px rgba(255, 226, 83, .95)) drop-shadow(0 0 19px rgba(255, 174, 28, .85))'
+                } : undefined}
+              >
+                {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
+              </span>
             </h3>
-
-            {/* Reduced star size from 64 to 36 */}
-            <div className="flex justify-center gap-3 mb-8 bg-slate-950/40 py-3 rounded-full border border-slate-800 shadow-inner">
-              {[1, 2, 3].map(s => (
-                <Star
-                  key={s}
-                  size={36}
-                  className={s <= (leftPlayer.stars || 0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'text-slate-700'}
-                />
-              ))}
+            <div className="flex items-center justify-center gap-2 mb-8 min-w-0">
+              {/* <h3 className="min-w-0 flex-1 text-2xl font-black text-white text-center truncate drop-shadow-md">
+                {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
+              </h3> */}
+              <div className="flex w-32 shrink-0 flex-col items-center gap-16">
+                {[1, 2, 3].map(s => (
+                  <div
+                    key={s}
+                    data-note-state={s <= (leftPlayer.stars || 0) ? 'active' : 'available'}
+                    className="retro-note-tile retro-round3-note"
+                  >
+                    <img
+                      src={musicalNoteAsset}
+                      alt=""
+                      aria-hidden="true"
+                      draggable="false"
+                      className="retro-note-art"
+                      style={{
+                        filter: s <= (leftPlayer.stars || 0) ? undefined : 'grayscale(1) brightness(.15)'
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Reduced score from text-7xl to text-6xl */}
-            <div className="text-center text-6xl font-black text-indigo-400 tabular-nums tracking-tighter drop-shadow-md">
-              {leftPlayer.score}
-            </div>
           </div>
 
           {/* ================= CENTER INFO (Expanded) ================= */}
-          <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-slate-800/40 to-slate-900/60 rounded-[4rem] p-10 lg:p-14 border border-slate-700/50 shadow-2xl relative">
-            <div className="text-2xl font-black text-slate-400 uppercase tracking-[0.3em] mb-6">
+          {/* <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-b from-slate-800/40 to-slate-900/60 rounded-[4rem] p-10 lg:p-14 border border-slate-700/50 shadow-2xl relative"> */}
+          {/* <div className="flex-1 flex flex-col items-center justify-center bg-transparent rounded-[4rem] p-10 lg:p-14 border border-slate-700/50 shadow-2xl relative"> */}
+           <div className="flex-1 flex flex-col items-center justify-center bg-transparent rounded-[4rem] p-10 lg:p-14">
+            {/* <div className="text-2xl font-black text-slate-400 uppercase tracking-[0.3em] mb-6">
               {t.turn || "TURN"} {turnIdx + 1} / 5
-            </div>
+            </div> */}
 
             {/* HINT TEXT CONTAINER: Same text-4xl size, enhanced container styling */}
             <div className="text-center bg-gradient-to-b from-slate-900/80 to-slate-950/90 rounded-[2.5rem] p-10 border border-slate-700 shadow-[inset_0_2px_15px_rgba(0,0,0,0.5)] mb-10 w-full relative overflow-hidden">
@@ -756,32 +781,53 @@ const PlayerScreenContent = () => {
           </div>
 
           {/* ================= RIGHT PLAYER (Narrowed, line removed) ================= */}
-          <div
+          {/* <div
             className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isRightActive
               ? 'bg-gradient-to-b from-rose-900/60 to-slate-900 border-rose-400 shadow-[0_0_40px_rgba(244,63,94,0.3)] scale-105 z-10'
               : 'bg-slate-900/80 border-slate-800 opacity-80'
               }`}
+          > */}
+          <div
+            className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isLeftActive
+              ? 'bg-transparent scale-105 z-10'
+              : 'bg-transparent border-slate-800 opacity-80'
+              }`}
           >
-            {/* Reduced from text-6xl to text-4xl */}
-            <h3 className="text-4xl font-black text-white text-center mb-6 truncate drop-shadow-md">
-              {rightPlayer.name || `Player ${rightPlayer.id + 1}`}
+            <h3 className="min-w-0 text-2xl leading-relaxed font-black text-white text-center drop-shadow-md py-2">
+              <span
+                className={`inline-block max-w-full truncate ${isRightActive ? 'rounded-md px-2 py-1' : ''}`}
+                style={isRightActive ? {
+                  backgroundImage: 'linear-gradient(90deg, rgba(255, 226, 83, 0.22), rgba(255, 174, 28, 0.32))',
+                  filter: 'brightness(1.25) saturate(1.2) drop-shadow(0 0 9px rgba(255, 226, 83, .95)) drop-shadow(0 0 19px rgba(255, 174, 28, .85))'
+                } : undefined}
+              >
+                {rightPlayer.name || `Player ${rightPlayer.id + 1}`}
+              </span>
             </h3>
+            <div className="flex items-center justify-center gap-2 mb-8 min-w-0">
 
-            {/* Reduced star size from 64 to 36 */}
-            <div className="flex justify-center gap-3 mb-8 bg-slate-950/40 py-3 rounded-full border border-slate-800 shadow-inner">
-              {[1, 2, 3].map(s => (
-                <Star
-                  key={s}
-                  size={36}
-                  className={s <= (rightPlayer.stars || 0) ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]' : 'text-slate-700'}
-                />
-              ))}
+              <div className="flex w-32 shrink-0 flex-col items-center gap-16">
+                {[1, 2, 3].map(s => (
+                  <div
+                    key={s}
+                    data-note-state={s <= (rightPlayer.stars || 0) ? 'active' : 'available'}
+                    className="retro-note-tile retro-round3-note"
+                  >
+                    <img
+                      src={musicalNoteAsset}
+                      alt=""
+                      aria-hidden="true"
+                      draggable="false"
+                      className="retro-note-art"
+                      style={{
+                        filter: s <= (rightPlayer.stars || 0) ? undefined : 'grayscale(1) brightness(.15)'
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Reduced score from text-7xl to text-6xl */}
-            <div className="text-center text-6xl font-black text-rose-400 tabular-nums tracking-tighter drop-shadow-md">
-              {rightPlayer.score}
-            </div>
           </div>
 
         </div>
