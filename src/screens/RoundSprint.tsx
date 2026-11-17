@@ -321,6 +321,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
           /> */}
 
           <ControlPanel
+            gameState={gameState}
             isPlaying={isPlaying}
             onStart={() => {
               // Only arm the specific player if this song is NOT already correct

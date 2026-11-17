@@ -226,6 +226,7 @@ const RoundDuel: React.FC<RoundDuelProps> = ({
           </div>
 
           <ControlPanel 
+            gameState={gameState}
             isPlaying={isPlaying} 
             onStart={() => onAudioControl('start')} 
             onStop={() => onAudioControl('stop')} 

@@ -418,6 +418,7 @@ const RoundStandard: React.FC<RoundStandardProps> = ({
           </div>
 
           <ControlPanel
+            gameState={gameState}
             isPlaying={isPlaying}
             onStart={() => onAudioControl('start')}
             onStop={() => onAudioControl('stop')}

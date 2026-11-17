@@ -1,7 +1,10 @@
 import React from 'react';
 import { Play, Square, CheckCircle, XCircle, Clock, Trophy } from 'lucide-react';
+import { getAvailableSets } from '../data/index_data';
+import type { GameState } from '../types';
 
 interface ControlPanelProps {
+  gameState: GameState;
   isPlaying: boolean;
   onStart: () => void;
   onStop: () => void;
@@ -17,6 +20,7 @@ interface ControlPanelProps {
 }
 
 const ControlPanel: React.FC<ControlPanelProps> = ({
+  gameState,
   isPlaying,
   onStart,
   onStop,
@@ -30,6 +34,12 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   isStartDisabled = false,
   showTimer = true, // Default to true
 }) => {
+  const roundId = gameState.activeRoundId;
+  const selectedSetId = roundId === null ? null : gameState.roundSets?.[roundId] || 'default';
+  const datasetName = roundId === null
+    ? null
+    : getAvailableSets(roundId).find(set => set.id === selectedSetId)?.name?.[gameState.language];
+
   const getTimerColor = () => {
     if (timeLeft === undefined) return 'text-slate-500';
     if (timeLeft <= 10) return 'text-red-500 animate-pulse';
@@ -41,6 +51,19 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
 
   return (
     <div className="bg-slate-900/95 backdrop-blur-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-xl border border-slate-800 p-3 w-full flex flex-col gap-2 animate-in slide-in-from-right duration-500">
+      {roundId !== null && (
+        <div className="flex items-baseline justify-center gap-2 min-w-0">
+          <span className="text-sm font-black text-slate-300 uppercase tracking-wider">
+            {t.round} {roundId}
+          </span>
+          {datasetName && (
+            <span className="min-w-0 text-sm font-black text-blue-400 uppercase tracking-wider truncate">
+              {datasetName}
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="flex items-center justify-between px-0">
         <div className="flex flex-col items-center flex-1">
           <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.12em] mb-0.5">{t.points}</span>
