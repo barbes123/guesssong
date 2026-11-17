@@ -106,21 +106,21 @@ export const SetupView: React.FC<SetupViewProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 pt-24 animate-in fade-in duration-700">
-      <div className="max-w-[1600px] mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-950 p-4 sm:p-6 pt-20 sm:pt-24 animate-in fade-in duration-700">
+      <div className="max-w-[1400px] mx-auto space-y-5">
 
         {/* 1. TOP PANEL: Dual Hardware Status Check */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
           {/* CARD A: Smartphone Socket Hub Status */}
-          <div className={`p-8 rounded-[3rem] border-2 transition-all duration-500 ${isBuzzerConnected ? 'bg-emerald-900/20 border-emerald-500/50' : 'bg-slate-900/50 border-slate-800'}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all ${isBuzzerConnected ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
-                  {isBuzzerConnected ? <Wifi size={32} /> : <WifiOff size={32} />}
+          <div className={`p-5 sm:p-6 rounded-3xl border-2 transition-all duration-500 ${isBuzzerConnected ? 'bg-emerald-900/20 border-emerald-500/50' : 'bg-slate-900/50 border-slate-800'}`}>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-all shrink-0 ${isBuzzerConnected ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
+                  {isBuzzerConnected ? <Wifi size={24} /> : <WifiOff size={24} />}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+                  <h2 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
                     {isBuzzerConnected ? "Buzzer Hub Linked" : "Hub Disconnected"}
                   </h2>
                   <p className={`text-xs font-bold uppercase tracking-widest ${isBuzzerConnected ? 'text-emerald-500' : (isBuzzAttempted ? 'text-yellow-500 animate-pulse' :'text-rose-500 animate-pulse')}`}>
@@ -145,10 +145,10 @@ export const SetupView: React.FC<SetupViewProps> = ({
                   }
                   onToggleBuzz();
                 }}
-                className={`w-40 justify-center px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${isBuzzerConnected ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
+                className={`w-32 ml-auto shrink-0 justify-center px-4 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${isBuzzerConnected ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
 
               >
-                <Wifi size={32} />
+                <Wifi size={22} />
                 {isBuzzerConnected ? 'Disconnect' : 'Connect'}
               </button>
 
@@ -156,7 +156,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
                 <button
                   type="button"
                   onClick={isBuzzerConnected ? onForceDisconnect : onCheckConnection}
-                  className={`px-8 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-xl ${isBuzzerConnected ? 'bg-rose-600/20 border-2 border-rose-500 text-rose-500 hover:bg-rose-600 hover:text-white' : 'bg-indigo-600 text-white hover:bg-indigo-500'}`}
+                  className={`px-5 py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-xl ${isBuzzerConnected ? 'bg-rose-600/20 border-2 border-rose-500 text-rose-500 hover:bg-rose-600 hover:text-white' : 'bg-indigo-600 text-white hover:bg-indigo-500'}`}
                 >
                   {isBuzzerConnected ? "Force Disconnect" : "Connect Hub"}
                 </button>
@@ -165,14 +165,14 @@ export const SetupView: React.FC<SetupViewProps> = ({
           </div>
 
           {/* CARD B: USB Pads Hardware Status */}
-          <div className={`p-8 rounded-[3rem] border-2 transition-all duration-500 ${isPadsConnected ? 'bg-indigo-900/20 border-indigo-500/50' : 'bg-slate-900/50 border-slate-800'}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center border-2 transition-all ${isPadsConnected ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
-                  <Usb size={32} />
+          <div className={`p-5 sm:p-6 rounded-3xl border-2 transition-all duration-500 ${isPadsConnected ? 'bg-indigo-900/20 border-indigo-500/50' : 'bg-slate-900/50 border-slate-800'}`}>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-all shrink-0 ${isPadsConnected ? 'bg-indigo-500 text-white border-indigo-400' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
+                  <Usb size={24} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-black text-white uppercase tracking-tight">
+                  <h2 className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">
                     {isPadsConnected ? "USB Pads Linked" : "USB Pads Unplugged"}
                   </h2>
                   <p className={`text-xs font-bold uppercase tracking-widest ${isPadsConnected ? 'text-emerald-500' : 'text-rose-500 animate-pulse'}`}>
@@ -193,10 +193,10 @@ export const SetupView: React.FC<SetupViewProps> = ({
                 type="button"
                 disabled={isBuzzerConnected}
                 onClick={onTogglePads}
-                className={`w-40 justify-center px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${isPadsConnected ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
+                className={`w-32 ml-auto shrink-0 justify-center px-4 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${isPadsConnected ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
 
               >
-                <Usb size={20} />
+                <Usb size={18} />
                 {isPadsConnected ? 'Disconnect' : 'Connect'}
               </button>
             </div>
@@ -205,17 +205,17 @@ export const SetupView: React.FC<SetupViewProps> = ({
         </div>
 
         {/* BOTTOM AREA: Three Panels Side-by-Side */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
 
           {/* 2. LEFT: Manual Player Input */}
           {/* 2. LEFT: Manual Player Input */}
-          <div className={`p-10 rounded-[4rem] border-2 transition-all duration-500 ${!isBuzzerConnected && !isPadsConnected ? 'bg-slate-900 border-indigo-500 shadow-[0_0_50px_rgba(99,102,241,0.15)]' : 'bg-slate-900/30 border-slate-800 opacity-60'}`}>
-            <div className="flex items-center gap-4 mb-8">
-              <Keyboard className="text-indigo-400" size={32} />
-              <h3 className="text-3xl font-black text-white uppercase italic">{t?.manualInput || "Manual Entry"}</h3>
+          <div className={`p-5 sm:p-6 rounded-3xl border-2 transition-all duration-500 ${!isBuzzerConnected && !isPadsConnected ? 'bg-slate-900 border-indigo-500 shadow-[0_0_50px_rgba(99,102,241,0.15)]' : 'bg-slate-900/30 border-slate-800 opacity-60'}`}>
+            <div className="flex items-center gap-3 mb-5">
+              <Keyboard className="text-indigo-400" size={26} />
+              <h3 className="text-2xl font-black text-white uppercase italic">{t?.manualInput || "Manual Entry"}</h3>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-4">
               {Array.from({ length: 3 }, (_, index) => {
                 const slotNumber = index + 1;
 
@@ -224,18 +224,18 @@ export const SetupView: React.FC<SetupViewProps> = ({
                 ) || null;
 
                 return (
-                  <div key={slotNumber} className="flex gap-4 items-end">
+                  <div key={slotNumber} className="flex gap-3 items-end">
                     <div className="flex-1 flex flex-col">
-                      <span className="text-[10px] font-black text-slate-500 mb-2 uppercase text-left">
+                      <span className="text-[10px] font-black text-slate-500 mb-1 uppercase text-left">
                         Slot 0{slotNumber}
                       </span>
-                      <div className={`border-2 rounded-[2rem] px-8 h-[84px] flex items-center transition-all duration-300 ${manualPlayer
+                      <div className={`border-2 rounded-2xl px-5 h-16 flex items-center transition-all duration-300 ${manualPlayer
                         ? 'bg-indigo-500/20 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.1)] focus-within:border-indigo-400'
                         : 'bg-slate-800/50 border-slate-700 border-dashed'
                         }`}>
 
                         {manualPlayer ? (
-                          <div className="flex flex-col w-full py-3">
+                          <div className="flex flex-col w-full py-2">
                             <input
                               type="text"
                               maxLength={9}
@@ -243,7 +243,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
                               value={manualPlayer.name}
                               onChange={(e) => handleLocalUpdate(manualPlayer.id, e.target.value, manualPlayer.score)}
                               onBlur={() => handleSaveAndBlur(manualPlayer.id)}
-                              className="bg-transparent border-none text-white font-black w-full outline-none placeholder:text-slate-600 text-xl uppercase tracking-tighter p-0"
+                              className="bg-transparent border-none text-white font-black w-full outline-none placeholder:text-slate-600 text-lg uppercase tracking-tighter p-0"
                               autoComplete="off"
                             />
                             <button
@@ -263,7 +263,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-500 mb-2 uppercase">{t?.points || "Points"}</span>
+                      <span className="text-[10px] font-black text-slate-500 mb-1 uppercase">{t?.points || "Points"}</span>
                       <input
                         type="number"
                         disabled={!manualPlayer}
@@ -271,7 +271,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
                         // FIX
                         onChange={(e) => { if (manualPlayer) handleLocalUpdate(manualPlayer.id, manualPlayer.name, parseInt(e.target.value) || 0); }}
                         onBlur={() => { if (manualPlayer) handleSaveAndBlur(manualPlayer.id); }}
-                        className={`w-28 h-[84px] border-2 rounded-[2rem] px-2 font-black text-3xl text-center outline-none transition-all ${manualPlayer
+                        className={`w-20 h-16 border-2 rounded-2xl px-2 font-black text-2xl text-center outline-none transition-all ${manualPlayer
                           ? 'bg-slate-800 border-indigo-500 text-indigo-400 focus:border-indigo-400'
                           : 'bg-slate-900/50 border-slate-800 text-slate-700 opacity-20'
                           }`}
@@ -287,7 +287,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
                 type="button"
                 disabled={isBuzzerConnected || isPadsConnected}
                 onClick={() => onAddPlayer("", undefined, undefined)}
-                className="w-full mt-6 py-5 rounded-2xl border-2 border-dashed border-slate-700 text-slate-500 font-bold hover:border-indigo-500 hover:text-indigo-400 transition-all flex items-center justify-center gap-2"
+                className="w-full mt-4 py-3 rounded-xl border-2 border-dashed border-slate-700 text-slate-500 font-bold hover:border-indigo-500 hover:text-indigo-400 transition-all flex items-center justify-center gap-2"
               >
                 <UserPlus size={20} /> {t?.addPlayer || "+ Add Player"}
               </button>
@@ -295,13 +295,13 @@ export const SetupView: React.FC<SetupViewProps> = ({
           </div>
 
           {/* 3. MIDDLE: Phone Buzz Assignment */}
-          <div className={`p-10 rounded-[4rem] border-2 transition-all duration-500 ${isBuzzerConnected ? 'bg-slate-900 border-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.15)]' : 'bg-slate-900/30 border-slate-800 grayscale'}`}>
-            <div className="flex items-center gap-4 mb-8">
-              <Smartphone className="text-emerald-400" size={32} />
-              <h3 className="text-3xl font-black text-white uppercase italic">{t?.buzzInput || "Phone Buzzers"}</h3>
+          <div className={`p-5 sm:p-6 rounded-3xl border-2 transition-all duration-500 ${isBuzzerConnected ? 'bg-slate-900 border-emerald-500 shadow-[0_0_50px_rgba(16,185,129,0.15)]' : 'bg-slate-900/30 border-slate-800 grayscale'}`}>
+            <div className="flex items-center gap-3 mb-5">
+              <Smartphone className="text-emerald-400" size={26} />
+              <h3 className="text-2xl font-black text-white uppercase italic">{t?.buzzInput || "Phone Buzzers"}</h3>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-4">
               {/* {Array.from({ length: Math.min(players.length, 3) }, (_, index) => { */}
               {Array.from({ length: 3 }, (_, index) => {
                 const slotNumber = index + 1;
@@ -312,12 +312,12 @@ export const SetupView: React.FC<SetupViewProps> = ({
                 const availablePhones = availableHubPlayers.filter(hp => !players.some(p => p.hubId === hp.id));
 
                 return (
-                  <div key={slotNumber} className="flex gap-4 items-end">
+                  <div key={slotNumber} className="flex gap-3 items-end">
                     <div className="flex-1 flex flex-col">
-                      <span className="text-[10px] font-black text-slate-500 mb-2 uppercase text-left">
+                      <span className="text-[10px] font-black text-slate-500 mb-1 uppercase text-left">
                         Slot 0{slotNumber}
                       </span>
-                      <div className={`border-2 rounded-[2rem] px-8 h-[84px] flex items-center transition-all duration-300 ${assignedPlayer
+                      <div className={`border-2 rounded-2xl px-5 h-16 flex items-center transition-all duration-300 ${assignedPlayer
                         ? 'bg-emerald-500/20 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.1)]'
                         : 'bg-slate-800/50 border-slate-700 border-dashed'
                         }`}>
@@ -325,7 +325,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
                         {assignedPlayer ? (
                           <div className="flex items-center justify-between w-full">
                             <div>
-                              <div className="text-white font-black text-xl uppercase tracking-tighter truncate max-w-[150px]">
+                              <div className="text-white font-black text-lg uppercase tracking-tighter truncate max-w-[150px]">
                                 {assignedPlayer.name}
                               </div>
                               <button
@@ -362,14 +362,14 @@ export const SetupView: React.FC<SetupViewProps> = ({
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-500 mb-2 uppercase">{t?.points || "Points"}</span>
+                      <span className="text-[10px] font-black text-slate-500 mb-1 uppercase">{t?.points || "Points"}</span>
                       <input
                         type="number"
                         disabled={!assignedPlayer}
                         value={assignedPlayer ? (localPlayers.find(lp => lp.id === assignedPlayer.id)?.score || 0) : 0}
                         onChange={(e) => handleLocalUpdate(slotNumber, assignedPlayer?.name || '', parseInt(e.target.value) || 0)}
                         onBlur={() => handleSaveAndBlur(slotNumber)}
-                        className={`w-28 h-[84px] border-2 rounded-[2rem] px-2 font-black text-3xl text-center outline-none transition-all ${assignedPlayer
+                        className={`w-20 h-16 border-2 rounded-2xl px-2 font-black text-2xl text-center outline-none transition-all ${assignedPlayer
                           ? 'bg-slate-800 border-emerald-500 text-emerald-400 focus:border-emerald-400'
                           : 'bg-slate-900/50 border-slate-800 text-slate-700 opacity-20'
                           }`}
@@ -390,7 +390,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
               </button>
             )} */}
 
-            <div className="mt-8 p-6 rounded-3xl bg-slate-950/50 border border-slate-800 text-center">
+            <div className="mt-5 p-4 rounded-2xl bg-slate-950/50 border border-slate-800 text-center">
               <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
                 {isBuzzerConnected
                   ? "Assign connected smartphones to game slots above."
@@ -401,13 +401,13 @@ export const SetupView: React.FC<SetupViewProps> = ({
 
 
           {/* 4. RIGHT: USB Pads Assignment Panel */}
-          <div className={`p-10 rounded-[4rem] border-2 transition-all duration-500 ${isPadsConnected ? 'bg-slate-900 border-indigo-500 shadow-[0_0_50px_rgba(99,102,241,0.15)]' : 'bg-slate-900/30 border-slate-800 grayscale'}`}>
-            <div className="flex items-center gap-4 mb-8">
-              <Usb className="text-indigo-400" size={32} />
-              <h3 className="text-3xl font-black text-white uppercase italic">{t?.padsInput || "USB Pads"}</h3>
+          <div className={`p-5 sm:p-6 rounded-3xl border-2 transition-all duration-500 ${isPadsConnected ? 'bg-slate-900 border-indigo-500 shadow-[0_0_50px_rgba(99,102,241,0.15)]' : 'bg-slate-900/30 border-slate-800 grayscale'}`}>
+            <div className="flex items-center gap-3 mb-5">
+              <Usb className="text-indigo-400" size={26} />
+              <h3 className="text-2xl font-black text-white uppercase italic">{t?.padsInput || "USB Pads"}</h3>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-4">
               {Array.from({ length: 3 }, (_, index) => {
                 const slotNumber = index + 1;
 
@@ -422,13 +422,13 @@ export const SetupView: React.FC<SetupViewProps> = ({
                 );
 
                 return (
-                  <div key={slotNumber} className="flex gap-4 items-end">
+                  <div key={slotNumber} className="flex gap-3 items-end">
                     <div className="flex-1 flex flex-col">
-                      <span className="text-[10px] font-black text-slate-500 mb-2 uppercase text-left">
+                      <span className="text-[10px] font-black text-slate-500 mb-1 uppercase text-left">
                         Slot 0{slotNumber} (Pad {slotNumber})
                       </span>
 
-                      <div className={`border-2 rounded-[2rem] px-8 h-[84px] flex items-center transition-all duration-300 ${assignedPlayer
+                      <div className={`border-2 rounded-2xl px-5 h-16 flex items-center transition-all duration-300 ${assignedPlayer
                         ? 'bg-indigo-500/20 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.1)]'
                         : 'bg-slate-800/50 border-slate-700 border-dashed'
                         }`}>
@@ -436,7 +436,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
                         {assignedPlayer ? (
                           <div className="flex items-center justify-between w-full">
                             <div>
-                              <div className="text-white font-black text-xl uppercase tracking-tighter truncate max-w-[150px]">
+                              <div className="text-white font-black text-lg uppercase tracking-tighter truncate max-w-[150px]">
                                 {assignedPlayer.name}
                               </div>
                               <button
@@ -479,14 +479,14 @@ export const SetupView: React.FC<SetupViewProps> = ({
                     </div>
 
                     <div className="flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-500 mb-2 uppercase">{t?.points || "Points"}</span>
+                      <span className="text-[10px] font-black text-slate-500 mb-1 uppercase">{t?.points || "Points"}</span>
                       <input
                         type="number"
                         disabled={!assignedPlayer}
                         value={assignedPlayer ? (localPlayers.find(lp => lp.id === assignedPlayer.id)?.score || 0) : 0}
                         onChange={(e) => handleLocalUpdate(slotNumber, assignedPlayer?.name || '', parseInt(e.target.value) || 0)}
                         onBlur={() => handleSaveAndBlur(slotNumber)}
-                        className={`w-28 h-[84px] border-2 rounded-[2rem] px-2 font-black text-3xl text-center outline-none transition-all ${assignedPlayer
+                        className={`w-20 h-16 border-2 rounded-2xl px-2 font-black text-2xl text-center outline-none transition-all ${assignedPlayer
                           ? 'bg-slate-800 border-indigo-500 text-indigo-400 focus:border-indigo-400'
                           : 'bg-slate-900/50 border-slate-800 text-slate-700 opacity-20'
                           }`}
@@ -507,7 +507,7 @@ export const SetupView: React.FC<SetupViewProps> = ({
               </button>
             )} */}
 
-            <div className="mt-8 p-6 rounded-3xl bg-slate-950/50 border border-slate-800 text-center">
+            <div className="mt-5 p-4 rounded-2xl bg-slate-950/50 border border-slate-800 text-center">
               <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest leading-relaxed">
                 {isPadsConnected
                   ? "USB Gamepad hardware detected and active."
@@ -523,12 +523,12 @@ export const SetupView: React.FC<SetupViewProps> = ({
           type="button"
           onClick={onStartGame}
           disabled={!players.some(p => p.name && p.name.trim() !== "")}
-          className={`w-full py-10 rounded-[3rem] font-black text-4xl uppercase tracking-tighter transition-all flex items-center justify-center gap-6 shadow-2xl ${!players.some(p => p.name && p.name.trim() !== "")
+          className={`w-full py-6 sm:py-7 rounded-3xl font-black text-2xl sm:text-3xl uppercase tracking-tighter transition-all flex items-center justify-center gap-4 shadow-2xl ${!players.some(p => p.name && p.name.trim() !== "")
             ? 'bg-slate-900 text-slate-700 cursor-not-allowed border-2 border-slate-800'
             : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-[1.01] active:scale-[0.99] shadow-indigo-900/20'
             }`}
         >
-          <PlayCircle size={40} fill="currentColor" />
+          <PlayCircle size={32} fill="currentColor" />
           {t?.startGame || "Start Game"}
         </button>
 
