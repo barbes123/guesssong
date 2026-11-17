@@ -10,8 +10,8 @@ const R4R41full  = audioUrl('', '/music/round4/Agata_Kristi_-_Kak_na_vojne.mp3')
 const R4R42minus = audioUrl('', '/music/round4/bi-2_-_polkovniku_nikto_minus.mp3');
 const R4R42full  = audioUrl('', '/music/round4/bi-2_-_polkovniku_nikto.mp3'); 
 
-const R4R43minus = audioUrl('', '/music/round4/tatu-nas-ne-dogonyat--staraya_minus_cut.mp3'); 
-const R4R43full  = audioUrl('', '/music/round4/tatu-nas-ne-dogonyat--staraya.mp3'); 
+const R4R43minus = audioUrl('', '/music/round4/Znaewli_ty_minus_cut.mp3'); 
+const R4R43full  = audioUrl('', '/music/round4/Znaewli_ty.mp3'); 
 
 const R4R44minus = audioUrl('davay-za--lyube-minus_ghi789', '/music/round4/davay-za--lyube-minus.mp3');
 const R4R44full  = audioUrl('davay-za--lyube_jkl012', '/music/round4/davay-za--lyube.mp3');
@@ -60,11 +60,11 @@ export const round4v4Set: RoundSet = {
         },
         { 
           id: 's5_24', 
-          title: 'Нас не догонят', 
-          artist: 'Тату', 
+          title: 'Знаешь ли ты', 
+          artist: 'МакSим', 
           audioUrl: R4R43minus, 
           audioUrlFull: R4R43full,
-          notes: 'Узнать по: Электронному голосу "I\'m your doll" и резкому вступлению ударных. Первые строки: "Нас не догонят, нас не догонят / Нас не догонят, мы улетаем". Припев: "Нас не догонят, нас не догонят / Мы в небесах, ты меня не ищи".'
+          notes: 'Один из самых эмоциональных российских поп-хитов середины 2000-х. Примечательно, что автор написала эту композицию ещё в подростковом возрасте, вложив в неё личные переживания. Спустя годы лирическая баллада неожиданно стала неофициальным гимном болельщиков известного московского футбольного клуба, которые исполняют её целыми трибунами.'
         },
         { 
           id: 's5_25', 
