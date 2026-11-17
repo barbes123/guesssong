@@ -15,7 +15,7 @@ interface SettingsOverlayProps {
   onGoHome: () => void;
   onGoStart: () => void;
   onReset: () => void;
-  volume?: number;
+  volume: number;
   onVolumeChange?: (volume: number) => void;
   t: any;
   isLocked?: boolean;
@@ -39,7 +39,7 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   onGoHome,
   onGoStart,
   onReset,
-  volume = 0.7,
+  volume,
   // onVolumeChange = () => {},
   onVolumeChange = (_v: number) => { },
   t,

@@ -261,9 +261,9 @@ const App: React.FC = () => {
     }
     const audio = new Audio(url);
     sfxRef.current = audio;
-    audio.volume = isMusicEnabledRef.current ? volume : 0;
+    audio.volume = isMusicEnabledRef.current ? volumeRef.current : 0;
     audio.play().catch(e => console.log("SFX block", e));
-  }, [volume]);
+  }, []);
 
   const handleVolumeChange = useCallback((newVolume: number) => {
     volumeRef.current = newVolume;
@@ -735,7 +735,7 @@ const App: React.FC = () => {
   const toggleMusic = () => {
     const next = !gameState.isMusicEnabled;
     isMusicEnabledRef.current = next;
-    const outputVolume = next ? volume : 0;
+    const outputVolume = next ? volumeRef.current : 0;
     if (songRef.current) songRef.current.volume = outputVolume;
     if (bgmRef.current) bgmRef.current.volume = outputVolume;
     if (sfxRef.current) sfxRef.current.volume = outputVolume;
@@ -1445,11 +1445,11 @@ const App: React.FC = () => {
 
       if (!songRef.current) {
         songRef.current = new Audio(audioUrlToPlay);
-        songRef.current.volume = isMusicEnabledRef.current ? volume : 0;
+        songRef.current.volume = isMusicEnabledRef.current ? volumeRef.current : 0;
       } else if (songRef.current.src !== audioUrlToPlay) {
         songRef.current.pause();
         songRef.current = new Audio(audioUrlToPlay);
-        songRef.current.volume = isMusicEnabledRef.current ? volume : 0;
+        songRef.current.volume = isMusicEnabledRef.current ? volumeRef.current : 0;
       }
 
       songRef.current.onloadedmetadata = () => {
