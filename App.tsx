@@ -134,7 +134,7 @@ const App: React.FC = () => {
     players: [],
     currentPlayerIndex: 0,
     currentRound: 0,
-    isMusicEnabled: true,
+    isMusicEnabled: false,
     language: 'en',
     gameStarted: false,
     activeRoundId: null,
