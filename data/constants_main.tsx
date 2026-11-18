@@ -32,7 +32,7 @@ export const SCREEN_BGM: { [key: string]: string } = {
 
 // One-shot sound effects
 export const SFX: { [key: string]: string } = {
-  stop: "https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3",
+  stop: audioUrl("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3",`${BASE_FOLDER}/stop.mp3`),
   select: audioUrl('50_50_svlsr5', `${BASE_FOLDER}/50_50_svlsr5.mp3`),
   correct: audioUrl('um_right_iu4vjb', `${BASE_FOLDER}/um_right_iu4vjb.mp3`),
   wrong: audioUrl('um_wrong_s9a496', `${BASE_FOLDER}/um_wrong_s9a496.mp3`),
