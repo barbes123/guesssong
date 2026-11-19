@@ -675,9 +675,7 @@ const PlayerScreenContent = () => {
                       aria-hidden="true"
                       draggable="false"
                       className="retro-note-art"
-                      style={{
-                        filter: s <= (leftPlayer.stars || 0) ? undefined : 'grayscale(1) brightness(.15)'
-                      }}
+                      style={{ opacity: s <= (leftPlayer.stars || 0) ? 1 : 0.5 }}
                     />
                   </div>
                 ))}
@@ -767,9 +765,7 @@ const PlayerScreenContent = () => {
                       aria-hidden="true"
                       draggable="false"
                       className="retro-note-art"
-                      style={{
-                        filter: s <= (rightPlayer.stars || 0) ? undefined : 'grayscale(1) brightness(.15)'
-                      }}
+                      style={{ opacity: s <= (rightPlayer.stars || 0) ? 1 : 0.5 }}
                     />
                   </div>
                 ))}
