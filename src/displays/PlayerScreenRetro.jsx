@@ -456,93 +456,41 @@ const PlayerScreenContent = () => {
       if (starsB !== starsA) return starsB - starsA;
       return (b.score || 0) - (a.score || 0);
     });
-    const winner = sortedPlayers[0];
-    const secondPlace = sortedPlayers[1];
-    const thirdPlace = sortedPlayers[2];
-    const otherPlayers = sortedPlayers.slice(3);
-
     return (
-      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950 p-8 text-center animate-in zoom-in duration-1000 overflow-y-auto">
-        <div className="max-w-[900px] w-full py-12">
-          <Trophy size={120} className="text-indigo-500 mx-auto mb-10 animate-bounce" />
-          <h1 className="text-[6rem] font-black text-white mb-4 uppercase tracking-tighter leading-none">
-            {t.victory || "VICTORY!"}
-          </h1>
-          <div className="bg-slate-900 p-12 rounded-[4rem] border-4 border-indigo-500/40 mb-8 shadow-[0_40px_80px_rgba(79,70,229,0.3)]">
-            <div className="text-sm font-black text-indigo-500 uppercase tracking-[0.4em] mb-4">
-              {t.winner || "WINNER"}
-            </div>
-            <div className="text-[5rem] font-black text-white mb-6 tracking-tighter leading-none">
-              {winner.name || `Player ${winner.id + 1}`}
-            </div>
-            <div className="flex justify-center gap-16">
-              <div className="text-center">
-                <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-3">{t.stars || "STARS"}</div>
-                <div className="text-6xl font-black text-yellow-500 tabular-nums tracking-tighter">{winner.stars || 0}</div>
-              </div>
-              <div className="w-1 h-24 bg-slate-800 rounded-full" />
-              <div className="text-center">
-                <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-3">{t.points || "POINTS"}</div>
-                <div className="text-6xl font-black text-indigo-400 tabular-nums tracking-tighter">{winner.score}</div>
-              </div>
-            </div>
-          </div>
+      <div className="retro-show retro-scoreboard-overlay fixed inset-0 z-[70] flex items-center justify-center animate-in fade-in duration-500">
+        <div className="retro-scoreboard-glow" aria-hidden="true" />
+        <section className="retro-scoreboard-card" aria-label={t.victory || "Winner"}>
+          <div className="retro-scoreboard-lights" aria-hidden="true" />
+          <div className="retro-scoreboard-content">
+            <header className="retro-scoreboard-header">
+              <Trophy className="retro-scoreboard-trophy" size={54} />
+              <div className="retro-scoreboard-kicker">♪ {t.winner || "WINNER"} ♪</div>
+              <h3>{t.victory || "Victory"}</h3>
+              <div className="retro-scoreboard-staff" aria-hidden="true"><span>♪</span><span>♫</span><span>♪</span><span>♫</span><span>♪</span></div>
+            </header>
 
-          {secondPlace && (
-            <div className="bg-slate-900/60 p-8 rounded-[3rem] border-2 border-slate-700/40 mb-6 shadow-xl">
-              <div className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-4">{t.secondPlace || "Second Place"}</div>
-              <div className="text-[3rem] font-black text-slate-300 mb-6 tracking-tight">{secondPlace.name || `Player ${secondPlace.id + 1}`}</div>
-              <div className="flex justify-center gap-12">
-                <div className="text-center">
-                  <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.stars || "STARS"}</div>
-                  <div className="text-4xl font-black text-yellow-500/80 tabular-nums">{secondPlace.stars || 0}</div>
-                </div>
-                <div className="w-1 h-16 bg-slate-800/50 rounded-full" />
-                <div className="text-center">
-                  <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.points || "POINTS"}</div>
-                  <div className="text-4xl font-black text-indigo-400/80 tabular-nums">{secondPlace.score}</div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {thirdPlace && (
-            <div className="bg-slate-900/40 p-8 rounded-[3rem] border-2 border-slate-700/30 mb-8 shadow-lg">
-              <div className="text-sm font-black text-slate-500 uppercase tracking-[0.4em] mb-4">{t.thirdPlace || "Third Place"}</div>
-              <div className="text-[2.5rem] font-black text-slate-400 mb-6 tracking-tight">{thirdPlace.name || `Player ${thirdPlace.id + 1}`}</div>
-              <div className="flex justify-center gap-10">
-                <div className="text-center">
-                  <div className="text-slate-600 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.stars || "STARS"}</div>
-                  <div className="text-3xl font-black text-yellow-500/60 tabular-nums">{thirdPlace.stars || 0}</div>
-                </div>
-                <div className="w-1 h-12 bg-slate-800/40 rounded-full" />
-                <div className="text-center">
-                  <div className="text-slate-600 text-xs font-black uppercase tracking-[0.2em] mb-2">{t.points || "POINTS"}</div>
-                  <div className="text-3xl font-black text-indigo-400/60 tabular-nums">{thirdPlace.score}</div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {otherPlayers.length > 0 && (
-            <div className="space-y-4">
-              {otherPlayers.map((player, idx) => (
-                <div key={player.id} className="bg-slate-900/20 p-4 rounded-2xl border border-slate-800 flex justify-between items-center">
-                  <div className="flex items-center gap-4">
-                    <span className="text-slate-600 font-bold text-lg w-8">{idx + 4}.</span>
-                    <span className="text-slate-400 font-bold text-xl">{player.name || `Player ${player.id + 1}`}</span>
+            <div className="retro-scoreboard-list">
+              {sortedPlayers.map((p, idx) => (
+                <article key={p.id} className={`retro-scoreboard-row ${idx === 0 ? 'is-leader' : ''}`}>
+                  <div className="retro-scoreboard-player">
+                    <div className="retro-scoreboard-rank">{idx + 1}</div>
+                    <div className="retro-scoreboard-player-info">
+                      <div className="retro-scoreboard-player-name">{p.name || `Player ${p.id + 1}`}</div>
+                      <div className="retro-scoreboard-stars">
+                        <Star size={17} fill="currentColor" /> {p.stars || 0} {t.stars || "STARS"}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-yellow-500/50 font-bold text-lg flex items-center gap-1">
-                      <Star size={14} /> {player.stars || 0}
-                    </span>
-                    <span className="text-indigo-400/50 font-bold text-lg">{player.score} pts</span>
+                  <div className="retro-scoreboard-score-note">
+                    <img src={musicalNoteAsset} alt="" aria-hidden="true" draggable="false" />
+                    <span>{p.score}</span>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
-          )}
-        </div>
+            <footer className="retro-scoreboard-footer">♪ {t.points || "POINTS"} ♪</footer>
+          </div>
+        </section>
       </div>
     );
   };
