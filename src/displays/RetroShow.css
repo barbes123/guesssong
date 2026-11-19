@@ -498,6 +498,78 @@
 }
 
 /* Round 3 duration choices now use the same note-and-staff language as Rounds 1, 2 and 4. */
+.retro-show .retro-duel-nameplate {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1.15em minmax(0, 1fr) 1.15em;
+  align-items: center;
+  gap: clamp(5px, .65vw, 10px);
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  margin: 0;
+  padding: .4rem .7rem .8rem;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  background: rgba(29, 10, 38, .82);
+  color: #fff5d8;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .75), 0 0 8px rgba(255, 204, 39, .18);
+  justify-items: center;
+  /* justify-content: center; */
+  /* text-align: center; */
+
+}
+
+.retro-show .retro-duel-nameplate::after {
+  content: "";
+  position: absolute;
+  right: .55rem;
+  bottom: .32rem;
+  left: .55rem;
+  height: 6px;
+  border-bottom: 2px solid var(--retro-gold);
+  border-radius: 0 0 50% 50%;
+  filter: drop-shadow(0 0 3px rgba(255, 204, 39, .8));
+  pointer-events: none;
+}
+
+.retro-show .retro-duel-nameplate__name {
+  min-width: 0;
+  color: #fff5d8;
+  font-size: clamp(1.4rem, 2.2vw, 1.8rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: .045em;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.retro-show .retro-duel-nameplate__clef {
+  color: var(--retro-gold);
+  font-family: 'Noto Music', 'Segoe UI Symbol', serif;
+  font-size: clamp(1.1rem, 1.6vw, 0.9rem);
+  line-height: 1;
+  text-shadow: 0 0 4px rgba(255, 204, 39, .9), 0 0 9px rgba(255, 157, 0, .55);
+}
+
+.retro-show .retro-duel-nameplate.is-active {
+  animation: retro-duel-nameplate-gold-flash 1s ease-in-out infinite;
+}
+
+@keyframes retro-duel-nameplate-gold-flash {
+  0%, 100% {
+    background-color: rgba(29, 10, 38, .82);
+    box-shadow: 0 0 8px rgba(255, 204, 39, .28), inset 0 0 8px rgba(255, 204, 39, .08);
+  }
+  50% {
+    background-color: rgba(180, 120, 0, .72);
+    box-shadow: 0 0 22px rgba(255, 204, 39, .85), inset 0 0 18px rgba(255, 226, 100, .4);
+  }
+}
+
 .retro-show .retro-round3-staff {
   position: relative;
   display: grid;

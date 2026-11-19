@@ -647,18 +647,14 @@ const PlayerScreenContent = () => {
               : 'bg-transparent border-slate-800 opacity-80'
               }`}
           >
-            <h3 className="min-w-0 text-2xl leading-relaxed font-black text-white text-center drop-shadow-md py-2">
-              <span
-                className={`inline-block max-w-full truncate ${isLeftActive ? 'rounded-md px-2 py-1' : ''}`}
-                style={isLeftActive ? {
-                  backgroundImage: 'linear-gradient(90deg, rgba(255, 226, 83, 0.22), rgba(255, 174, 28, 0.32))',
-                  filter: 'brightness(1.25) saturate(1.2) drop-shadow(0 0 9px rgba(255, 226, 83, .95)) drop-shadow(0 0 19px rgba(255, 174, 28, .85))'
-                } : undefined}
-              >
+            <h3 className={`retro-duel-nameplate ${isLeftActive ? 'is-active' : ''}`}>
+              <span className="retro-duel-nameplate__clef" aria-hidden="true"></span>
+              <span className="retro-duel-nameplate__name">
                 {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
               </span>
+              <span className="retro-duel-nameplate__clef" aria-hidden="true"></span>
             </h3>
-            <div className="flex items-center justify-center gap-2 mb-8 min-w-0">
+            <div className="flex items-center justify-center gap-2 mb-8 min-w-0 mt-12">
               {/* <h3 className="min-w-0 flex-1 text-2xl font-black text-white text-center truncate drop-shadow-md">
                 {leftPlayer.name || `Player ${leftPlayer.id + 1}`}
               </h3> */}
@@ -734,23 +730,20 @@ const PlayerScreenContent = () => {
               }`}
           > */}
           <div
-            className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isLeftActive
+            className={`w-[280px] xl:w-[340px] shrink-0 p-8 rounded-[3rem] border-2 flex flex-col justify-center transition-all duration-500 relative ${isRightActive
               ? 'bg-transparent scale-105 z-10'
               : 'bg-transparent border-slate-800 opacity-80'
               }`}
           >
-            <h3 className="min-w-0 text-2xl leading-relaxed font-black text-white text-center drop-shadow-md py-2">
-              <span
-                className={`inline-block max-w-full truncate ${isRightActive ? 'rounded-md px-2 py-1' : ''}`}
-                style={isRightActive ? {
-                  backgroundImage: 'linear-gradient(90deg, rgba(255, 226, 83, 0.22), rgba(255, 174, 28, 0.32))',
-                  filter: 'brightness(1.25) saturate(1.2) drop-shadow(0 0 9px rgba(255, 226, 83, .95)) drop-shadow(0 0 19px rgba(255, 174, 28, .85))'
-                } : undefined}
-              >
+            <h3 className={`retro-duel-nameplate ${isRightActive ? 'is-active' : ''}`}>
+              <span className="retro-duel-nameplate__clef" aria-hidden="true"></span>
+              <span className="retro-duel-nameplate__name">
                 {rightPlayer.name || `Player ${rightPlayer.id + 1}`}
               </span>
+              {/* 𝄞 */}
+              <span className="retro-duel-nameplate__clef" aria-hidden="true"></span> 
             </h3>
-            <div className="flex items-center justify-center gap-2 mb-8 min-w-0">
+            <div className="flex items-center justify-center gap-2 mb-8 min-w-0 mt-12">
 
               <div className="flex w-32 shrink-0 flex-col items-center gap-16">
                 {[1, 2, 3].map(s => (
