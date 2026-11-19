@@ -32,6 +32,19 @@ import './index.css'
 
 type ActiveNote = { categoryId: string; noteIndex: number; isReveal?: boolean } | null;
 
+interface CenteredGamePanelProps {
+  children: React.ReactNode;
+  animationClassName?: string;
+}
+
+const CenteredGamePanel: React.FC<CenteredGamePanelProps> = ({ children, animationClassName = '' }) => (
+  <div className={`fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/95 p-4 backdrop-blur-xl sm:p-6 ${animationClassName}`}>
+    <section className="flex h-[calc(100dvh-2rem)] max-h-[720px] min-h-0 w-full max-w-3xl flex-col rounded-3xl border border-slate-800 bg-slate-900/90 p-5 text-center shadow-2xl sm:p-6">
+      {children}
+    </section>
+  </div>
+);
+
 const resolveAiContext = (gameState: GameState, activeNote: ActiveNote) => {
   const activeRoundId = gameState.activeRoundId;
   if (!activeNote || activeRoundId === null) {
@@ -2543,80 +2556,89 @@ const App: React.FC = () => {
 
   // UPDATED R3SelectView component (was R6SelectView)
   const R3SelectView = () => (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8">
-      <div className="bg-slate-900/90 backdrop-blur-xl p-16 rounded-[4rem] border border-slate-800 max-w-4xl w-full text-center shadow-2xl">
-        <Users size={80} className="text-indigo-500 mx-auto mb-10 animate-pulse" />
-        <div className="mb-12"><h2 className="text-6xl font-black text-white mb-4 tracking-tighter uppercase">{t.selectTeams}</h2><p className="text-xl font-bold text-slate-400 uppercase tracking-widest">{t.selectTwo}</p></div>
-        <div className="space-y-6 mb-14">{gameState.players.map(p => (<button key={p.id} onClick={() => setR3Selection(prev => prev.includes(p.id) ? prev.filter(i => i !== p.id) : prev.length < 2 ? [...prev, p.id] : prev)} className={`w-full px-10 py-6 rounded-[2rem] border-2 transition-all flex items-center justify-between ${r3Selection.includes(p.id) ? 'bg-indigo-600/20 border-indigo-500 scale-[1.02]' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}><div className="text-left"><div className="text-2xl font-black text-white">{p.name || `Player ${p.id + 1}`}</div><div className="text-sm font-bold text-slate-500 uppercase">{p.score} {t.points}</div></div>{r3Selection.includes(p.id) ? <CheckCircle size={36} className="text-indigo-500" /> : <div className="w-9 h-9 rounded-full border-2 border-slate-600" />}</button>))}</div>
-        <div className="grid grid-cols-2 gap-6"><button onClick={() => navigateTo('start')} className="py-10 rounded-[2.5rem] bg-slate-800 text-white font-black text-3xl uppercase">{t.cancel}</button><button onClick={() => { if (r3Selection.length !== 2) return; setGameState(prev => ({ ...prev, currentPlayerIndex: prev.players.findIndex(p => p.id === r3Selection[0]), roundProgress: { ...prev.roundProgress, [3]: { usedNotes: new Set(), activatedCategories: new Set(), pointMap: {}, activationCounts: {}, results: {}, activePlayerIds: r3Selection, currentTurnIndex: 0 } }, activeRoundId: 3 })); setCurrentPage('round'); setActiveNote({ categoryId: 'r3_final', noteIndex: 0 }); setSelectedDuration(null); setIsR3Finalized(false); }} className={`py-10 rounded-[2.5rem] font-black text-3xl uppercase ${r3Selection.length === 2 ? 'bg-indigo-600 text-white shadow-2xl' : 'bg-slate-900 text-slate-700 cursor-not-allowed'}`}>{t.startGame}</button></div>
+    <CenteredGamePanel>
+      <Users size={52} className="mx-auto mb-3 shrink-0 text-indigo-500 animate-pulse" />
+      <header className="mb-4 shrink-0">
+        <h2 className="mb-1 text-3xl font-black uppercase tracking-tighter text-white sm:text-4xl">{t.selectTeams}</h2>
+        <p className="text-sm font-bold uppercase tracking-widest text-slate-400 sm:text-base">{t.selectTwo}</p>
+      </header>
+      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto px-1">
+        {gameState.players.map(p => (
+          <button
+            key={p.id}
+            onClick={() => setR3Selection(prev => prev.includes(p.id) ? prev.filter(i => i !== p.id) : prev.length < 2 ? [...prev, p.id] : prev)}
+            className={`flex min-h-[64px] w-full items-center justify-between rounded-2xl border-2 px-5 py-3 text-left transition-all ${r3Selection.includes(p.id) ? 'scale-[1.01] border-indigo-500 bg-indigo-600/20' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
+          >
+            <div>
+              <div className="text-lg font-black text-white sm:text-xl">{p.name || `Player ${p.id + 1}`}</div>
+              <div className="text-xs font-bold uppercase text-slate-500 sm:text-sm">{p.score} {t.points}</div>
+            </div>
+            {r3Selection.includes(p.id) ? <CheckCircle size={28} className="shrink-0 text-indigo-500" /> : <div className="h-7 w-7 shrink-0 rounded-full border-2 border-slate-600" />}
+          </button>
+        ))}
       </div>
-    </div>
+      <div className="grid shrink-0 grid-cols-2 gap-3">
+        <button onClick={() => navigateTo('start')} className="min-h-14 rounded-2xl bg-slate-800 py-3 text-lg font-black uppercase text-white transition-colors hover:bg-slate-700 sm:text-xl">{t.cancel}</button>
+        <button onClick={() => { if (r3Selection.length !== 2) return; setGameState(prev => ({ ...prev, currentPlayerIndex: prev.players.findIndex(p => p.id === r3Selection[0]), roundProgress: { ...prev.roundProgress, [3]: { usedNotes: new Set(), activatedCategories: new Set(), pointMap: {}, activationCounts: {}, results: {}, activePlayerIds: r3Selection, currentTurnIndex: 0 } }, activeRoundId: 3 })); setCurrentPage('round'); setActiveNote({ categoryId: 'r3_final', noteIndex: 0 }); setSelectedDuration(null); setIsR3Finalized(false); }} className={`min-h-14 rounded-2xl py-3 text-lg font-black uppercase transition-all sm:text-xl ${r3Selection.length === 2 ? 'bg-indigo-600 text-white shadow-xl' : 'cursor-not-allowed bg-slate-900 text-slate-700'}`}>{t.startGame}</button>
+      </div>
+    </CenteredGamePanel>
   );
 
   const R4SelectView = () => (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8">
-      <div className="bg-slate-900/90 backdrop-blur-xl p-16 rounded-[4rem] border border-slate-800 max-w-4xl w-full text-center shadow-2xl">
-        <Users size={80} className="text-indigo-500 mx-auto mb-10 animate-pulse" />
-        <div className="mb-12">
-          <h2 className="text-6xl font-black text-white mb-4 tracking-tighter uppercase">
-            {t.playerName}
-          </h2>
-          <p className="text-xl font-bold text-slate-400 uppercase tracking-widest">
-            {t.confirmPlayerActive}
-          </p>
-        </div>
-        <div className="space-y-6 mb-14">
-          {gameState.players.map((p, idx) => (
-            <button
-              key={p.id}
-              onClick={() => {
-                setR4SelectedPlayerId(p.id);
-                playSFX(SFX.select);
-              }}
-              className={`w-full px-10 py-6 rounded-[2rem] border-2 transition-all flex items-center justify-between ${r4SelectedPlayerId === p.id ? 'bg-indigo-900/40 border-indigo-500 scale-[1.02]' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}
-            >
-              <div className="text-left">
-                <div className="text-2xl font-black text-white">{p.name || `Player ${p.id + 1}`}</div>
-                <div className="text-sm font-bold text-slate-500 uppercase">{p.score} {t.points}</div>
-              </div>
-              {r4SelectedPlayerId === p.id ? <CheckCircle size={36} className="text-indigo-500" /> : <div className="w-9 h-9 rounded-full border-2 border-slate-600" />}
-            </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 gap-6">
+    <CenteredGamePanel>
+      <Users size={52} className="mx-auto mb-3 shrink-0 text-indigo-500 animate-pulse" />
+      <header className="mb-4 shrink-0">
+        <h2 className="mb-1 text-3xl font-black uppercase tracking-tighter text-white sm:text-4xl">{t.playerName}</h2>
+        <p className="text-sm font-bold uppercase tracking-widest text-slate-400 sm:text-base">{t.confirmPlayerActive}</p>
+      </header>
+      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto px-1">
+        {gameState.players.map(p => (
           <button
-            onClick={() => showModal(t.mainMenu, t.confirmNav, () => navigateTo('start'))}
-            className="py-10 rounded-[2.5rem] bg-slate-800 text-white font-black text-3xl uppercase hover:bg-slate-700 transition-colors"
-          >
-            {t.cancel || "Cancel"}
-          </button>
-          <button
+            key={p.id}
             onClick={() => {
-              if (r4SelectedPlayerId === null) return;
-              const playerIdx = gameState.players.findIndex(p => p.id === r4SelectedPlayerId);
-              if (playerIdx === -1) return;
-
-              stopSong();
-              initializeRound(4);
-              setActiveNote(null);
-              setCurrentRoundPoints(undefined);
-              setTimeLeft(undefined);
-              setR4IsActiveSession(false);
-              setSelectedRow(null);
-              setR4CurrentSongIdx(0);
-              setShowTimerSettings(false);
-              setPlayedButNotEvaluated([]);
-              setGameState(prev => ({ ...prev, currentPlayerIndex: playerIdx, activeRoundId: 4 }));
-              setCurrentPage('round');
+              setR4SelectedPlayerId(p.id);
+              playSFX(SFX.select);
             }}
-            className={`py-10 rounded-[2.5rem] font-black text-3xl uppercase transition-all ${r4SelectedPlayerId !== null ? 'bg-indigo-600 text-white shadow-2xl hover:scale-105' : 'bg-slate-900 text-slate-700 cursor-not-allowed'}`}
-            disabled={r4SelectedPlayerId === null}
+            className={`flex min-h-[64px] w-full items-center justify-between rounded-2xl border-2 px-5 py-3 text-left transition-all ${r4SelectedPlayerId === p.id ? 'scale-[1.01] border-indigo-500 bg-indigo-900/40' : 'border-slate-700 bg-slate-800 hover:bg-slate-700'}`}
           >
-            {t.startGame || "Start Game"}
+            <div>
+              <div className="text-lg font-black text-white sm:text-xl">{p.name || `Player ${p.id + 1}`}</div>
+              <div className="text-xs font-bold uppercase text-slate-500 sm:text-sm">{p.score} {t.points}</div>
+            </div>
+            {r4SelectedPlayerId === p.id ? <CheckCircle size={28} className="shrink-0 text-indigo-500" /> : <div className="h-7 w-7 shrink-0 rounded-full border-2 border-slate-600" />}
           </button>
-        </div>
+        ))}
       </div>
-    </div>
+      <div className="grid shrink-0 grid-cols-2 gap-3">
+        <button onClick={() => showModal(t.mainMenu, t.confirmNav, () => navigateTo('start'))} className="min-h-14 rounded-2xl bg-slate-800 py-3 text-lg font-black uppercase text-white transition-colors hover:bg-slate-700 sm:text-xl">
+          {t.cancel || "Cancel"}
+        </button>
+        <button
+          onClick={() => {
+            if (r4SelectedPlayerId === null) return;
+            const playerIdx = gameState.players.findIndex(p => p.id === r4SelectedPlayerId);
+            if (playerIdx === -1) return;
+
+            stopSong();
+            initializeRound(4);
+            setActiveNote(null);
+            setCurrentRoundPoints(undefined);
+            setTimeLeft(undefined);
+            setR4IsActiveSession(false);
+            setSelectedRow(null);
+            setR4CurrentSongIdx(0);
+            setShowTimerSettings(false);
+            setPlayedButNotEvaluated([]);
+            setGameState(prev => ({ ...prev, currentPlayerIndex: playerIdx, activeRoundId: 4 }));
+            setCurrentPage('round');
+          }}
+          className={`min-h-14 rounded-2xl py-3 text-lg font-black uppercase transition-all sm:text-xl ${r4SelectedPlayerId !== null ? 'bg-indigo-600 text-white shadow-xl hover:scale-105' : 'cursor-not-allowed bg-slate-900 text-slate-700'}`}
+          disabled={r4SelectedPlayerId === null}
+        >
+          {t.startGame || "Start Game"}
+        </button>
+      </div>
+    </CenteredGamePanel>
   );
 
   const Round3VictoryView = () => {
@@ -2787,46 +2809,48 @@ const App: React.FC = () => {
     };
 
     return (
-      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950 p-8 text-center animate-in zoom-in duration-1000">
-        <div className="max-w-[900px] w-full">
+      <CenteredGamePanel animationClassName="animate-in zoom-in duration-1000">
+        <header className="shrink-0">
           <PartyPopper
-            size={120}
-            className="text-indigo-500 mx-auto mb-10 animate-bounce cursor-pointer"
+            size={56}
+            className="mx-auto mb-2 text-indigo-500 animate-bounce cursor-pointer"
             onClick={() => playSFX(SFX.select)}
           />
 
-          <h1 className="text-[6rem] font-black text-white mb-4 uppercase tracking-tighter leading-none">
+          <h1 className="mb-1 text-4xl font-black uppercase leading-none tracking-tighter text-white sm:text-5xl">
             {t.victory || "VICTORY!"}
           </h1>
-          <p className="text-2xl text-slate-400 mb-12 font-bold uppercase tracking-[0.3em] opacity-60">
+          <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-slate-400 opacity-80 sm:text-base">
             {t.congratulations || "CONGRATULATIONS!"}
           </p>
+        </header>
 
-          <div className="bg-slate-900 p-12 rounded-[4rem] border-4 border-indigo-500/40 mb-6 shadow-[0_40px_80px_rgba(79,70,229,0.3)] relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-6 opacity-10">
-              <Trophy size={100} />
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-1 text-left">
+          <div className="relative overflow-hidden rounded-3xl border-2 border-indigo-500/40 bg-slate-900 p-5 shadow-xl sm:p-6">
+            <div className="absolute right-3 top-3 opacity-10">
+              <Trophy size={64} />
             </div>
-            <div className="text-sm font-black text-indigo-500 uppercase tracking-[0.4em] mb-4">
+            <div className="mb-2 text-xs font-black uppercase tracking-[0.3em] text-indigo-400 sm:text-sm">
               {t.winner || "WINNER"}
             </div>
-            <div className="text-[5rem] font-black text-white mb-8 tracking-tighter leading-none">
+            <div className="mb-4 break-words text-3xl font-black leading-tight tracking-tighter text-white sm:text-4xl">
               {winner.name || `Player ${winner.id + 1}`}
             </div>
-            <div className="flex justify-center gap-16">
-              <div className="text-center">
-                <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-3">
+            <div className="flex justify-center gap-8 sm:gap-12">
+              <div className="min-w-0 text-center">
+                <div className="mb-1 text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 sm:text-xs">
                   {t.stars || "STARS"}
                 </div>
-                <div className="text-6xl font-black text-yellow-500 tabular-nums tracking-tighter">
+                <div className="text-3xl font-black tabular-nums tracking-tighter text-yellow-500 sm:text-4xl">
                   {winner.stars || 0}
                 </div>
               </div>
-              <div className="w-1 h-24 bg-slate-800 rounded-full" />
-              <div className="text-center">
-                <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-3">
+              <div className="w-px self-stretch bg-slate-800" />
+              <div className="min-w-0 text-center">
+                <div className="mb-1 text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 sm:text-xs">
                   {t.points || "POINTS"}
                 </div>
-                <div className="text-6xl font-black text-indigo-400 tabular-nums tracking-tighter">
+                <div className="text-3xl font-black tabular-nums tracking-tighter text-indigo-400 sm:text-4xl">
                   {winner.score}
                 </div>
               </div>
@@ -2834,28 +2858,28 @@ const App: React.FC = () => {
           </div>
 
           {gameState.players.length >= 2 && secondPlace && (
-            <div className="bg-slate-900/60 p-8 rounded-[3rem] border-2 border-slate-700/40 mb-6 shadow-xl">
-              <div className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-4">
+            <div className="rounded-2xl border border-slate-700/50 bg-slate-800/70 p-4 shadow-lg">
+              <div className="mb-1 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 sm:text-xs">
                 {t.secondPlace || "Second Place"}
               </div>
-              <div className="text-[3rem] font-black text-slate-300 mb-6 tracking-tight">
+              <div className="mb-2 break-words text-xl font-black tracking-tight text-slate-200 sm:text-2xl">
                 {secondPlace.name || `Player ${secondPlace.id + 1}`}
               </div>
-              <div className="flex justify-center gap-12">
+              <div className="flex justify-center gap-8">
                 <div className="text-center">
-                  <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-2">
+                  <div className="mb-1 text-[10px] font-black uppercase tracking-[0.15em] text-slate-500">
                     {t.stars || "STARS"}
                   </div>
-                  <div className="text-4xl font-black text-yellow-500/80 tabular-nums">
+                  <div className="text-2xl font-black tabular-nums text-yellow-500/80">
                     {secondPlace.stars || 0}
                   </div>
                 </div>
-                <div className="w-1 h-16 bg-slate-800/50 rounded-full" />
+                <div className="w-px bg-slate-800/70" />
                 <div className="text-center">
-                  <div className="text-slate-500 text-xs font-black uppercase tracking-[0.2em] mb-2">
+                  <div className="mb-1 text-[10px] font-black uppercase tracking-[0.15em] text-slate-500">
                     {t.points || "POINTS"}
                   </div>
-                  <div className="text-4xl font-black text-indigo-400/80 tabular-nums">
+                  <div className="text-2xl font-black tabular-nums text-indigo-400/80">
                     {secondPlace.score}
                   </div>
                 </div>
@@ -2864,51 +2888,51 @@ const App: React.FC = () => {
           )}
 
           {gameState.players.length >= 3 && thirdPlace && (
-            <div className="bg-slate-900/40 p-8 rounded-[3rem] border-2 border-slate-700/30 mb-8 shadow-lg">
-              <div className="text-sm font-black text-slate-500 uppercase tracking-[0.4em] mb-4">
+            <div className="rounded-2xl border border-slate-700/30 bg-slate-800/40 p-4 shadow-md">
+              <div className="mb-1 text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 sm:text-xs">
                 THIRD PLACE
               </div>
-              <div className="text-[2.5rem] font-black text-slate-400 mb-6 tracking-tight">
+              <div className="mb-2 break-words text-lg font-black tracking-tight text-slate-400 sm:text-xl">
                 {thirdPlace.name || `Player ${thirdPlace.id + 1}`}
               </div>
-              <div className="flex justify-center gap-10">
+              <div className="flex justify-center gap-8">
                 <div className="text-center">
-                  <div className="text-slate-600 text-xs font-black uppercase tracking-[0.2em] mb-2">
+                  <div className="mb-1 text-[10px] font-black uppercase tracking-[0.15em] text-slate-600">
                     {t.stars || "STARS"}
                   </div>
-                  <div className="text-3xl font-black text-yellow-500/60 tabular-nums">
+                  <div className="text-xl font-black tabular-nums text-yellow-500/60">
                     {thirdPlace.stars || 0}
                   </div>
                 </div>
-                <div className="w-1 h-12 bg-slate-800/40 rounded-full" />
+                <div className="w-px bg-slate-800/40" />
                 <div className="text-center">
-                  <div className="text-slate-600 text-xs font-black uppercase tracking-[0.2em] mb-2">
+                  <div className="mb-1 text-[10px] font-black uppercase tracking-[0.15em] text-slate-600">
                     {t.points || "POINTS"}
                   </div>
-                  <div className="text-3xl font-black text-indigo-400/60 tabular-nums">
+                  <div className="text-xl font-black tabular-nums text-indigo-400/60">
                     {thirdPlace.score}
                   </div>
                 </div>
               </div>
             </div>
           )}
-
-          <div className="flex gap-6 justify-center">
-            <button
-              onClick={handleClose}
-              className="px-10 py-6 bg-slate-800 text-white rounded-[2rem] font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-slate-900/40 uppercase tracking-[0.2em] flex items-center gap-4"
-            >
-              <XCircle size={28} /> {t.close || "CLOSE"}
-            </button>
-            <button
-              onClick={handleReset}
-              className="px-10 py-6 bg-indigo-600 text-white rounded-[2rem] font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-indigo-900/40 uppercase tracking-[0.2em] flex items-center gap-4"
-            >
-              <RotateCcw size={28} /> {t.reset || "RESET GAME"}
-            </button>
-          </div>
         </div>
-      </div>
+
+        <footer className="mt-4 flex shrink-0 gap-3">
+          <button
+            onClick={handleClose}
+            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-800 px-4 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-slate-900/40 transition-all hover:scale-[1.02] active:scale-95 sm:text-base"
+          >
+            <XCircle size={20} /> {t.close || "CLOSE"}
+          </button>
+          <button
+            onClick={handleReset}
+            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 py-3 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-indigo-900/40 transition-all hover:scale-[1.02] active:scale-95 sm:text-base"
+          >
+            <RotateCcw size={20} /> {t.reset || "RESET GAME"}
+          </button>
+        </footer>
+      </CenteredGamePanel>
     );
   };
 
