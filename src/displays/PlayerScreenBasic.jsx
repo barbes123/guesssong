@@ -264,7 +264,8 @@ const PlayerScreen = () => {
     showScoreboard,
     r3Selection,
     r4SelectedPlayerId,
-    r4CurrentSongIdx
+    r4CurrentSongIdx,
+    r4RulesDismissed
   } = state;
 
   const t = translations[language] || translations['en'];
@@ -836,6 +837,19 @@ const PlayerScreen = () => {
               {currentPlayer.score} <span className="text-2xl font-bold uppercase text-indigo-400/50 ml-2">pts</span>
             </div>
           </div>
+
+          {/* ROUND 4 RULES */}
+          {!r4RulesDismissed && <div className="bg-slate-900/50 border-2 border-slate-800 rounded-[2.5rem] px-8 py-5 text-center">
+            <div className="text-sm font-black text-slate-400 uppercase tracking-[0.2em] mb-2">{t.round4Rules}</div>
+            <div className="text-xl lg:text-2xl font-black text-white">
+              {t.correctAnswers}: <span className="text-indigo-400">10 → 20 → 30 → 40 → 50 → 60 → 70 {t.pointsShort}</span>
+            </div>
+            <div className="text-base lg:text-lg font-bold text-slate-300 mt-1">
+              <span className="text-emerald-400">{t.allSevenCorrectBonus}</span>
+              <span className="text-slate-600 mx-3">·</span>
+              {t.oneWrongEndsRound}
+            </div>
+          </div>}
 
         </div>
       </div>
