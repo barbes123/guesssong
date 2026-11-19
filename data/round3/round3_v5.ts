@@ -30,7 +30,7 @@ export const round3v5Set: RoundSet = {
           id: 'q7',
           title: 'Такси, такси',
           artist: 'Игорь Николаев',
-          audioUrl: audioUrl('green_taxi-minus_cut', '/music/round3/green_taxi-minus_cut.mp3'),
+          audioUrl: audioUrl('green_taxi-minus_cut', '/music/round3/green_taxI-minus.mp3'),
           audioUrlFull: audioUrl('green_taxi.mp3', '/music/round3/green_taxi.mp3'),
           notes: 'Ночью после закрытия ресторана двое решают оставить машину и остановить попутку. В машине только они, водитель молчит, огни города проносятся мимо окна. Это песня о побеге — не от кого-то, а от суеты, о желании просто обнять кого-то и вместе встретить рассвет. Иногда самый романтичный момент случается не в роскошном автомобиле, а на заднем сиденье обычного такси.',
           hint: {
@@ -66,7 +66,7 @@ export const round3v5Set: RoundSet = {
           id: 'q10',
           title: 'Солнышко',
           artist: 'Демо',
-          audioUrl: audioUrl('solnyshko_cut', '/music/round3/solnyshko_cut.mp3'),
+          audioUrl: audioUrl('solnyshko_cut', '/music/round3/solnyshko.mp3'),
           audioUrlFull: audioUrl('solnyshko', '/music/round3/solnyshko.mp3'),
           notes: 'Группа «Демо» была одним из самых ярких представителей российского евродэнса конца 90-х. «Солнышко» вышла в 1999 году и мгновенно стала хитом — её крутили на всех радиостанциях и в клубах. Солистка Саша Зверева позже признавалась, что текст песни казался ей «слишком детским», но именно это и сделало её народной.',
           hint: {

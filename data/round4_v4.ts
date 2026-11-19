@@ -19,8 +19,8 @@ const R4R44full  = audioUrl('davay-za--lyube_jkl012', '/music/round4/davay-za--l
 const R4R45minus = audioUrl('gruppa_krovi_minus_cut_mno345', '/music/round4/gruppa_krovi_minus_cut.mp3');
 const R4R45full  = audioUrl('gruppa_krovi_pqr678', '/music/round4/gruppa_krovi.mp3');
 
-const R4R46minus = audioUrl('', '/music/round4/mumiy-troll-live-nik--vladivostok-2000_minus_cut.mp3'); // Minus not found in the list
-const R4R46full  = audioUrl('', '/music/round4/mumiy-troll-live-nik--vladivostok-2000'); // Full not found in the list
+const R4R46minus = audioUrl('', '/music/round4/mumiy-troll-live-nik--vladivostok-2000_minus_cut.mp3'); 
+const R4R46full  = audioUrl('', '/music/round4/mumiy-troll-live-nik--vladivostok-2000.mp3');
 
 const R4R47minus = audioUrl('Diskoteka_Avariya_Novogodnyaya_minus_cut_stu901', '/music/round4/Diskoteka_Avariya_Novogodnyaya_minus_cut.mp3');
 const R4R47full  = audioUrl('Diskoteka_Avariya_Novogodnyaya_vwx234', '/music/round4/Diskoteka_Avariya_Novogodnyaya.mp3');
