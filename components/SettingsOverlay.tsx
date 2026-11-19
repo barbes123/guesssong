@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff, Plug, Unplug, MonitorPlay, MonitorPause, Sparkles } from 'lucide-react';
+import { Music, VolumeX, Maximize, Minimize, Languages, Home, Play, RotateCcw, Wifi, WifiOff, Plug, Unplug, MonitorPlay, MonitorPause, Sparkles, Trophy } from 'lucide-react';
 import { Language } from '../types';
 
 interface SettingsOverlayProps {
@@ -12,6 +12,8 @@ interface SettingsOverlayProps {
   onFullscreenToggle: () => void;
   isScreensaverActive: boolean;
   onToggleScreensaver: () => void;
+  isScoreboardActive: boolean;
+  onToggleScoreboard: () => void;
   onGoHome: () => void;
   onGoStart: () => void;
   onReset: () => void;
@@ -36,6 +38,8 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
   onFullscreenToggle,
   isScreensaverActive,
   onToggleScreensaver,
+  isScoreboardActive,
+  onToggleScoreboard,
   onGoHome,
   onGoStart,
   onReset,
@@ -177,6 +181,18 @@ const SettingsOverlay: React.FC<SettingsOverlayProps> = ({
           {isScreensaverActive ? <MonitorPause size={24} /> : <MonitorPlay size={24} />}
           <span className="pointer-events-none absolute left-1/2 top-full z-[80] mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
             {isScreensaverActive ? t.stopScreensaver : t.startScreensaver}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={onToggleScoreboard}
+          aria-label={isScoreboardActive ? (t.close || 'Hide Scoreboard') : (t.scorePanel || 'Scoreboard')}
+          aria-pressed={isScoreboardActive}
+          className={`group relative p-3 rounded-full transition-all hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400 ${isScoreboardActive ? 'text-amber-300 bg-amber-900/40' : 'text-slate-300 hover:bg-slate-700'}`}
+        >
+          <Trophy size={24} />
+          <span className="pointer-events-none absolute left-1/2 top-full z-[80] mt-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+            {isScoreboardActive ? (t.close || 'Hide Scoreboard') : (t.scorePanel || 'Scoreboard')}
           </span>
         </button>
         <button
