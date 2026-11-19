@@ -423,12 +423,22 @@
   transition: transform .2s ease, filter .2s ease;
 }
 
+.retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="available"] .retro-note-art {
+  opacity: .5;
+}
+
 .retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="playing"] .retro-note-art {
+  opacity: 1;
   filter: brightness(1.28) saturate(1.15) drop-shadow(0 0 8px rgba(255, 226, 83, .95)) drop-shadow(0 0 18px rgba(255, 174, 28, .8));
   transform: translate(-50%, -50%) scale(1.07);
 }
 
+.retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="playing"] {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 .retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="active"] .retro-note-art {
+  opacity: 1;
   filter: brightness(1.18) drop-shadow(0 0 7px rgba(255, 218, 73, .85));
 }
 
@@ -438,6 +448,11 @@
 
 .retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="wrong"] .retro-note-art {
   filter: saturate(.58) brightness(.68) drop-shadow(0 0 3px rgba(255, 70, 70, .35));
+}
+
+.retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="wrong"] {
+  opacity: .5;
+  filter: grayscale(50%);
 }
 
 .retro-show .retro-sprint-staff .retro-sprint-note[data-note-state="used"] .retro-note-art {
