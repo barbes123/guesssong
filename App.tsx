@@ -1834,11 +1834,22 @@ const App: React.FC = () => {
         handleDisarm();
 
         // Clean up
+        if (status === 'wrong') {
+          // A wrong answer ends Round 4 immediately. The existing victory view
+          // ranks the players by stars and score once the answer is recorded.
+          setR4IsActiveSession(false);
+          setTimeLeft(undefined);
+        }
         stopSong(true);
         setActiveNote(null);
         setCurrentRoundPoints(undefined);
         // setTimeLeft(undefined);
         setModal(null); // close confirmation modal
+
+        if (status === 'wrong') {
+          setVictoryContext({ roundId: null, winnerId: null });
+          setShowVictory(true);
+        }
       };
 
       if (skipConfirmation) {
