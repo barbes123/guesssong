@@ -1,0 +1,11 @@
+{
+  "SERVER_IP": "192.168.1.137",
+  "AI_IP": "192.168.1.137",
+  "PHONES_PORT": 3001,
+  "PADS_PORT": 3002,
+  "LEADER_PORT": 3003,
+   "AI_PORT": 3004,
+  "MAX_PLAYERS": 10,
+  "LEADER_PASS": "leader123",
+  "HOST_PASSWORD": "dumon"
+}
