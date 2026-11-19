@@ -1173,7 +1173,7 @@ const PlayerScreenContent = () => {
                         } else if (result === 'wrong') {
                           songBgColor = 'bg-gradient-to-b from-rose-500/20 to-rose-900/40';
                           songBorderColor = 'border-rose-500/50';
-                          songShadow = 'shadow-[inset_0_1px_0_rgba(244,63,94,0.2)]';
+                          songShadow = 'opacity-50 grayscale-[50%]';
                         } else if (isNoteActive) {
                           songBgColor = 'bg-gradient-to-b from-indigo-500/30 to-indigo-900/60';
                           // HIGHLIGHT: Intense white border and glow when playing
