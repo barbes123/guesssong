@@ -6,7 +6,8 @@ import configBuzz from '../../configBuzz.json';
 const LeaderDisplay = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [passwordInput, setPasswordInput] = useState('');
-    const [songInfo, setSongInfo] = useState({ title: '', artist: '', notes: '' });
+    const [songInfo, setSongInfo] = useState({ id: '', title: '', artist: '', notes: '' });
+    const [lyrics, setLyrics] = useState(null);
     const [categoryInfo, setCategoryInfo] = useState({ name: '', description: '' });
     const [error, setError] = useState('');
     const [socketConnected, setSocketConnected] = useState(false);
@@ -50,6 +51,41 @@ const LeaderDisplay = () => {
         return obj.ru || obj.en || '';
     };
 
+    // Load lyrics from the matching file in the public directory.
+    useEffect(() => {
+        if (!songInfo.id) {
+            setLyrics(null);
+            return;
+        }
+
+        const controller = new AbortController();
+        let isCurrentRequest = true;
+        setLyrics(null);
+
+        fetch(`/lyrics/${songInfo.id}.txt`, { signal: controller.signal })
+            .then((response) => {
+                if (!response.ok) throw new Error(`Lyrics request failed (${response.status})`);
+                const contentType = response.headers.get('content-type') || '';
+                if (/text\/html|application\/xhtml\+xml/i.test(contentType)) {
+                    throw new Error('Lyrics response was HTML');
+                }
+                return response.text();
+            })
+            .then((text) => {
+                if (isCurrentRequest && text.trim()) {
+                    setLyrics({ songId: songInfo.id, text });
+                }
+            })
+            .catch(() => {
+                if (isCurrentRequest) setLyrics(null);
+            });
+
+        return () => {
+            isCurrentRequest = false;
+            controller.abort();
+        };
+    }, [songInfo.id]);
+
     // 1. Initial Authentication Check
     useEffect(() => {
         const isAuth = sessionStorage.getItem('leaderAuthenticated');
@@ -87,8 +123,9 @@ const LeaderDisplay = () => {
             const song = data.currentSong || data;
 
             // Update song info
-            if (song && (song.title || song.notes)) {
+            if (song && (song.id || song.title || song.notes)) {
                 setSongInfo({
+                    id: song.id || '',
                     title: song.title || '',
                     artist: song.artist || '',
                     notes: song.notes || song.hint || ''
@@ -133,16 +170,18 @@ const LeaderDisplay = () => {
     // 4. LocalStorage Sync (For same-device testing)
     useEffect(() => {
         if (!isAuthenticated) return;
-        let lastTitle = '';
+        let lastSongKey = '';
 
         const checkStorage = () => {
             const saved = localStorage.getItem('musicQuizPlayerState');
             if (saved) {
                 const state = JSON.parse(saved);
                 const song = state.currentSong;
-                if (song && song.title !== lastTitle) {
-                    lastTitle = song.title;
+                const songKey = song ? `${song.id || ''}:${song.title || ''}` : '';
+                if (song && songKey !== lastSongKey) {
+                    lastSongKey = songKey;
                     setSongInfo({
+                        id: song.id || '',
                         title: song.title || '',
                         artist: song.artist || '',
                         notes: song.notes || ''
@@ -222,9 +261,9 @@ const LeaderDisplay = () => {
 
                 <div style={{ marginBottom: '15px', borderBottom: '3px solid #000', paddingBottom: '15px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
-                    <h1 style={{ fontSize: '24px', textTransform: 'uppercase', fontWeight: 'bold', margin: '0' }}>
-                        Now Playing
-                    </h1>
+                        <h1 style={{ fontSize: '24px', textTransform: 'uppercase', fontWeight: 'bold', margin: '0' }}>
+                            Now Playing
+                        </h1>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             {fullscreenError && (
                                 <div role="alert" style={{ maxWidth: 'min(240px, 55vw)', color: '#b91c1c', fontSize: '12px', textAlign: 'right' }}>
@@ -327,6 +366,30 @@ const LeaderDisplay = () => {
                         {songInfo.notes || 'No notes for this song.'}
                     </p>
                 </div>
+
+                {lyrics?.songId === songInfo.id && (
+                    <div style={{
+                        marginTop: '16px',
+                        backgroundColor: '#fafafa',
+                        padding: '20px',
+                        borderRadius: '8px',
+                        border: '2px solid #ddd',
+                        maxHeight: '55vh',
+                        overflowY: 'auto',
+                        overflowWrap: 'anywhere'
+                    }}>
+                        <label style={{ fontWeight: 'bold', display: 'block', fontSize: '12px', textTransform: 'uppercase', marginBottom: '10px', color: '#666' }}>Lyrics</label>
+                        <p style={{
+                            fontSize: '18px',
+                            margin: '0',
+                            lineHeight: '1.5',
+                            whiteSpace: 'pre-wrap',
+                            textAlign: 'center'
+                        }}>
+                            {lyrics.text}
+                        </p>
+                    </div>
+                )}
 
                 <div style={{ marginTop: '40px', textAlign: 'center', fontSize: '11px', color: socketConnected ? '#4caf50' : '#f44336', fontWeight: 'bold' }}>
                     {socketConnected ? '● LIVE CONNECTION ACTIVE' : '○ DISCONNECTED - RECONNECTING...'}
