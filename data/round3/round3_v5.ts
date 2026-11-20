@@ -19,7 +19,7 @@ export const round3v5Set: RoundSet = {
           title: 'Всё идёт по плану',
           artist: 'Гражданская Оборона',
           audioUrl: audioUrl('vse_idet_po_planu_minus_cut', '/music/round3/vse_idet_po_planu_minus_cut.mp3'),
-          audioUrlFull: audioUrl('vse_idet_po_planu.mp3', '/music/round3/vse_idet_po_planu.mp3'),
+          audioUrlFull: audioUrl('vse_idet_po_planu.mp3', '/music/round3/vse_idet_po_planu_good.mp3'),
           notes: 'Записана в 1987 году в домашних условиях — Егор Летов использовал самодельное оборудование и записывал вокал в ванной для лучшей акустики. Песня стала неофициальным гимном советского андеграунда и до сих пор звучит на протестных акциях. Сам Летов называл её «песней о том, что каждый человек — винтик, но винтик, который это осознаёт».',
           hint: {
             en: 'Imagine you were given a schedule for your whole life — and forgot to ask whether you want to follow it. This song is not about rebellion with fists, but about the tired smirk of a man who long ago understood: the system has laid everything out on shelves, and he still just stands and watches. Behind the words hides a cold fury — as if someone very calmly informs you that there is no way out.',
@@ -30,7 +30,7 @@ export const round3v5Set: RoundSet = {
           id: 'q7',
           title: 'Такси, такси',
           artist: 'Игорь Николаев',
-          audioUrl: audioUrl('green_taxi-minus_cut', '/music/round3/green_taxI-minus.mp3'),
+          audioUrl: audioUrl('green_taxi-minus_cut', '/music/round3/green_taxi-minus_cut.mp3'),
           audioUrlFull: audioUrl('green_taxi.mp3', '/music/round3/green_taxi.mp3'),
           notes: 'Ночью после закрытия ресторана двое решают оставить машину и остановить попутку. В машине только они, водитель молчит, огни города проносятся мимо окна. Это песня о побеге — не от кого-то, а от суеты, о желании просто обнять кого-то и вместе встретить рассвет. Иногда самый романтичный момент случается не в роскошном автомобиле, а на заднем сиденье обычного такси.',
           hint: {
