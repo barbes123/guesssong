@@ -188,7 +188,7 @@ export const timesOfChangeCat: Category = {
     },
     songs: [
       {
-        id: 'SI_AFARA_PLOUA',
+        id: 'PLOUA',
         title: 'Și afară plouă',
         artist: 'Marina Voica',
         audioUrl: audioUrl('Marina_Voica_Si_afara_ploua_ploua_minus_cut_u7istl.mp3', '/music/round1/Marina_Voica_Si_afara_ploua_ploua_minus_cut.mp3'),
@@ -196,7 +196,7 @@ export const timesOfChangeCat: Category = {
         notes: 'Лирическая румынская песня о дожде и тоске по любимому. Исполняет Marina Voica — одна из самых узнаваемых голосов румынской эстрады. Название переводится как «И на улице идёт дождь».'
       },
       {
-        id: 'DRAGOSTEA_DIN_TEI',
+        id: 'DRAGOSTEA',
         title: 'Dragostea din tei',
         artist: 'O-Zone',
         audioUrl: audioUrl('O-Zone-Dragostea-Din-Tei_minus_cut', '/music/round1/O-Zone-Dragostea-Din-Tei_minus_cut.mp3'),
@@ -204,7 +204,7 @@ export const timesOfChangeCat: Category = {
         notes: 'Легендарный хит 2004 года, известный во всём мире как «Numa Numa». Молдавская группа O-Zone (Dan Bălan, Arsenie Todiraș, Radu Sîrbu). Музыка и слова — Dan Bălan. «Dragostea din tei» переводится как «Любовь из липы». Одна из самых продаваемых песен в истории Европы.'
       },
       {
-        id: 'SUB_PIELEA_MEA_EROINA',
+        id: 'EROINA',
         title: 'Sub pielea mea (Eroina)',
         artist: 'Carla\'s Dreams',
         audioUrl: audioUrl('Carlas_Dreams_Sub_Pielea_Mea_eroina_minus_cut_cnalsf.mp3', '/music/round1/Carlas_Dreams_Sub_Pielea_Mea_eroina_minus_cut.mp3'),
@@ -212,12 +212,12 @@ export const timesOfChangeCat: Category = {
         notes: 'Современный румынский хит от Carla\'s Dreams (Carla и Alex Cotoi). Название переводится как «Под кожей моей, героиня». Танцевальный трек с элементами румынского фольклора и поп-музыки.'
       },
       {
-        id: 'O_LUME_MINUNATA',
+        id: 'LUMEMI',
         title: 'O lume minunată',
         artist: 'Mihai Constantinescu',
         audioUrl: audioUrl('Mihai_Constantinescu_O_lume_minunata_minus_cut_bq9mhv.mp3', '/music/round1/Mihai_Constantinescu_O_lume_minunata_minus_cut.mp3'),
         audioUrlFull: audioUrl('Mihai_Constantinescu_O_lume_minunata_new_gagene.mp3', '/music/round1/Mihai_Constantinescu_O_lume_minunata_new.mp3'),
-        notes: 'Задушевная песня Mihai Constantinescu — одного из классиков румынской эстрады. Название переводится как «Прекрасный мир». В папке также есть версия `_new` и полный минус, если понадобится альтернативный вариант.'
+        notes: 'Задушевная песня Mihai Constantinescu — одного из классиков румынской эстрады. Название переводится как «Прекрасный мир».'
       }
     ]
   };
