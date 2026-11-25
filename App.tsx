@@ -1831,18 +1831,42 @@ const App: React.FC = () => {
           }
         }));
 
-        // setActiveResponder(null);
-        // handleDisarm();
-        // if (buzzerSocket) {
-        //   buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
-        // }
-        handleDisarm();
+        if (status === 'wrong') {
+          if (countdownIntervalRef.current) {
+            window.clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
+          stopSong(false);
+          setActiveResponder(null);
+          handleDisarm();
+          if (buzzerSocket) {
+            buzzerSocket.emit('gameAction', { type: 'SET_STATE', data: { state: 'IDLE' } });
+          }
+          setGameState(prevState => {
+            const sprintProgress = prevState.roundProgress[roundId];
+            if (!sprintProgress) return prevState;
+            const usedRows = new Set(sprintProgress.usedRows || []);
+            if (selectedRow !== null) usedRows.add(selectedRow);
+            return {
+              ...prevState,
+              roundProgress: {
+                ...prevState.roundProgress,
+                [roundId]: { ...sprintProgress, usedRows }
+              }
+            };
+          });
+          setR4IsActiveSession(false);
+          setTimeLeft(0);
+          playSFX(SFX.scoreboard);
+          setShowScoreboard(true);
+        } else {
+          handleDisarm();
 
-        // Clean up
-        stopSong(true);
-        setActiveNote(null);
-        setCurrentRoundPoints(undefined);
-        // setTimeLeft(undefined);
+          // Clean up
+          stopSong(true);
+          setActiveNote(null);
+          setCurrentRoundPoints(undefined);
+        }
         setModal(null); // close confirmation modal
       };
 
