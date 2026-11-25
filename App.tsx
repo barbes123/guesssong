@@ -156,6 +156,7 @@ const App: React.FC = () => {
     position?: 'center' | 'inline';
   } | null>(null);
   const [showScoreboard, setShowScoreboard] = useState(false);
+  const [isScoreboardDisplayActive, setIsScoreboardDisplayActive] = useState(false);
   const [showVictory, setShowVictory] = useState(false);
   const [isScreensaverActive, setIsScreensaverActive] = useState(false);
   const [isAIModuleOpen, setIsAIModuleOpen] = useState(false);
@@ -652,6 +653,7 @@ const App: React.FC = () => {
       victoryContext: victoryContext,
       showVictory: showVictory,
       showScoreboard: showScoreboard,
+      isScoreboardDisplayActive: isScoreboardDisplayActive,
       r4SelectedPlayerId: r4SelectedPlayerId,
       language: gameState.language,
       currentSong: currentSong,
@@ -682,6 +684,7 @@ const App: React.FC = () => {
     victoryContext,
     showVictory,
     showScoreboard,
+    isScoreboardDisplayActive,
     r4SelectedPlayerId,
     activeResponder,
     showBuzzerPopup,
@@ -2958,8 +2961,8 @@ const App: React.FC = () => {
           isAIModuleOpen={isAIModuleOpen}
           isAIModuleEnabled={isAIModuleEnabled}
           onToggleAIModule={() => setIsAIModuleOpen(open => !open)}
-          isScoreboardActive={showScoreboard}
-          onToggleScoreboard={() => setShowScoreboard(active => !active)} 
+          isScoreboardActive={isScoreboardDisplayActive}
+          onToggleScoreboard={() => setIsScoreboardDisplayActive(active => !active)}
         />
         {/* {currentPage === 'setup' && (
           <SetupView

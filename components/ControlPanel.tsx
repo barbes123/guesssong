@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Square, CheckCircle, XCircle, Clock, Trophy } from 'lucide-react';
+import { Play, Square, CheckCircle, XCircle, Clock, Trophy, Music2 } from 'lucide-react';
 import { getAvailableSets } from '../data/index_data';
 import type { GameState } from '../types';
 
@@ -150,21 +150,39 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       <div className="w-full h-px bg-slate-800" />
 
       {/* 🟢 NEW ROW: FINISH ROUND (Full Width) */}
+      <div className="grid grid-cols-2 gap-2">
 
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          onFinishRound?.();
-        }}
-        className="w-full mt-2 flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-900 hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-900/10 group"
-      >
-        <Trophy size={16} className="group-hover:animate-bounce" />
-        <span className="text-[8px] font-black uppercase tracking-widest">
-          {t.finishRound || "Finish Round"}
-        </span>
-      </button>
+        <div>
+          <input
+            id="full-songs-autoplay"
+            type="checkbox"
+            role="switch"
+            aria-label={t.autoPlayFullSongs}
+            className="peer sr-only"
+          />
+          <label
+            htmlFor="full-songs-autoplay"
+            className="flex cursor-pointer flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all duration-200 after:rounded after:px-1 after:py-0.5 after:text-[7px] after:tracking-widest bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700 hover:text-orange-300 hover:border-orange-500/40 hover:scale-105 active:scale-95 after:content-['OFF'] after:bg-slate-900 after:text-slate-500 peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-400/50 peer-checked:shadow-lg peer-checked:shadow-orange-900/20 peer-checked:hover:bg-orange-500 peer-checked:after:content-['ON'] peer-checked:after:bg-orange-950/40 peer-checked:after:text-orange-100"
+          >
+            <Music2 size={16} />
+            <span className="text-[8px] font-black uppercase tracking-widest">{t.autoPlayFullSongs}</span>
+          </label>
+        </div>
 
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onFinishRound?.();
+          }}
+          className="w-full flex flex-col items-center justify-center gap-0.5 py-2 rounded-lg font-black transition-all bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500 hover:text-slate-900 hover:scale-[1.02] active:scale-95 shadow-lg shadow-amber-900/10 group"
+        >
+          <Trophy size={16} className="group-hover:animate-bounce" />
+          <span className="text-[8px] font-black uppercase tracking-widest">
+            {t.finishRound || "Finish Round"}
+          </span>
+        </button>
+      </div>
     </div>
   );
 };
