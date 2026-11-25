@@ -238,8 +238,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
                         const thisSongWrong = playerProg?.wrongIndex === songIdx;
                         const thisSongFinished = thisSongCorrect || thisSongWrong;
 
-                        // 🔴 THE LOCK: If time is up, only allow if this specific song is finished
-                        const canSelect = !isTimeOver || thisSongFinished;
+                        const canSelect = true;
 
                         const isActive = activeNote ? (r4CurrentSongIdx === songIdx) : (songIdx === r4CurrentSongIdx);
 
@@ -312,7 +311,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             t={t}
 
             // 🟢 Play only enabled if a note is selected AND (Time > 0 OR that specific song is finished)
-            isStartDisabled={!activeNote || (isTimeOver && !isSongFinished)}
+            isStartDisabled={!activeNote}
 
             // 🟢 Actions locked by the global state (including timeLeft === 0)
             disabledActions={!activeNote || shouldDisableActions}
@@ -337,7 +336,7 @@ const RoundSprint: React.FC<RoundSprintProps> = ({
             onFinishRound={onFinishRound}
             t={t}
             disabledActions={isAIModuleOpen || shouldDisableActions}
-            isStartDisabled={!activeNote || (isTimeOver && !isSongFinished)}
+            isStartDisabled={!activeNote}
           />
           <MusicTimeline
             isPlaying={isPlaying}

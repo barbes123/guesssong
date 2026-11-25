@@ -1235,6 +1235,15 @@ const App: React.FC = () => {
       const pId = gameState.players[gameState.currentPlayerIndex].id;
       const playerProg = progress.r4PlayerProgress?.[pId];
 
+      if (timeLeft === 0) {
+        if (isPlaying) return;
+        stopSong(false);
+        setR4CurrentSongIdx(noteIndex);
+        setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
+        playSFX(SFX.select);
+        return;
+      }
+
       if (playerProg?.hasFinished) {
         stopSong(false);
         setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
@@ -1248,7 +1257,7 @@ const App: React.FC = () => {
       const usedRowsSet = progress.usedRows || new Set();
 
       // If the row is already used, only allow correct songs (as reveals)
-      if (usedRowsSet.has(row)) {
+      if (timeLeft !== 0 && usedRowsSet.has(row)) {
         if (isCorrect) {
           stopSong(false);                             // preserve timer at 0
           setActiveNote({ categoryId: 'r4_sprint', noteIndex, isReveal: true });
@@ -1409,7 +1418,7 @@ const App: React.FC = () => {
       }
 
       const isRevealMode = activeNote.isReveal ||
-        (isSprintRound && (!r4IsActiveSession || isSongCorrect)) ||
+        (isSprintRound && (timeLeft === 0 || !r4IsActiveSession || isSongCorrect)) ||
         (isFinalRound && progress.currentTurnIndex !== songIndex);
 
       // const isRevealMode = activeNote.isReveal || (isSprintRound && !r4IsActiveSession) || (isFinalRound && progress.currentTurnIndex !== songIndex);
@@ -1593,7 +1602,7 @@ const App: React.FC = () => {
 
         // Compute reveal mode – matches startPlayback exactly
         const isRevealMode = activeNote.isReveal ||
-          (isSprintRound && (!r4IsActiveSession || isSongCorrect)) ||
+          (isSprintRound && (timeLeft === 0 || !r4IsActiveSession || isSongCorrect)) ||
           (isFinalRound && progress.currentTurnIndex !== songIndex);
 
 
