@@ -67,6 +67,37 @@ If a port is locked or in use, release it using:
 Cut audio files using FFmpeg (e.g., extract segment from 00:00:50 to 00:02:00):
   ffmpeg -i nadezhda-kadysheva-techet-ruchey-minus.mp3 -vn -acodec copy -ss 00:00:50 -to 00:02:00 nadezhda-kadysheva-techet-ruchey-minus_cut.mp3
 
+
+## Download
+
+mkdir -p ~/.local/bin
+
+curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp \
+  -o ~/.local/bin/yt-dlp
+
+chmod +x ~/.local/bin/yt-dlp
+
+
+~/.local/bin/yt-dlp --version
+
+
+~/.local/bin/yt-dlp --update-to nightly
+
+
+~/.local/bin/yt-dlp -f "bv*+ba/b" \
+  --merge-output-format mp4 \
+  "https://www.youtube.com/watch?v=RZwoiUj-LP0"
+
+
+  ~/.local/bin/yt-dlp \
+  -x \
+  --audio-format mp3 \
+  --audio-quality 0 \
+  -P . \
+  "https://www.youtube.com/watch?v=RZwoiUj-LP0"
+
+   ~/.local/bin/yt-dlp -x --audio-format mp3 --audio-quality 0 -P .  --no-playlist "https://www.youtube.com/watch?v=RZwoiUj-LP0"
+
 ---
 
 ## 🔧 Troubleshooting
