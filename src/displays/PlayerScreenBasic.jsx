@@ -262,6 +262,7 @@ const PlayerScreen = () => {
     showVictory,
     victoryContext,
     showScoreboard,
+    isScoreboardDisplayActive,
     r3Selection,
     r4SelectedPlayerId,
     r4CurrentSongIdx,
@@ -1204,6 +1205,10 @@ const PlayerScreen = () => {
       </>
     );
   };
+  if (isScoreboardDisplayActive) {
+    return renderScoreboard();
+  }
+
   if (currentPage === 'victory' || showVictory) {
     return renderVictory();
   }
